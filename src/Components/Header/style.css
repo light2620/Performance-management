@@ -1,0 +1,94 @@
+.header-bar{
+    height: 10vh;
+    width: 100%;
+    box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+
+}
+
+.header-container{
+   display: flex;
+   width: 90%;
+   padding: 10px 30px ;
+   height: 100%;
+   justify-content: flex-end;
+   align-items: center;
+}
+
+
+.header-action-cont{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    
+}
+.profile-icon{
+    border-radius: 50%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background-color: #5638B0;
+}
+.user-info{
+    display: flex;
+    flex-direction: column;
+    gap: 2px
+}
+.user-info p{
+     padding: .125rem .625rem;
+}
+
+.user-info span{
+    font-size: 14px;
+    font-weight: 600;
+    color: black;
+    font-size: .75rem;
+    padding: .125rem .625rem;
+    background-color: #F5F5F7;
+    border-radius: 9999px;;
+}
+
+.logout-btn{
+       font-size: 1rem;
+    font-weight: 500;
+}
+
+.logout-btn button{
+    font-size: inherit;
+    font-weight: inherit;
+     background-color: #F5F5F7;
+     border : 2px solid #E5E6EB;
+     padding: .35rem .75rem;
+     border-radius: 4px;
+     display: flex;
+     align-items: center;
+     gap: 5px;
+     cursor: pointer;
+}
+
+.logout-btn button:hover{
+     background-color: #e7e7e8;
+}
+
+.logout-btn button:active{
+    transition: .9s;
+}
+
+
+@media(max-width: 1300px){
+    .nav-logo-cont{
+        width: 40%;
+    }
+}
+
+
+@media(max-width: 769px){
+    .nav-logo-cont{
+        width: 30%;
+    }
+}

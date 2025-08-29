@@ -1,0 +1,34 @@
+
+.info-column{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    height: 90vh;
+   
+}
+.welcome-title{
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+.welcome-title h1{
+    font-weight: 700;
+    font-size: 1.875rem;
+}
+
+.welcome-title p{
+    color: #76767B;
+}
+
+
+.performance-cont{
+    display: flex;
+    gap: 10px;
+}
+
+@media(max-width: 769px){
+    .performance-cont{
+        flex-direction: column;
+    }
+}

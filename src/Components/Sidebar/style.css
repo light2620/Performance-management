@@ -1,0 +1,40 @@
+.navbar-cont{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-option,
+.active-option{
+    display: flex;
+    align-items: center; 
+    gap: 10px;
+     color: black;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.active-option{
+    background-color:  #5638B0;
+    color : white;
+    border-radius: 6px;
+}
+
+.nav-option:hover{
+    background-color: #5638b025;
+    border-radius: 6px;
+}
+
+.setting-cont{
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-option-cont{
+ 
+}
+
+.border-remove{
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}

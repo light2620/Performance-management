@@ -1,0 +1,54 @@
+.performance-option{
+    padding: 1.5rem;
+    display: flex; 
+    align-items: center;
+    gap: 20px;
+    border-radius: 10px;
+    width: 25%;
+    
+}
+
+.performance-logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    border-radius: 8px;
+}
+
+.merit-cont{
+    border : 2px solid #dfd7fb;
+    background-color: #ede9fc;
+}
+
+.merit-logo{
+    background-color: #5638b018;
+}
+
+
+.demerit-cont{
+    background-color: #fbe6e6;
+    border: 2px solid #ffd4d4;
+}
+
+.demerit-logo{
+    background-color: #eb263018
+;
+}
+
+.total-points p {
+    font-size: .875rem;
+    columns: #717275;
+
+}
+
+.total-points span{
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+@media(max-width: 769px){
+    .performance-option{
+        width: 100%;
+    }
+}

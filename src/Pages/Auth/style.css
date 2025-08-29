@@ -1,0 +1,164 @@
+.login-container,
+.create-user-container{
+    max-width: 500px;
+    width: 90%;
+    background-color: white;
+    border-radius: 20px;
+   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+.create-user-container{
+    max-width: 600px;
+}
+
+.logo-cont{
+     width: 200px;
+     align-self: center;
+}
+
+
+.login-form,
+.create-user-form{
+     display: flex;
+ flex-direction: column;
+text-align: center;
+    padding: 40px ;
+    gap: 30px
+}
+
+.login-form h1,
+.create-user-form h1{
+    font-weight: 700;
+    font-size: 2rem;
+    color: rgb(42, 42, 42);
+}
+
+.login-form p{
+    font-size: .875rem;
+    color: hsl(240 4% 46%);
+}
+.login-form form,
+.create-user-form form{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.create-user-form form{
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.login-form-group,
+.create-user-form-group {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 6px
+}
+
+.create-user-form-group{
+    width: 48%;
+}
+
+.create-user-password{
+    width: 100%;
+}
+.login-form-group label,
+.create-user-form-group label{
+    align-self: start;
+    font-size: .875rem;
+    font-weight: 500;
+    
+}
+
+.login-form-group input,
+.create-user-form-group input{
+    padding: .75rem .75rem;
+    border: none;
+    border: 1px solid rgba(146, 142, 142, 0.438);
+    border-radius: 6px ;
+    font-size: .875rem;
+   
+    
+}
+.login-form-group input.input-error,
+.create-user-form-group input.input-error{
+    border: 1px solid red;
+}
+.login-form-group input:focus {
+    outline: 2px solid hsl(249 47% 48%);
+    border: none;
+}
+
+.login-form-group small,
+.create-user-form small{
+    align-self: flex-start;
+    color : red;
+}
+
+.login-form form button,
+.create-user-form form button {
+    color: white;
+    font-weight: 500;
+    border-radius: 6px;
+        padding: .75rem .75rem;
+        background-color: #5638B0;
+        border: none;
+        width: 100%;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex
+;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.login-form form button:hover,
+.create-user-form form button{
+     background-color: #5638b0c4;
+}
+
+.login-form form button:disabled,
+.create-user-form form button:disabled{
+    background-color: #7654ddc4 ;
+    cursor: not-allowed
+}
+.show-pass{
+    position: absolute;
+    right:20px;
+    top: 30px;
+    cursor: pointer;
+    font-size: 1.4rem;
+   
+}
+.show-pass-error{
+    color : red;
+}
+
+
+
+@media(max-width:769px){
+    .login-container,
+    .create-user-container{
+      grid-template-columns: 1fr; /* one column */
+    grid-auto-rows: auto;  
+    }
+
+    .login-form{
+        padding: 30px;
+    }
+
+    .create-user-form{
+        padding: 20px;
+        gap: 20px;
+    }
+    .create-user-form-group{
+       width: 100%
+    }
+
+    .create-user-form form {
+        gap: 10px;
+    }
+
+}

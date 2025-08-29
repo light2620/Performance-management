@@ -1,0 +1,28 @@
+.setting-options-container{
+background-color: rgb(240, 239, 239);
+   border-bottom-left-radius: 6px;
+   border-bottom-right-radius: 6px;
+   padding: 10px;
+   display: flex;
+   flex-direction: column;
+   gap: 5px;
+}
+
+.setting-options,
+.active-setting-option{
+    display: flex;
+    align-items: center; 
+    gap: 10px;
+    color: black;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+.active-setting-option{
+        background-color:  #5638B0;
+    color : white;
+    border-radius: 6px;
+}
+.setting-options:hover{
+        background-color: #5638b040;
+    border-radius: 6px;
+}

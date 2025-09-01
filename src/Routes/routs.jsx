@@ -8,6 +8,10 @@ import GuestRoute from "./GuestRoute";
 import AdminRoute from "./AdmiRoute";
 import Setting from "../Pages/Setting/Setting";
 import Createuser from "../Pages/Createuser/Createuser";
+import UserManagement from "../Pages/UserManagement/UserManagement";
+import ManageDepartment from "../Pages/ManageDepartment/ManageDepartment";
+import Requests from "../Pages/Requests/Requests";
+import Entries from "../Pages/Entries/Entries";
 
 
 
@@ -24,8 +28,13 @@ const router = createBrowserRouter([
       // when user hits "/", push them to /dashboard
       { index: true, element: <Home />},
       { path: "/home", element: <Home /> },
+         {path: "/requests",element: <Requests />},
+         {path: "/points-entries",element: <Entries/>},
       {path: "/settings",element: <Setting />},
-      {path : "/settings/create-user", element: <Createuser />},
+      {path: "/settings/manage-user",element: <UserManagement />},
+      {path: "/settings/manage-department",element: <ManageDepartment />}
+ 
+   
       // add more private routes here
     ],
   },

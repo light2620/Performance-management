@@ -10,7 +10,6 @@ const departmentSlice = createSlice({
     initialState,
     reducers : {
         setDepartment : (state,action) => {
-            console.log(action.payload)
             state.departments = action.payload
         
         }

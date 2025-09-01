@@ -36,6 +36,15 @@
 ;
 }
 
+.total-point-cont{
+    width:51%;
+      background-color: #b7d1f7;
+    border: 2px solid #adccf9;
+}
+.total-point-logo{
+    background-color: #96c0ff;
+}
+
 .total-points p {
     font-size: .875rem;
     columns: #717275;
@@ -46,7 +55,11 @@
     font-weight: 700;
     font-size: 1.5rem;
 }
-
+@media(max-width: 1200px){
+    .performance-option{
+        width: 100%;
+    }
+}
 @media(max-width: 769px){
     .performance-option{
         width: 100%;

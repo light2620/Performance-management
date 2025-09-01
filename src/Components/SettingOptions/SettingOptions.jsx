@@ -1,24 +1,34 @@
 import React from 'react'
 import { FaUser } from "react-icons/fa";
-import { useLocation } from 'react-router-dom';
+import { MdManageSearch } from "react-icons/md";
+import { MdManageAccounts } from "react-icons/md";
 import "./style.css"
-const SettingOptions = ({navigate,location}) => {
+const SettingOptions = ({navigate,location,closeMobileMenu}) => {
  
 
         const settingOption =[
+
           {
-            path: "/settings/create-user",
-            name : "Create User",
-            icon: <FaUser size={16} />,
-            active: true
+            path: "/settings/manage-user",
+            name: "Manage User",
+            icon : <MdManageAccounts size={26}/>,
+          
           },
+          {
+            path: "/settings/manage-department",
+            name: "Manage Department",
+            icon : <MdManageSearch size={26}/>,
+          }
     ]
   return (
     <div className="setting-options-container">
       {
         settingOption.map((option,index) => {
             return <div 
-            onClick={() => navigate(option.path)}
+            onClick={() => {
+              navigate(option.path)
+             closeMobileMenu()
+            }}
             className={`${location.pathname === option.path ? "active-setting-option" : 'setting-options'}`} key={index}>
                 {option.icon}
                 <p>{option.name}</p>

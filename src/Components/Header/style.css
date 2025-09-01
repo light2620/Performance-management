@@ -78,6 +78,33 @@
 .logout-btn button:active{
     transition: .9s;
 }
+.header-container-mobile{
+    display: flex;
+    align-items: center;
+
+}
+
+
+.header-logo-cont-mobile{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    
+}
+
+
+.header-logo-cont-mobile img{
+    margin: 0 auto;
+    cursor: pointer;
+}
+.mobile-nav-option{
+    display: flex;
+    flex-grow: 1;
+    justify-content: right;
+    padding-right: 20px;
+    cursor: pointer;
+
+}
 
 
 @media(max-width: 1300px){
@@ -90,5 +117,9 @@
 @media(max-width: 769px){
     .nav-logo-cont{
         width: 30%;
+    }
+
+    .header-bar{
+        padding: 10px;
     }
 }

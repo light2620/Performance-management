@@ -53,6 +53,11 @@
      background-color: rgba(199, 199, 199, 0.431);
 }
 
+@media(max-width: 1200px){
+   .quick-action-cont{
+        width: 100%;
+    }
+}
 @media(max-width: 769px){
     .quick-action-cont{
         width: 100%;

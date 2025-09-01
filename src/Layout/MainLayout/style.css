@@ -1,11 +1,14 @@
 .main-layout-container{
-     background-color: rgba(240, 240, 240, 0.593);
+     
 }
 
 .component-cont{
     height: 100vh;
    display: flex;
 
+}
+.main-cont{
+    padding: 30px 60px;
 }
 
 .sidebar-area{
@@ -35,9 +38,23 @@
     flex :1;
 }
 
+.side-bar-logo img{
+   cursor: pointer;
+}
+
+@media(max-width: 1300px){
+    .sidebar-area{
+        width: 30%;
+    }
+}
+
 @media(max-width: 769px){
     .component-cont{
         width: 100%;
-        padding: 40px 20px;
+
+    }
+
+    .main-cont{
+        padding: 20px;
     }
 }

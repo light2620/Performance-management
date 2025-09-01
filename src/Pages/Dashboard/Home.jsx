@@ -1,9 +1,36 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Merit from '../../Components/Performance/Merit'
 import Demerit from '../../Components/Performance/Demerit'
 import "./style.css"
 import QuickAction from '../../Components/QuickAction/QuickAction'
+import { getPerformanceApi } from '../../Apis/Points'
+import TotalPoints from '../../Components/Performance/TotalPoints'
 const Home= () => {
+
+  const [performance,setPerformance] = useState({
+    totalPoints : "",
+    merits : "",
+    demerits: ""
+  })
+
+  const fetchPerformancePoint = async() => {
+    try{
+        const res = await getPerformanceApi();
+      setPerformance({
+        totalPoints: res.data.net_points,
+        merits: res.data.total_merit,
+        demerits : res.data.total_demerit
+
+      })
+      
+    }catch(err){
+      console.log(err)
+    }
+  }
+  useEffect( ()=> {
+        
+       fetchPerformancePoint();
+  } ,[])
   return (
     <div className='dashboard-cont'>
       <div className="info-column">
@@ -12,8 +39,11 @@ const Home= () => {
           <p>Track your performance and provide feedback to colleagues</p>
         </div>
           <div className="performance-cont">
-             <Merit />
-             <Demerit />
+             <Merit merits={performance.merits} />
+             <Demerit demerits ={performance.demerits} />
+          </div>
+          <div>
+            <TotalPoints totalPoints = {performance.totalPoints}/>
           </div>
           <div>
             <QuickAction />

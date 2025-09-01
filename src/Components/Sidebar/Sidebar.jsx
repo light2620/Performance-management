@@ -5,11 +5,14 @@ import { TbMessageReportFilled } from "react-icons/tb";
 import { FaChevronRight, FaChevronDown } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import SettingOptions from "../SettingOptions/SettingOptions";
+import { PiNotificationBold } from "react-icons/pi";
+import { GrDocumentPerformance } from "react-icons/gr";
 import "./style.css";
+import useIsMobile from "../../CustomHook/useMobile";
 
-const Sidebar = () => {
+const Sidebar = ({closeMobileMenu}) => {
   const [showSettingOptions, setShowSettingOptions] = useState(false);
-
+  const isMobile = useIsMobile()
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -20,12 +23,19 @@ const Sidebar = () => {
       icon: <MdDashboard size={22} />,
       className: "nav-home",
     },
-    {
-      path: "/report",
-      name: "Report",
-      icon: <TbMessageReportFilled size={22} />,
-      className: "nav-report",
+
+     {
+      path: "/requests",
+      name: "Points Requests",
+      icon: <PiNotificationBold size={22}/>,
+      className: "nav-requests",
     },
+    {
+      path: "/points-entries",
+      name: "Points Entries",
+      icon: <GrDocumentPerformance size={22}/>,
+      className: "nav-requests",
+    }
   ];
 
   return (
@@ -40,6 +50,7 @@ const Sidebar = () => {
           onClick={() => {
             navigate(option.path)
             setShowSettingOptions(false)
+            isMobile && closeMobileMenu();
           }}
         >
           {option.icon}
@@ -53,14 +64,16 @@ const Sidebar = () => {
           className={`${
             location.pathname.includes("/settings") ? "active-option border-remove" : "nav-option"
           }`}
-          onClick={() => {
+           onClick={(e) => {
             setShowSettingOptions(!showSettingOptions)
-            navigate("/settings")
           }}
         >
           <IoSettingsSharp size={22} />
           <span >Setting</span>
           <div
+          onClick={(e) => {
+            setShowSettingOptions(!showSettingOptions)
+          }}
             style={{
               flex: "1",
               display: "flex",
@@ -73,7 +86,7 @@ const Sidebar = () => {
 
         {showSettingOptions && (
           <div className="setting-option-cont">
-            <SettingOptions navigate={navigate} location={location} />
+            <SettingOptions closeMobileMenu ={closeMobileMenu} navigate={navigate} location={location} />
           </div>
         )}
       </div>

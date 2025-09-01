@@ -38,3 +38,10 @@
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
+
+@media(max-width: 769px){
+    .navbar-cont{
+       margin-top: 30px;
+
+    }
+}

@@ -1,0 +1,39 @@
+
+
+.manage-dept-page { max-width: 980px; margin: 0 auto; padding: 16px; }
+.manage-dept-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.manage-dept-header h2 { margin: 0; font-size: 20px; }
+.manage-dept-filters { display: flex; gap: 8px; align-items: center; }
+
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; margin-top: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.add-dept .label { font-weight: 600; margin-bottom: 8px; display: block; }
+.row { display: flex; gap: 8px; align-items: center; }
+.row.gap { gap: 6px; }
+.table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.table-wrap { overflow: auto; border-radius: 8px; border: 1px solid #eee; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 10px; border-bottom: 1px solid #f0f0f0; text-align: left; }
+.table th { background: #fafafa; font-weight: 600; }
+.center { text-align: center; }
+.muted { color: #6b7280; font-size: 12px; }
+.hint { color: #ef4444; font-size: 12px; margin-top: 6px; }
+
+.manage-dept-input { border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 12px; outline: none; min-width: 220px; }
+.manage-dept-input.sm { padding: 6px 8px; min-width: 160px; }
+.manage-dept-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+.manage-dept-input-error { border-color: #ef4444; }
+
+.manage-dept-select { border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 12px; background: #fff; }
+
+.manage-dept-btn { border: 1px solid #d1d5db; background: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+.manage-dept-btn:hover { background: #f8fafc; }
+.manage-dept-btn.primary { background: #111827; border-color: #111827; color: #fff; }
+.manage-dept-btn.primary:hover { filter: brightness(0.95); }
+.manage-dept-btn.danger { background: #ef4444; border-color: #ef4444; color: #fff; }
+.manage-dept-btn.sm { padding: 6px 8px; font-size: 12px; }
+
+.pager { display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; }
+
+.edit-cell { display: flex; align-items: center; gap: 6px; }
+
+.manage-dept-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; border-radius: 8px; padding: 8px 10px; margin-top: 10px; }

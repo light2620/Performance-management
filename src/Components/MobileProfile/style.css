@@ -1,0 +1,54 @@
+.mobile-profile {
+ margin-top: 10px;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #111827;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.profile-info {
+  flex-grow: 1;
+}
+
+.profile-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.profile-dept {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Logout button */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.logout-btn:hover {
+  color: #dc2626;
+}

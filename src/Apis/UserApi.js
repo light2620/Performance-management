@@ -13,4 +13,34 @@ const getCurrentUserApi = async() =>{
 }
 
 
-export {getCurrentUserApi}
+const createUserApi = async(data) => {
+    try{
+        const res = await axiosInstance.post("users/",data);
+        return res;
+
+    }catch(err){
+        throw err
+    }
+}
+
+const getAllUserApi = async() => {
+    try{
+        const res = await axiosInstance.get("users/")
+        return res;
+
+    }catch(err){
+        throw err
+    }
+}
+
+const deleteUserApi = async(id) => {
+    try{
+          const res = await axiosInstance.delete(`users/${id}/`)
+          return res;
+    }catch(err){
+        throw err
+    }
+
+}
+
+export {getCurrentUserApi,createUserApi,getAllUserApi,deleteUserApi}

@@ -1,0 +1,33 @@
+import axiosInstance from "./axiosInstance";
+
+
+
+const getAllEntriesApi = async(url) => {
+    try{
+       const res = await axiosInstance.get(url);
+       return res;
+    }catch(err){
+        throw err
+    }
+}
+
+const createEntriesApi = async(data) => {
+    try{
+        const res = await axiosInstance.post("/point-entries/",data)
+        return res;
+
+    }catch(err){
+        throw err
+    }
+}
+
+
+const reverseEntryApi = async(id) => {
+    try{
+       const res = await axiosInstance.post(`/point-entries/${id}/rollback/`)
+       return res;
+    }catch(err){
+        throw err
+    }
+}
+export {getAllEntriesApi,createEntriesApi,reverseEntryApi}

@@ -1,13 +1,9 @@
-.login-container,
-.create-user-container{
+.login-container{
     max-width: 500px;
     width: 90%;
     background-color: white;
     border-radius: 20px;
    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-}
-.create-user-container{
-    max-width: 600px;
 }
 
 .logo-cont{
@@ -16,8 +12,7 @@
 }
 
 
-.login-form,
-.create-user-form{
+.login-form{
      display: flex;
  flex-direction: column;
 text-align: center;
@@ -25,8 +20,7 @@ text-align: center;
     gap: 30px
 }
 
-.login-form h1,
-.create-user-form h1{
+.login-form h1{
     font-weight: 700;
     font-size: 2rem;
     color: rgb(42, 42, 42);
@@ -36,18 +30,13 @@ text-align: center;
     font-size: .875rem;
     color: hsl(240 4% 46%);
 }
-.login-form form,
-.create-user-form form{
+.login-form form{
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
-.create-user-form form{
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-.login-form-group,
-.create-user-form-group {
+
+.login-form-group{
     display: flex;
     position: relative;
     flex-direction: column;
@@ -55,23 +44,15 @@ text-align: center;
     gap: 6px
 }
 
-.create-user-form-group{
-    width: 48%;
-}
 
-.create-user-password{
-    width: 100%;
-}
-.login-form-group label,
-.create-user-form-group label{
+.login-form-group label{
     align-self: start;
     font-size: .875rem;
     font-weight: 500;
     
 }
 
-.login-form-group input,
-.create-user-form-group input{
+.login-form-group input{
     padding: .75rem .75rem;
     border: none;
     border: 1px solid rgba(146, 142, 142, 0.438);
@@ -80,8 +61,7 @@ text-align: center;
    
     
 }
-.login-form-group input.input-error,
-.create-user-form-group input.input-error{
+.login-form-group input.input-error{
     border: 1px solid red;
 }
 .login-form-group input:focus {
@@ -89,14 +69,12 @@ text-align: center;
     border: none;
 }
 
-.login-form-group small,
-.create-user-form small{
+.login-form-group small{
     align-self: flex-start;
     color : red;
 }
 
-.login-form form button,
-.create-user-form form button {
+.login-form form button {
     color: white;
     font-weight: 500;
     border-radius: 6px;
@@ -114,13 +92,11 @@ text-align: center;
     gap: 10px;
 }
 
-.login-form form button:hover,
-.create-user-form form button{
+.login-form form button:hover{
      background-color: #5638b0c4;
 }
 
-.login-form form button:disabled,
-.create-user-form form button:disabled{
+.login-form form button:disabled{
     background-color: #7654ddc4 ;
     cursor: not-allowed
 }
@@ -139,8 +115,7 @@ text-align: center;
 
 
 @media(max-width:769px){
-    .login-container,
-    .create-user-container{
+    .login-container{
       grid-template-columns: 1fr; /* one column */
     grid-auto-rows: auto;  
     }
@@ -149,16 +124,5 @@ text-align: center;
         padding: 30px;
     }
 
-    .create-user-form{
-        padding: 20px;
-        gap: 20px;
-    }
-    .create-user-form-group{
-       width: 100%
-    }
-
-    .create-user-form form {
-        gap: 10px;
-    }
 
 }

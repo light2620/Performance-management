@@ -1,0 +1,41 @@
+/* Backdrop */
+.mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* Sidebar container */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: -280px; /* hidden by default */
+  width: 260px;
+  height: 100%;
+  background: #fff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  transition: left 0.3s ease-in-out;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu.open {
+  padding: 10px 20px;
+  left: 0; /* slide in */
+}
+
+.mobile-menu-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}

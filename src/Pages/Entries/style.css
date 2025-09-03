@@ -105,19 +105,25 @@
 }
 
 /* Table */
+/* Table wrapper */
 .entriesComp-tableWrapper {
   margin-top: 10px;
   max-height: 50vh;
-  overflow: auto; /* ✅ allows both horizontal & vertical scroll */
+  overflow: auto; /* both scroll directions */
   position: relative;
 }
 
+.entriesComp-tableScroll {
+  overflow-x: auto;
+}
+
+/* Table */
 .entriesComp-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 8px;
+  border-spacing: 0 8px; /* spacing like requests table */
   font-size: 13px;
-  table-layout: fixed; /* ✅ fixes column sizing */
+  table-layout: auto;
 }
 
 /* Sticky header */
@@ -144,29 +150,23 @@
   text-overflow: ellipsis;
 }
 
-/* Reason column (fixed width desktop + mobile) */
+/* Hover effect */
+.entriesComp-table tbody tr:hover td {
+  background: #f9fafb;
+}
+
+/* Reason column */
 .entriesComp-table th:nth-child(5),
 .entriesComp-table td:nth-child(5),
 .entriesComp-reason {
-  width: 300px; /* desktop */
+  min-width: 240px;
+  max-width: 400px;
   white-space: normal !important;
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
-@media (max-width: 768px) {
-  .entriesComp-table th:nth-child(5),
-  .entriesComp-table td:nth-child(5),
-  .entriesComp-reason {
-    width: 240px; /* smaller width on mobile */
-  }
-}
-
-.entriesComp-table tbody tr:hover td {
-  background: #f9fafb;
-}
-
-/* Tags */
+/* Operation tags */
 .entriesComp-tag {
   display: inline-block;
   padding: 4px 10px;
@@ -191,6 +191,11 @@
   cursor: pointer;
   text-align: center;
   color: #991b1b;
+  transition: color 0.2s ease;
+}
+
+.entriesComp-reverse:hover {
+  color: #b91c1c;
 }
 
 /* States */
@@ -238,7 +243,7 @@
   color: #9ca3af;
 }
 
-/* 🔹 Mobile Responsive */
+/* Responsive */
 @media (max-width: 768px) {
   .entriesComp-header {
     flex-direction: column;
@@ -261,5 +266,9 @@
 
   .entriesComp-table {
     font-size: 12px;
+  }
+
+  .entriesComp-reason {
+    max-width: 240px;
   }
 }

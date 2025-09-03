@@ -244,8 +244,8 @@ const Requests = () => {
                     </td>
                     <td>{req.points}</td>
                     <td className="requestsComp-reason">{req.reason}</td>
-                    <td>{new Date(req.created_at).toLocaleString()}</td>
-                    <td>{new Date(req.updated_at).toLocaleString()}</td>
+                    <td>{new Date(req.created_at).toLocaleDateString()}</td>
+                    <td>{new Date(req.updated_at).toLocaleDateString()}</td>
                     <td className="requestsComp-actionsCell">
                       {req.status === "APPROVED" ||
                       req.status === "CANCELLED" ||

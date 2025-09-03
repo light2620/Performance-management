@@ -231,8 +231,8 @@ const Entries = () => {
                       {entry.created_by?.first_name}{" "}
                       {entry.created_by?.last_name}
                     </td>
-                    <td>{new Date(entry.created_at).toLocaleString()}</td>
-                    <td>{new Date(entry.updated_at).toLocaleString()}</td>
+<td>{new Date(entry.created_at).toLocaleDateString()}</td>
+<td>{new Date(entry.updated_at).toLocaleDateString()}</td>
                     {user.role === "ADMIN" && (
                       <td
                         onClick={() => handleReverseEntry(entry.id)}

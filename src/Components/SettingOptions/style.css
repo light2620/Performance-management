@@ -1,5 +1,5 @@
 .setting-options-container{
-background-color: rgb(240, 239, 239);
+background-color: #111827;
    border-bottom-left-radius: 6px;
    border-bottom-right-radius: 6px;
    padding: 10px;
@@ -13,16 +13,16 @@ background-color: rgb(240, 239, 239);
     display: flex;
     align-items: center; 
     gap: 10px;
-    color: black;
+    color: white;
     padding: 10px 20px;
     cursor: pointer;
 }
 .active-setting-option{
-        background-color:  #5638B0;
-    color : white;
+    background-color:  white;
+    color : black;
     border-radius: 6px;
 }
 .setting-options:hover{
-        background-color: #5638b040;
+        background-color: rgba(255, 255, 255, 0.214);
     border-radius: 6px;
 }

@@ -7,6 +7,7 @@ import { getAllUser } from "../../Apis/UserApi";
 import axiosInstance from "../../Apis/axiosInstance";
 import CreateUser from "../Createuser/Createuser";
 import { deleteUserApi } from "../../Apis/UserApi";
+import UserDetailModal from "../../Components/UserDetailModal/UserDetailModal";
 
 const API_BASE = "users/";
 
@@ -33,37 +34,38 @@ export default function UserManagement() {
   const [search, setSearch] = useState("");
   const [ordering, setOrdering] = useState("-created_at");
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState("");
   const [pageUrl, setPageUrl] = useState(API_BASE); // current endpoint
   const [meta, setMeta] = useState({ count: 0, next: null, previous: null });
   const [showCreateUserModal,setShowCreateUserModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+const [modalEditable, setModalEditable] = useState(false);
 
-  useEffect(() => {
-    const url = new URL(API_BASE, window.location.origin);
-    if (search.trim()) url.searchParams.set("search", search.trim());
-    if (ordering) url.searchParams.set("ordering", ordering);
-    setPageUrl(url.pathname + url.search);
-  }, [search, ordering]);
+useEffect(() => {
+  const url = new URL(API_BASE, window.location.origin);
+  if (search.trim()) url.searchParams.set("search", search.trim());
+  if (ordering) url.searchParams.set("ordering", ordering);
+  fetchUsers(url.pathname + url.search);
+}, [search, ordering]);
 
-   const fetchUsers = async () => {
-      setLoading(true);
-      setErr("");
-      try {
-        const token = tokenService.getAccess
-          ? tokenService.getAccess()
-          : tokenService.get?.();
-        const res = await axiosInstance.get(pageUrl, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const { results, count, next, previous } = res.data;
-        setRows(results || []);
-        setMeta({ count: count ?? 0, next, previous });
-      } catch (e) {
-        setErr("Something went wrong, try again…");
-      } finally {
-        setLoading(false);
-      }
-    };
+const fetchUsers = async (url = pageUrl) => {
+  setLoading(true);
+  try {
+    const token = tokenService.getAccess
+      ? tokenService.getAccess()
+      : tokenService.get?.();
+
+    const res = await axiosInstance.get(url);
+
+    const { results, count, next, previous } = res.data;
+    setRows(results || []);
+    setMeta({ count: count ?? 0, next, previous });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    setLoading(false);
+  }
+};
+
   // fetch data
   useEffect(() => {
    
@@ -154,9 +156,7 @@ export default function UserManagement() {
           <table className="user-mgmt-table">
             <thead>
               <tr>
-                <th style={{ width: 36 }}>
-                  <input type="checkbox" />
-                </th>
+               
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Phone</th>
@@ -178,15 +178,7 @@ export default function UserManagement() {
                 </tr>
               )}
 
-              {!loading && err && (
-                <tr>
-                  <td colSpan={10} className="center error">
-                    {err}
-                  </td>
-                </tr>
-              )}
-
-              {!loading && !err && rows.length === 0 && (
+              {!loading && rows.length === 0 && (
                 <tr>
                   <td colSpan={10} className="center muted">
                     No users found.
@@ -195,12 +187,16 @@ export default function UserManagement() {
               )}
 
               {!loading &&
-                !err &&
+  
                 rows.map((u) => (
-                  <tr key={u.id}>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
+                  <tr key={u.id} 
+                  onClick={() => {
+    setSelectedUserId(u.id);
+    setModalEditable(false); // view mode
+  }}
+  style={{ cursor: "pointer" }}
+                  >
+              
 
                     {/* Full name with avatar */}
                     <td>
@@ -234,9 +230,17 @@ export default function UserManagement() {
 
                     {/* Actions */}
                     <td className="user-mgmt-actions">
-                      <button className="user-mgmt-icon-btn" title="Edit">
-                        <LuPencil />
-                      </button>
+                     <button
+  className="user-mgmt-icon-btn"
+  title="Edit"
+  onClick={(e) => {
+    e.stopPropagation();
+    setSelectedUserId(u.id);
+    setModalEditable(true); // edit mode
+  }}
+>
+  <LuPencil />
+</button>
                       <button 
                       onClick={() => handleDelete(u.id)}
                       className="user-mgmt-icon-btn danger" title="Delete">
@@ -269,8 +273,22 @@ export default function UserManagement() {
             </button>
           </div>
         </div>
+        {selectedUserId && (
+  <UserDetailModal
+    fetchUsers={ () => fetchUsers(API_BASE)}
+    userId={selectedUserId}
+    onClose={() => setSelectedUserId(null)}
+    editable={modalEditable}
+  />
+)}
       </div>
-      {showCreateUserModal && <CreateUser onClose={() => setShowCreateUserModal(false)} fetchUsers={fetchUsers} />}
+      {showCreateUserModal && <CreateUser  resetFilters ={ () => {
+  setSearch("");
+  setOrdering("-created_at");
+  setPageUrl(API_BASE);   // ✅ force reset explicitly
+  fetchUsers(API_BASE);   // ✅ call fetch right here
+}}
+   onClose={() => setShowCreateUserModal(false)}  />}
     </div>
   );
 }

@@ -10,12 +10,15 @@ import Sidebar from '../../Components/Sidebar/Sidebar'
 import logo from "../../assets/Logo-Orange.png"
 import useIsMobile from '../../CustomHook/useMobile'
 import { useNavigate } from 'react-router-dom'
+import MobileProfile from '../../Components/MobileProfile/MobileProfile'
+import ProfileModal from '../../Components/Profile/Profile'
 
 import "./style.css"
 const MainLayout = () => {
 const dispatch = useDispatch();
 const isMobile = useIsMobile();
 const navigate = useNavigate();
+const [showProfileModal,setShowProfileModal] = React.useState(false);
 
 const fetchAllDepartment = async() => {
   try{
@@ -49,12 +52,19 @@ const fetchAllUsers = async() => {
               </div>
                <div className='sidebar-cont'>
                <Sidebar />
+               
               </div>
+               <div style={{marginTop: 'auto'}}>
+        {
+         <MobileProfile />
+        }
+      </div>
          
 
             </div>}
               <div className="main-content-area">
-                <Header />
+                {/* <Header /> */}
+                {isMobile && <Header />}
                 <div className="main-cont">
                      <Outlet />
                 </div>
@@ -62,6 +72,7 @@ const fetchAllUsers = async() => {
             </div>
             
           </div>
+          {showProfileModal && <ProfileModal  onClose={() => setShowProfileModal(false)} />}
     </div>
   )
 }

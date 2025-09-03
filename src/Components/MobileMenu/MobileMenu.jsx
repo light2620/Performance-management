@@ -12,13 +12,14 @@ const MobileMenu = ({ open, onClose,closeMobileMenu }) => {
       {/* Sidebar */}
       <div className={`mobile-menu ${open ? "open" : ""}`}>
         <div className="mobile-menu-header">
-          <button className="close-btn" onClick={onClose}>
+          <button className="mobile-menu-close-btn" onClick={onClose}>
             ✕
           </button>
         </div>
-<MobileProfile />
+
               <Sidebar closeMobileMenu={closeMobileMenu} />
 
+<MobileProfile />
      
 
       

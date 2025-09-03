@@ -2,9 +2,10 @@ import React from 'react'
 import { FaUser } from "react-icons/fa";
 import { MdManageSearch } from "react-icons/md";
 import { MdManageAccounts } from "react-icons/md";
+import useIsMobile from '../../CustomHook/useMobile';
 import "./style.css"
 const SettingOptions = ({navigate,location,closeMobileMenu}) => {
- 
+  const isMobile = useIsMobile()
 
         const settingOption =[
 
@@ -27,7 +28,7 @@ const SettingOptions = ({navigate,location,closeMobileMenu}) => {
             return <div 
             onClick={() => {
               navigate(option.path)
-             closeMobileMenu()
+              isMobile && closeMobileMenu()
             }}
             className={`${location.pathname === option.path ? "active-setting-option" : 'setting-options'}`} key={index}>
                 {option.icon}

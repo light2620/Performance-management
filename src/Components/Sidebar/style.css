@@ -9,19 +9,19 @@
     display: flex;
     align-items: center; 
     gap: 10px;
-     color: black;
+     color: white;
     padding: 10px 20px;
     cursor: pointer;
 }
 
 .active-option{
-    background-color:  #5638B0;
-    color : white;
+    background-color:  white;
+    color : #111827;
     border-radius: 6px;
 }
 
 .nav-option:hover{
-    background-color: #5638b025;
+    background-color: rgba(255, 255, 255, 0.214);
     border-radius: 6px;
 }
 
@@ -33,6 +33,16 @@
 .setting-option-cont{
  
 }
+.notif-badge {
+  background: #ef4444; /* red */
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 6px 6px;
+  margin-left: auto;
+}
+
 
 .border-remove{
     border-bottom-left-radius: 0;

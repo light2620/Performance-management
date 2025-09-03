@@ -5,6 +5,7 @@ import "./style.css"
 import QuickAction from '../../Components/QuickAction/QuickAction'
 import { getPerformanceApi } from '../../Apis/Points'
 import TotalPoints from '../../Components/Performance/TotalPoints'
+import { useAuth } from '../../Utils/AuthContext'
 const Home= () => {
 
   const [performance,setPerformance] = useState({
@@ -12,6 +13,7 @@ const Home= () => {
     merits : "",
     demerits: ""
   })
+  const {user} = useAuth();
 
   const fetchPerformancePoint = async() => {
     try{
@@ -35,8 +37,8 @@ const Home= () => {
     <div className='dashboard-cont'>
       <div className="info-column">
         <div className="welcome-title">
-          <h1>Welcome back, Shivam</h1>
-          <p>Track your performance and provide feedback to colleagues</p>
+          <h1>Welcome back, {user?.first_name} {user?.last_name}</h1>
+          <p>Track your performance</p>
         </div>
           <div className="performance-cont">
              <Merit merits={performance.merits} />

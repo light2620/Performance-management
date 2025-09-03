@@ -4,12 +4,10 @@ import { setDepartment } from "../../Redux/DepartmentSlice";
 import AddDepartment from "../../Components/AddDepartment/AddDepartment";
 import DepartmentsTable from "../../Components/DepartmentsTable/DepartmentsTable";
 import axiosInstance from "../../Apis/axiosInstance";
-import { addDepartment } from "../../Apis/DepartmentApis";
-import { editDepartment } from "../../Apis/DepartmentApis";
-import { deleteDepartment } from "../../Apis/DepartmentApis";
+import { addDepartment, editDepartment, deleteDepartment } from "../../Apis/DepartmentApis";
 import "./style.css";
 
-const API_BASE = "/departments/"; // list + create
+const API_BASE = "/departments/";
 
 const ManageDepartment = () => {
   const dispatch = useDispatch();
@@ -20,7 +18,7 @@ const ManageDepartment = () => {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [search, setSearch] = useState("");
-  const [ordering, setOrdering] = useState(""); // "dept_name" | "-created_at" etc.
+  const [ordering, setOrdering] = useState("");
 
   const params = useMemo(() => {
     const p = {};
@@ -29,7 +27,6 @@ const ManageDepartment = () => {
     return p;
   }, [search, ordering]);
 
-  // if server returns absolute next/previous, axios can still fetch them.
   const fetchDepartments = async (url = API_BASE, p = params) => {
     setLoading(true);
     setErr("");
@@ -57,31 +54,22 @@ const ManageDepartment = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, ordering]);
 
-  // ---- CRUD handlers (you said you'll wire these; here are ready-to-go stubs) ----
   const handleAdd = async (deptName, reset) => {
     try {
-      await addDepartment({dept_name: deptName});
+      await addDepartment({ dept_name: deptName });
       reset?.();
       fetchDepartments(API_BASE, params);
     } catch (e) {
-      alert(
-        e?.response?.data?.detail ||
-          e?.response?.data?.message ||
-          "Failed to add department"
-      );
+      alert(e?.response?.data?.detail || "Failed to add department");
     }
   };
 
   const handleEdit = async ({ id, dept_name }) => {
     try {
-      await editDepartment(id,{dept_name});
+      await editDepartment(id, { dept_name });
       fetchDepartments(API_BASE, params);
     } catch (e) {
-      alert(
-        e?.response?.data?.detail ||
-          e?.response?.data?.message ||
-          "Failed to update department"
-      );
+      alert(e?.response?.data?.detail || "Failed to update department");
     }
   };
 
@@ -91,27 +79,23 @@ const ManageDepartment = () => {
       await deleteDepartment(id);
       fetchDepartments(API_BASE, params);
     } catch (e) {
-      alert(
-        e?.response?.data?.detail ||
-          e?.response?.data?.message ||
-          "Failed to delete department"
-      );
+      alert(e?.response?.data?.detail || "Failed to delete department");
     }
   };
 
   return (
-    <div className="manage-dept-page">
-      <div className="manage-dept-header">
-        <h2>Manage Departments</h2>
-        <div className="manage-dept-filters">
+    <div className="manageDeptComp-page">
+      <div className="manageDeptComp-header">
+        <h2 className="manageDeptComp-title">Manage Departments</h2>
+        <div className="manageDeptComp-filters">
           <input
-            className="manage-dept-input"
+            className="manageDeptComp-input"
             placeholder="Search department…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select
-            className="manage-dept-select"
+            className="manageDeptComp-select"
             value={ordering}
             onChange={(e) => setOrdering(e.target.value)}
           >
@@ -123,7 +107,10 @@ const ManageDepartment = () => {
             <option value="updated_at">Updated ↑</option>
             <option value="-updated_at">Updated ↓</option>
           </select>
-          <button className="manage-dept-btn" onClick={() => fetchDepartments(API_BASE, params)}>
+          <button
+            className="manageDeptComp-btn"
+            onClick={() => fetchDepartments(API_BASE, params)}
+          >
             Apply
           </button>
         </div>
@@ -131,7 +118,7 @@ const ManageDepartment = () => {
 
       <AddDepartment onAdd={handleAdd} />
 
-      {err && <div className="manage-dept-error">{err}</div>}
+      {err && <div className="manageDeptComp-error">{err}</div>}
 
       <DepartmentsTable
         rows={rows}
@@ -141,8 +128,8 @@ const ManageDepartment = () => {
         previous={prev}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onNext={() => next && fetchDepartments(next)}      // handles absolute URLs
-        onPrev={() => prev && fetchDepartments(prev)}      // handles absolute URLs
+        onNext={() => next && fetchDepartments(next)}
+        onPrev={() => prev && fetchDepartments(prev)}
         onRefresh={() => fetchDepartments(API_BASE, params)}
       />
     </div>
@@ -150,4 +137,3 @@ const ManageDepartment = () => {
 };
 
 export default ManageDepartment;
-

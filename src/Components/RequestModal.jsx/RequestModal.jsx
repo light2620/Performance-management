@@ -44,8 +44,7 @@ const RequestModal = ({ onClose,getApi,postApi }) => {
       };
 
       const res = await postApi(body)
-      console.log(res)
-      await getApi();
+      setTimeout(async () => await getApi(),1000 )
       onClose();
     } catch (err) {
       console.error("Error creating request:", err);

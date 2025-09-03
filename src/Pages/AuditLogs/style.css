@@ -1,0 +1,86 @@
+.activity-wrapper {
+  padding: 16px;
+}
+
+.activity-wrapper h2 {
+  margin-bottom: 12px;
+}
+
+.activity-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.activity-toolbar select,
+.refresh-btn {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.refresh-btn {
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+.activity-table-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.activity-table-scroll {
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.activity-table thead {
+  position: sticky;
+  top: 0;
+  background: #f9fafb;
+  z-index: 1;
+}
+
+.activity-table th,
+.activity-table td {
+  padding: 10px;
+  border-bottom: 1px solid #f3f4f6;
+  text-align: left;
+}
+
+.center {
+  text-align: center;
+}
+
+.muted {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.error {
+  color: red;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: 4px;
+  background: #e5e7eb;
+  margin-right: 4px;
+}
+
+.pill.type {
+  background: #fee2e2;
+  color: #b91c1c;
+}

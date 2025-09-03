@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../Utils/AuthContext";
-import { createEntriesApi, getAllEntriesApi } from "../../Apis/EntriesApi";
+import { createEntriesApi, getAllEntriesApi, reverseEntryApi } from "../../Apis/EntriesApi";
 import RequestModal from "../../Components/RequestModal.jsx/RequestModal";
 import { FaTrashRestore } from "react-icons/fa";
-import { reverseEntryApi } from "../../Apis/EntriesApi";
 import "./style.css";
 
 const API_URL = "/point-entries/";
@@ -12,7 +11,7 @@ const Entries = () => {
   const { user } = useAuth();
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal,setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
 
   // filters
   const [type, setType] = useState("");
@@ -73,35 +72,40 @@ const Entries = () => {
       setLoading(false);
     }
   };
-  const hanldeReverseEntry = async(id) => {
-    try{
-      const res = await reverseEntryApi(id);
-      console.log(res);
+
+  const handleReverseEntry = async (id) => {
+    try {
+      await reverseEntryApi(id);
       await fetchEntries(API_URL);
       setType("");
       setOrdering("");
       setEmployee("");
-      setEmployeeSearch("")
-
-    }catch(err){
-      console.log(err)
+      setEmployeeSearch("");
+    } catch (err) {
+      console.log(err);
     }
-  }
+  };
+
   if (!user) {
-    return <p className="loading">Loading user...</p>;
+    return <p className="entriesComp-loading">Loading user...</p>;
   }
 
   return (
-    <div className="entries-container">
+    <div className="entriesComp-container">
       {/* Header */}
-      <div className="entries-header">
-        <h2 className="title">Point Entries</h2>
-        <div className="header-actions" >
-            { user && user.role === "ADMIN" && <button className="creat-entry-btn" onClick={() => setShowModal(true)}>
-                Create Entry
-            </button>}
+      <div className="entriesComp-header">
+        <h2 className="entriesComp-title">Point Entries</h2>
+        <div className="entriesComp-actions">
+          {user && user.role === "ADMIN" && (
+            <button
+              className="entriesComp-createBtn"
+              onClick={() => setShowModal(true)}
+            >
+              Create Entry
+            </button>
+          )}
           <button
-            className="refresh-btn"
+            className="entriesComp-refreshBtn"
             onClick={() => {
               setType("");
               setOperation("");
@@ -117,20 +121,17 @@ const Entries = () => {
       </div>
 
       {/* Filters */}
-      <div className="filter-bar">
+      <div className="entriesComp-filters">
         <select value={type} onChange={(e) => setType(e.target.value)}>
           <option value="">All Types</option>
           <option value="MERIT">Merit</option>
           <option value="DEMERIT">Demerit</option>
         </select>
 
-        <select
-          value={operation}
-          onChange={(e) => setOperation(e.target.value)}
-        >
+        <select value={operation} onChange={(e) => setOperation(e.target.value)}>
           <option value="">All Operations</option>
           <option value="GRANT">Grant</option>
-          <option value="REVOKE">Revoke</option>
+          <option value="REVERSAL">Reversal</option>
         </select>
 
         <select value={ordering} onChange={(e) => setOrdering(e.target.value)}>
@@ -141,7 +142,7 @@ const Entries = () => {
         </select>
 
         {user?.role === "ADMIN" && (
-          <div className="employee-filter">
+          <div className="entriesComp-employeeFilter">
             <input
               type="text"
               placeholder="Search employee in entries..."
@@ -150,7 +151,6 @@ const Entries = () => {
                 const value = e.target.value;
                 setEmployeeSearch(value);
                 setShowSuggestions(true);
-
                 if (value.trim() === "") {
                   setEmployee("");
                 }
@@ -159,9 +159,9 @@ const Entries = () => {
             />
 
             {showSuggestions && employeeSearch && (
-              <ul className="suggestions-list">
+              <ul className="entriesComp-suggestions">
                 {uniqueEmployees.length === 0 ? (
-                  <li className="no-results">No employees found</li>
+                  <li className="entriesComp-noResults">No employees found</li>
                 ) : (
                   uniqueEmployees.map((emp) => (
                     <li
@@ -188,85 +188,95 @@ const Entries = () => {
       </div>
 
       {/* Table */}
-      <div className="table-wrapper">
+      <div className="entriesComp-tableWrapper">
         {loading ? (
-          <p className="loading">Loading...</p>
+          <p className="entriesComp-loading">Loading...</p>
         ) : entries.length === 0 ? (
-          <p className="no-entries">No entries found.</p>
+          <p className="entriesComp-noEntries">No entries found.</p>
         ) : (
-          <table className="entries-table">
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Operation</th>
-                <th>Employee</th>
-                <th>Points</th>
-                <th>Reason</th>
-                <th>Created By</th>
-                <th>Created</th>
-                <th>Updated</th>
-                {user.role === "ADMIN" && <th>action</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((entry) => (
-                <tr key={entry.id}>
-                  <td>{entry.type}</td>
-                  <td>
-                    <span
-                      className={`operation-tag ${entry.operation.toLowerCase()}`}
-                    >
-                      {entry.operation}
-                    </span>
-                  </td>
-                  <td>
-                    {entry.employee?.first_name} {entry.employee?.last_name}
-                  </td>
-                  <td>{entry.points}</td>
-                  <td className="reason-cell">{entry.reason}</td>
-                  <td>
-                    {entry.created_by?.first_name}{" "}
-                    {entry.created_by?.last_name}
-                  </td>
-                  <td>{new Date(entry.created_at).toLocaleString()}</td>
-                  <td>{new Date(entry.updated_at).toLocaleString()}</td>
-                  <td 
-                  onClick={() => hanldeReverseEntry(entry.id)}
-                  title="revoke" style={{"cursor" : "pointer", display:"flex","justifyContent" : "center","alignItems" : "center"}}>{user.role === 'ADMIN' && <FaTrashRestore size={18} />}</td>
+          <div className="entriesComp-tableScroll">
+            <table className="entriesComp-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Operation</th>
+                 { user?.role === "ADMIN" && <th>Employee</th>}
+                  <th>Points</th>
+                  <th>Reason</th>
+                  <th>Created By</th>
+                  <th>Created</th>
+                  <th>Updated</th>
+                  {user.role === "ADMIN" && <th>Action</th>}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {entries.map((entry) => (
+                  <tr key={entry.id}>
+                    <td>{entry.type}</td>
+                    <td>
+                      <span
+                        className={`entriesComp-tag ${entry.operation.toLowerCase()}`}
+                      >
+                        {entry.operation}
+                      </span>
+                    </td>
+                   { user?.role === "ADMIN" && (
+                      <td>
+                        {entry.employee?.first_name} {entry.employee?.last_name}
+                      </td>
+                    )}
+                    <td>{entry.points}</td>
+                    <td className="entriesComp-reason">{entry.reason}</td>
+                    <td>
+                      {entry.created_by?.first_name}{" "}
+                      {entry.created_by?.last_name}
+                    </td>
+                    <td>{new Date(entry.created_at).toLocaleString()}</td>
+                    <td>{new Date(entry.updated_at).toLocaleString()}</td>
+                    {user.role === "ADMIN" && (
+                      <td
+                        onClick={() => handleReverseEntry(entry.id)}
+                        className="entriesComp-reverse"
+                      >
+                        <FaTrashRestore size={18} />
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
       {/* Pagination */}
-      <div className="pagination">
-        <p className="pagination-info">
+      <div className="entriesComp-pagination">
+        <p>
           Showing {entries.length} of {count} entries
         </p>
-        <div className="pagination-buttons">
+        <div className="entriesComp-pageBtns">
           <button
             disabled={!prevUrl}
             onClick={() => fetchEntries(prevUrl)}
-            className="pagination-btn"
           >
             ← Prev
           </button>
           <button
             disabled={!nextUrl}
             onClick={() => fetchEntries(nextUrl)}
-            className="pagination-btn"
           >
             Next →
           </button>
         </div>
       </div>
-      {showModal 
-      && <RequestModal 
-      postApi={createEntriesApi}
-      getApi= {() => getAllEntriesApi(API_URL)}
-      onClose={() => setShowModal(false)} />}
+
+      {showModal && (
+        <RequestModal
+          postApi={createEntriesApi}
+          getApi={() => getAllEntriesApi(API_URL)}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };

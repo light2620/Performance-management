@@ -5,13 +5,15 @@ import Login from "../Pages/Auth/Login/Login";
 import Home from "../Pages/Dashboard/Home";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
-import AdminRoute from "./AdmiRoute";
 import Setting from "../Pages/Setting/Setting";
-import Createuser from "../Pages/Createuser/Createuser";
 import UserManagement from "../Pages/UserManagement/UserManagement";
 import ManageDepartment from "../Pages/ManageDepartment/ManageDepartment";
 import Requests from "../Pages/Requests/Requests";
 import Entries from "../Pages/Entries/Entries";
+import AllPoints from "../Pages/All Points/AllPoints";
+import AdminRoute from "./AdmiRoute";
+import AuditLogs from "../Pages/AuditLogs/AuditLogs";
+import Notifications from "../Pages/Notifications/Notification";
 
 
 
@@ -30,9 +32,12 @@ const router = createBrowserRouter([
       { path: "/home", element: <Home /> },
          {path: "/requests",element: <Requests />},
          {path: "/points-entries",element: <Entries/>},
-      {path: "/settings",element: <Setting />},
-      {path: "/settings/manage-user",element: <UserManagement />},
-      {path: "/settings/manage-department",element: <ManageDepartment />}
+         {path: "/audit-log",element: <AuditLogs/>},
+         {path: "/notifications",element: <Notifications/>},
+      {path: "/settings/manage-user",element: <AdminRoute><UserManagement /> </AdminRoute> },
+      {path: "/settings/manage-department",element: <AdminRoute><ManageDepartment /> </AdminRoute>},
+      {path: "/points-summary",element: <AdminRoute><AllPoints /></AdminRoute>},
+      
  
    
       // add more private routes here

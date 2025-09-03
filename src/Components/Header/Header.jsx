@@ -31,28 +31,7 @@ const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className='header-bar'>
-    {!isMobile ? <div className='header-container'>
-
-
-          <div className="header-action-cont">
-                <div className="profile-icon">
-                    {initials || "U"}
-                </div>
-
-                <div className="user-info">
-                <p>{user?.first_name} {user?.last_name}</p>
-                <span>{user?.department?.dept_name || "No Department"}</span>
-                </div>
-                
-                <div className='logout-btn'>
-                  <button onClick={handleLogout}>
-                    <IoLogOutOutline />
-                    logout
-                  </button>
-                </div>
-                
-          </div>
-    </div> : (
+    {
       <div className="header-container-mobile">
         <div className="header-logo-cont-mobile" >
            <img src={logo} alt="logo" width="50%" height="50%" onClick={() => navigate("/")}/>
@@ -62,7 +41,7 @@ const [menuOpen, setMenuOpen] = useState(false);
           <GiHamburgerMenu size={22} />
        </div>
       </div>
-    )}
+    }
       <MobileMenu closeMobileMenu={() => setMenuOpen(false)} open={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   )

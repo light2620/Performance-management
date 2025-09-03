@@ -12,6 +12,7 @@ import useIsMobile from '../../CustomHook/useMobile'
 import { useNavigate } from 'react-router-dom'
 import MobileProfile from '../../Components/MobileProfile/MobileProfile'
 import ProfileModal from '../../Components/Profile/Profile'
+import ThemeToggle from '../../Utils/ThemeToggle.js/ThemeToggle'
 
 import "./style.css"
 const MainLayout = () => {
@@ -57,7 +58,9 @@ const fetchAllUsers = async() => {
                <div style={{marginTop: 'auto'}}>
         {
          <MobileProfile />
+
         }
+
       </div>
          
 

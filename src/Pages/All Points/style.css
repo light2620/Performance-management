@@ -1,190 +1,109 @@
-/* Container */
-.pointsComp-container {
+/* PointsTable.css */
+
+.points-table-container {
+  padding: 16px; /* Slightly reduced padding for smaller screens */
   background: #fff;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  margin: 16px 0;
+  border-radius: 8px; /* Slightly reduced border radius */
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1); /* Adjusted shadow */
+  margin: 10px; /* Reduced margin for smaller screens */
 }
 
-/* Header */
-.pointsComp-header {
+.points-table-title {
+  font-size: 18px; /* Reduced font size */
+  margin-bottom: 12px; /* Reduced margin */
+
+}
+
+.controls {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-direction: column; /* Stack controls vertically on smaller screens */
+  gap: 8px; /* Reduced gap */
+  margin-bottom: 10px; /* Reduced margin */
 }
 
-.pointsComp-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.pointsComp-refreshBtn {
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-size: 14px;
-  border: 1px solid #111827;
-  background: #fff;
-  cursor: pointer;
-}
-
-.pointsComp-refreshBtn:hover {
-  background: #f3f4f6;
-}
-
-/* Filters */
-.pointsComp-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 16px 0;
-}
-
-.pointsComp-filters select,
-.pointsComp-filters input {
-  padding: 6px 10px;
+.order-select,
+.search-input {
+  padding: 6px 8px; /* Reduced padding */
   border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  min-width: 140px;
+  border-radius: 4px; /* Reduced border radius */
+  font-size: 12px; /* Reduced font size */
 }
 
-/* Table wrapper */
-.pointsComp-tableWrapper {
-  margin-top: 10px;
-  max-height: 50vh;
-  overflow: scroll;
+.table-wrapper {
+  overflow-x: auto; /* Enable horizontal scrolling on small screens */
+  border: 1px solid #e5e7eb;
+  border-radius: 4px; /* Reduced border radius */
 }
 
-.pointsComp-tableScroll {
-  overflow-x: auto;
-}
-
-/* Table */
-.pointsComp-table {
+.points-table {
   width: 100%;
-  border-collapse: separate;   /* ✅ same as Requests */
-  border-spacing: 0 8px;       /* ✅ adds gap between rows */
-  font-size: 13px;
-  table-layout: auto;
+  border-collapse: collapse;
+  min-width: 600px; /* Minimum width to prevent table from collapsing too much */
 }
 
-.pointsComp-table th,
-.pointsComp-table td {
-  padding: 10px 12px;
-  background: #fff;
+.points-table th,
+.points-table td {
+  padding: 8px 10px; /* Reduced padding */
   text-align: left;
-  white-space: nowrap;
+  font-size: 12px; /* Reduced font size */
 }
 
-/* Sticky header */
-.pointsComp-table thead th {
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 12px;
-  color: #374151;
-  border-bottom: 2px solid #e5e7eb;
+.points-table th {
   position: sticky;
   top: 0;
-  background: #fff;
-  z-index: 2;
-}
-
-/* Hover effect */
-.pointsComp-table tbody tr:hover td {
   background: #f9fafb;
+  font-weight: bold;
+  z-index: 1;
 }
 
-/* Employee column (wider for readability) */
-.pointsComp-table th:nth-child(1),
-.pointsComp-table td:nth-child(1) {
-  min-width: 200px;
-  max-width: 260px;
-  white-space: normal !important;
-  word-break: break-word;
-  overflow-wrap: break-word;
+.merit {
+  color: green;
+  font-weight: bold;
 }
 
-/* Email column (allow wrapping if needed) */
-.pointsComp-table th:nth-child(2),
-.pointsComp-table td:nth-child(2) {
-  min-width: 220px;
-  max-width: 300px;
-  white-space: normal !important;
-  word-break: break-word;
-  overflow-wrap: break-word;
+.demerit {
+  color: red;
+  font-weight: bold;
 }
 
-/* Department column */
-.pointsComp-table th:nth-child(3),
-.pointsComp-table td:nth-child(3) {
-  min-width: 160px;
-}
-
-/* Colored values */
-.pointsComp-merit {
-  color: #16a34a;
-  font-weight: 600;
-}
-
-.pointsComp-demerit {
-  color: #dc2626;
-  font-weight: 600;
-}
-
-.pointsComp-net {
+.net {
   color: #2563eb;
-  font-weight: 600;
+  font-weight: bold;
 }
 
-/* States */
-.pointsComp-noData,
-.pointsComp-loading {
+.loading {
   text-align: center;
-  padding: 20px;
-  color: #6b7280;
+  padding: 16px; /* Reduced padding */
+  font-size: 14px; /* Reduced font size */
 }
 
-/* Pagination/Footer */
-.pointsComp-pagination {
-  margin-top: 16px;
-  font-size: 14px;
-  color: #6b7280;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .pointsComp-header {
-    flex-direction: column;
-    align-items: flex-start;
+/* Media Query for larger screens */
+@media (min-width: 768px) {
+  .points-table-container {
+    padding: 20px;
+    margin: 20px 0;
   }
 
-  .pointsComp-filters {
-    flex-direction: column;
+  .points-table-title {
+    font-size: 20px;
+    text-align: left;
   }
 
-  .pointsComp-filters select,
-  .pointsComp-filters input {
-    width: 100%;
+  .controls {
+    flex-direction: row; /* Display controls horizontally */
+    justify-content: space-between;
+    align-items: center; /* Align items vertically in the center */
   }
 
-  .pointsComp-table {
-    font-size: 12px;
+  .order-select,
+  .search-input {
+    padding: 8px 10px;
+    font-size: 14px;
   }
 
-  /* Adjust column widths for smaller screens */
-  .pointsComp-table th:nth-child(1),
-  .pointsComp-table td:nth-child(1) {
-    min-width: 160px;
-    max-width: 200px;
-  }
-
-  .pointsComp-table th:nth-child(2),
-  .pointsComp-table td:nth-child(2) {
-    min-width: 180px;
-    max-width: 220px;
+  .points-table th,
+  .points-table td {
+    padding: 10px 12px;
+    font-size: 14px;
   }
 }

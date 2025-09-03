@@ -8,16 +8,18 @@ import { RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './Utils/AuthContext';
 import { Provider } from 'react-redux';
 import { store } from './Redux/store';
+import { ThemeProvider } from './Utils/ThemeContext';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-
+ <ThemeProvider>
     <AuthProvider>
       <Provider store={store}>
     <App />
     </Provider>
      </AuthProvider>
+    </ThemeProvider >
  
 );
 

@@ -84,3 +84,13 @@
   background: #fee2e2;
   color: #b91c1c;
 }
+
+.pill-merit {
+  background: #dcfce7; /* light green background */
+  color: #15803d; /* dark green text */
+}
+
+.pill-demerit {
+  background: #fee2e2; /* light red background */
+  color: #b91c1c; /* dark red text */
+}

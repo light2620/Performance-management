@@ -1,0 +1,49 @@
+.theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 55px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider background */
+.theme-switch .slider {
+  position: absolute;
+  inset: 0;
+  background-color: var(--border-color);
+  border-radius: 50px;
+  transition: 0.4s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  padding-left: 6px;
+}
+
+/* Round circle inside slider */
+.theme-switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--bg-color);
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+/* When checked (Dark mode) */
+.theme-switch input:checked + .slider {
+  background-color: #4f46e5; /* Indigo accent */
+}
+
+.theme-switch input:checked + .slider::before {
+  transform: translateX(26px);
+}

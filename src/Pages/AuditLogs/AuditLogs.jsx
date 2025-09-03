@@ -112,11 +112,15 @@ const MyActivity = () => {
                       {a.details?.points && (
                         <span className="pill">{a.details.points} pts</span>
                       )}
-                      {a.details?.type && (
-                        <span className="pill type">
-                          {a.details.type}
-                        </span>
-                      )}
+                     {a.details?.type && (
+  <span
+    className={`pill ${
+      a.details.type === "MERIT" ? "pill-merit" : "pill-demerit"
+    }`}
+  >
+    {a.details.type}
+  </span>
+)}
                       <br />
                       <span className="muted">{a.details?.reason}</span>
                     </td>

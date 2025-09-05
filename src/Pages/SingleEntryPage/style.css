@@ -1,0 +1,415 @@
+/* SingleEntryPage.css - complete file */
+
+/* -------------------- Base / Layout -------------------- */
+
+
+.single-entry-page {
+  min-height: 100vh;
+  padding: 28px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  color: #233043;
+}
+
+/* Card */
+.entry-card {
+  position: relative;
+  width: 100%;
+  max-width: 980px;             /* desktop max width */
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+  box-shadow: 0 10px 30px rgba(31,41,55,0.09);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.3s ease, transform 0.12s ease;
+}
+
+/* subtle hover lift on larger screens */
+@media (hover: hover) and (min-width: 900px) {
+  .entry-card:hover { transform: translateY(-4px); }
+}
+
+/* -------------------- Left accent -------------------- */
+
+.entry-left-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: #9ca3af;
+  z-index: 0;
+  transition: background 0.25s ease, width 0.25s ease;
+}
+
+.entry-status-approved .entry-left-accent { background: #16a34a; }
+.entry-status-rejected .entry-left-accent { background: #ef4444; }
+.entry-status-pending .entry-left-accent { background: #9ca3af; }
+
+/* -------------------- Header -------------------- */
+
+.entry-card-header {
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid #f0f4f8;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+  gap: 12px;
+}
+
+/* Title & status */
+.entry-title-block {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+}
+
+.entry-type {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.4px;
+  color: #0f1724;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60vw;
+}
+
+.entry-big-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  box-shadow: 0 6px 18px rgba(31,41,55,0.06);
+  white-space: nowrap;
+}
+.entry-big-status .status-emoji { font-size: 14px; }
+
+.entry-big-status.pending { background: #fff7ed; color: #b45309; }
+.entry-big-status.approved { background: #ecfdf5; color: #046c4b; }
+.entry-big-status.rejected { background: #fff1f2; color: #b91c1c; }
+
+/* -------------------- Meta (avatars + who) -------------------- */
+
+.entry-meta-block {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+}
+
+.entry-for-block,
+.entry-by-block {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Avatar */
+.entry-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  color: white;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.entry-avatar-employee { background: linear-gradient(135deg,#60a5fa,#34d399); }
+.entry-avatar-creator  { background: linear-gradient(135deg,#f97316,#f43f5e); }
+
+.entry-who {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+.entry-who-label {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+}
+.entry-who-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0b1220;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.entry-who-sub {
+  margin-top: 4px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #475569;
+}
+.entry-who-email { font-weight: 600; color: #0f1724; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;}
+.entry-who-dept  { font-weight: 700; color: #334155; }
+
+/* -------------------- Body -------------------- */
+
+.entry-body {
+  display: flex;
+  gap: 18px;
+  padding: 18px;
+  z-index: 2;
+  align-items: flex-start;
+  flex-wrap: wrap; /* allow wrapping to avoid overflow */
+}
+
+/* Left column */
+.entry-left-column {
+  flex: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* Points pill */
+.entry-points-pill {
+  align-self: flex-start;
+  background: linear-gradient(90deg,#60a5fa,#7c3aed);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(99,102,241,0.12);
+  font-size: 13px;
+}
+
+/* Reason (square box) */
+.entry-reason-box {
+  background: #fff;
+  border: 1px solid #e8eef8;
+  padding: 14px;
+  border-radius: 10px;
+  min-height: 100px;
+  box-shadow: 0 6px 18px rgba(31,41,55,0.03);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.entry-reason-title { font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 8px; }
+.entry-reason-content {
+  font-size: 15px;
+  color: #263544;
+  line-height: 1.45;
+  overflow-y: auto;
+  max-height: 260px;
+  padding-right: 6px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Timestamps row */
+.entry-timestamps { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+.entry-ts-row {
+  background: #fff;
+  border: 1px dashed #e6eef9;
+  padding: 10px 12px;
+  border-radius: 8px;
+  flex: 1 1 140px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.entry-ts-label { font-size: 12px; color: #64748b; font-weight: 700; }
+.entry-ts-value { font-size: 13px; color: #123; margin-top: 6px; }
+
+/* Right column */
+.entry-right-column {
+  flex: 0.85;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 220px;
+  flex-shrink: 1;
+}
+
+/* Additional card */
+.entry-additional-card {
+  padding: 12px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #eef6ff;
+  box-shadow: 0 6px 18px rgba(59,130,246,0.04);
+}
+.entry-add-title { font-weight: 800; font-size: 14px; margin-bottom: 8px; }
+.entry-add-row { display:flex; justify-content: space-between; padding: 6px 0; color:#334155; }
+.entry-add-row .k { font-weight: 700; color:#64748b; font-size: 13px; }
+.entry-add-row .v { font-weight: 700; }
+
+/* -------------------- Buttons -------------------- */
+
+.entry-cta-block { display:flex; flex-direction: column; gap: 10px; }
+.entry-btn {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(15,23,42,0.06);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.entry-btn:active { transform: translateY(1px); }
+
+.entry-btn.reverse { background: linear-gradient(90deg,#ef4444,#dc2626); color: #fff; }
+.entry-btn.back    { background: linear-gradient(90deg,#9ca3af,#6b7280); color: #fff; }
+.entry-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* -------------------- Footer -------------------- */
+
+.entry-footer {
+  display:flex;
+  justify-content:space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  border-top: 1px solid #f0f4f8;
+  font-size: 13px;
+  color: #64748b;
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+}
+.entry-footer code { background: #f8fafc; padding: 2px 6px; border-radius: 6px; color: #0b1220; }
+
+/* -------------------- Accessibility / small tweaks -------------------- */
+
+.entry-card { box-sizing: border-box; }
+.entry-title-block, .entry-meta-block, .entry-for-block, .entry-by-block { min-width: 0; }
+.entry-type { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.entry-big-status { flex: 0 0 auto; max-width: 40%; min-width: 0; }
+
+/* Make sure long/unbroken strings wrap instead of causing overflow */
+.entry-who-value,
+.entry-who-email,
+.entry-add-row .v,
+.entry-add-row .k,
+.entry-ts-value {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* -------------------- Responsive breakpoints -------------------- */
+
+/* Tablet and below */
+@media (max-width: 900px) {
+  .single-entry-page { padding: 22px 14px; }
+
+  .entry-card { max-width: 720px; }
+  .entry-left-accent { width: 8px; }
+
+  .entry-card-header { padding: 14px 14px; gap: 8px; }
+  .entry-type { font-size: 17px; max-width: 50vw; }
+  .entry-big-status { font-size: 12px; padding: 7px 10px; }
+
+  /* stack body columns */
+  .entry-body { flex-direction: column; padding: 16px; gap: 16px; }
+  .entry-right-column { min-width: 100%; width: 100%; order: 2; }
+  .entry-left-column { order: 1; }
+
+  /* make buttons more tap-friendly */
+  .entry-cta-block { flex-direction: row; }
+  .entry-cta-block .entry-btn { flex: 1; }
+  .entry-cta-block .entry-btn + .entry-btn { margin-left: 8px; }
+
+  /* show less meta detail on smaller tablets */
+  .entry-meta-block { gap: 10px; }
+  .entry-who-sub { display: none; } /* hide extra creator info on tablet */
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  .single-entry-page { padding: 16px 12px; }
+  .entry-card { border-radius: 10px; }
+
+  .entry-left-accent { width: 6px; }
+  .entry-card-header { padding: 12px 12px; }
+
+  .entry-avatar { width: 36px; height: 36px; font-size: 13px; border-radius: 8px; }
+  .entry-type { font-size: 16px; max-width: 54vw; }
+
+  /* stack header items: title on top, meta below */
+  .entry-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .entry-title-block { width: 100%; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .entry-meta-block { width: 100%; display:flex; justify-content: flex-start; gap: 12px; }
+
+  /* body stacks */
+  .entry-body { padding: 12px; gap: 12px; }
+  .entry-left-column { gap: 12px; }
+  .entry-right-column { min-width: 100%; width: 100%; }
+
+  /* reason box smaller, font slightly reduced */
+  .entry-reason-box { padding: 12px; min-height: 90px; }
+  .entry-reason-content { font-size: 14px; max-height: 170px; }
+
+  /* Make CTA buttons full width stacked */
+  .entry-cta-block { flex-direction: column; }
+  .entry-cta-block .entry-btn { width: 100%; }
+  .entry-cta-block .entry-btn + .entry-btn { margin-left: 0; }
+
+  /* hide small non-essential text that clutters mobile */
+  .entry-who-sub { display: none; }
+  .entry-add-row .k { font-size: 12px; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .entry-left-accent { width: 5px; }
+  .entry-avatar { width: 34px; height: 34px; font-size: 12px; }
+  .entry-type { font-size: 15px; }
+  .entry-points-pill { padding: 6px 8px; font-size: 12px; }
+  .entry-reason-content { font-size: 13px; }
+}
+
+/* -------------------- Overflow / safety fixes (prevent right-gap) -------------------- */
+
+/* ensure header/meta title area shrink if space is tight */
+.entry-title-block,
+.entry-meta-block,
+.entry-for-block,
+.entry-by-block {
+  min-width: 0;
+}
+
+/* ensure big-status doesn't push layout — allow it to shrink */
+.entry-big-status {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+/* right column should be allowed to shrink / wrap on smaller screens */
+.entry-right-column {
+  min-width: 0;
+
+}
+
+/* left column should be flexible too */
+.entry-left-column {
+  min-width: 0;
+
+}
+
+/* Final safety: prevent accidental horizontal scroll for this page */
+

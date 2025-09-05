@@ -155,16 +155,6 @@
   background: #f9fafb;
 }
 
-/* Reason column */
-.entriesComp-table th:nth-child(5),
-.entriesComp-table td:nth-child(5),
-.entriesComp-reason {
-  min-width: 240px;
-  max-width: 400px;
-  white-space: normal !important;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
 
 /* Operation tags */
 .entriesComp-tag {

@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../Utils/AuthContext";
 import {
   getAllrequest,
-  approveRequestApi,
-  rejectRequestApi,
-  deleteRequestApi,
   createRequestApi,
 } from "../../Apis/pointRequestApi";
 import RequestModal from "../../Components/RequestModal.jsx/RequestModal";
+import { useNavigate } from "react-router-dom";
 import "./style.css";
 
 const API_URL = "/point-requests/";
@@ -17,6 +15,7 @@ const Requests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [lastUrl, setLastUrl] = useState(API_URL);
 
   // filters
@@ -81,32 +80,7 @@ const Requests = () => {
     }
   };
 
-  const handleApprove = async (id) => {
-    try {
-      await approveRequestApi(id);
-      fetchRequests(lastUrl);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
-  const handleReject = async (id) => {
-    try {
-      await rejectRequestApi(id);
-      fetchRequests(lastUrl);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteRequestApi(id);
-      fetchRequests(lastUrl);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   if (!user) {
     return <p className="requestsComp-loading">Loading user...</p>;
@@ -222,15 +196,14 @@ const Requests = () => {
                   <th>Status</th>
                   <th>Employee</th>
                   <th>Points</th>
-                  <th>Reason</th>
+                  {user?.role === "ADMIN" && <th>Created By</th>}
                   <th>Created</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody className="requestsComp-body">
                 {requests.map((req) => (
-                  <tr key={req.id}>
+                  <tr key={req.id} onClick={() => navigate(`/requests/${req.id}`)} style={{cursor:"pointer"}}>
                     <td>{req.type}</td>
                     <td>
                       <span
@@ -243,10 +216,13 @@ const Requests = () => {
                       {req.employee?.first_name} {req.employee?.last_name}
                     </td>
                     <td>{req.points}</td>
-                    <td className="requestsComp-reason">{req.reason}</td>
+                    { user.role === "ADMIN" && (
+                      <td>
+                        {req.created_by?.first_name} {req.created_by?.last_name}
+                      </td>
+                    )}
                     <td>{new Date(req.created_at).toLocaleDateString()}</td>
-                    <td>{new Date(req.updated_at).toLocaleDateString()}</td>
-                    <td className="requestsComp-actionsCell">
+                    {/* <td className="requestsComp-actionsCell">
                       {req.status === "APPROVED" ||
                       req.status === "CANCELLED" ||
                       req.status === "REJECTED" ? (
@@ -280,7 +256,8 @@ const Requests = () => {
                           Delete
                         </button>
                       )}
-                    </td>
+                    </td> */}
+                    <td style={{textDecoration:"underline", cursor:"pointer"} }>view</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getAllNotifications, markAsRead } from "../../Apis/NotificationApis";
 import NotificationModal from "../../Components/NotificationModal/NotificationModal";
+import NotificationListener from "../../Components/NotificationListener/NotificationListener";
 import "./style.css";
 
 const API_URL = "/notifications/";
+
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -178,6 +180,7 @@ const Notifications = () => {
         setSelectedNotif(null)}}
   />
 )}
+
     </div>
   );
 };

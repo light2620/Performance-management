@@ -9,12 +9,14 @@ import { AuthProvider } from './Utils/AuthContext';
 import { Provider } from 'react-redux';
 import { store } from './Redux/store';
 import { ThemeProvider } from './Utils/ThemeContext';
+import NotificationListener from './Components/NotificationListener/NotificationListener';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
  <ThemeProvider>
     <AuthProvider>
+      <NotificationListener />
       <Provider store={store}>
     <App />
     </Provider>

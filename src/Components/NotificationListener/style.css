@@ -1,0 +1,150 @@
+/* NotificationListener.css - floating in-app notifications */
+
+/* root sits at top-right of viewport */
+.nl-root {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 1400;
+  pointer-events: none; /* allow clicks to pass when not on items */
+}
+
+/* container holds stacked notifications */
+.nl-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: auto; /* enable interactions on items */
+  max-width: 360px;
+}
+
+/* individual item */
+.nl-item {
+  display: flex;
+  gap: 12px;
+  background: linear-gradient(180deg,#ffffff,#fbfdff);
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(11,20,35,0.12);
+  padding: 12px;
+  overflow: hidden;
+  position: relative;
+  cursor: default;
+  transition: transform 220ms cubic-bezier(.2,.9,.2,1), opacity 220ms;
+  opacity: 0;
+  transform: translateX(12px);
+  animation: nl-slide-in 260ms forwards;
+}
+
+/* slide in */
+@keyframes nl-slide-in {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* colors by kind */
+.nl-success { border-left: 4px solid #10b981; }
+.nl-error   { border-left: 4px solid #ef4444; }
+.nl-warning { border-left: 4px solid #f59e0b; }
+.nl-info    { border-left: 4px solid #3b82f6; }
+
+/* left icon */
+.nl-left { display:flex; align-items:flex-start; }
+.nl-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  color: white;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  box-shadow: 0 6px 14px rgba(102,126,234,0.08);
+}
+
+/* main content clickable area */
+.nl-main {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1;
+  min-width:0;
+  outline: none;
+}
+.nl-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #0b1220;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nl-msg {
+  font-size: 13px;
+  color: #334155;
+  max-height: 3.6em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+.nl-meta {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  font-size:11px;
+  color:#6b7280;
+}
+.nl-type { background:#eef2ff; color:#3730a3; padding:4px 8px; border-radius:999px; font-weight:700; }
+.nl-status-txt { color:#64748b; }
+
+/* progress bar at bottom of item - CSS animation will simulate progress */
+.nl-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(16,185,129,0.9), rgba(59,130,246,0.9));
+  transform-origin: left;
+  animation: nl-progress linear forwards;
+  animation-duration: 5s; /* default match AUTO_DISMISS_MS; javascript will pause/resume by removing/adding element */
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* close button (top-right of item) */
+.nl-close-btn {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 6;
+}
+
+/* kind-specific icon bg tweaks */
+.nl-success .nl-icon { background: linear-gradient(135deg,#059669,#10b981); }
+.nl-error   .nl-icon { background: linear-gradient(135deg,#dc2626,#ef4444); }
+.nl-warning .nl-icon { background: linear-gradient(135deg,#f97316,#f59e0b); }
+.nl-info    .nl-icon { background: linear-gradient(135deg,#3b82f6,#60a5fa); }
+
+/* progress animation - shrink width to 0 */
+@keyframes nl-progress {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+/* pause animation helper (when JS pauses timer, we'll add class .paused to the item) */
+.nl-item.paused .nl-progress {
+  animation-play-state: paused;
+}
+
+/* responsive smaller width on phone */
+@media (max-width: 520px) {
+  .nl-container { right: 12px; left: 12px; max-width: calc(100% - 24px); }
+  .nl-icon { width: 40px; height: 40px; font-size: 16px; }
+  .nl-title { font-size: 13px; }
+  .nl-msg { font-size: 13px; }
+}

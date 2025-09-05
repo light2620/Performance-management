@@ -92,31 +92,30 @@ const Sidebar = ({ closeMobileMenu }) => {
     <div className="navbar-cont">
       {/* Main Nav Options */}
       {navOption
-        .filter((option) => {
-          return !option.isAdmin || (option.isAdmin && user?.role === "ADMIN");
-        })
-        .map((option, index) => (
-          <div
-            key={index}
-            className={` ${
-              location.pathname === option.path && !showSettingOptions
-                ? "active-option"
-                : "nav-option"
-            }`}
-            onClick={() => {
-              navigate(option.path);
-              setShowSettingOptions(false);
-              isMobile && closeMobileMenu();
-            }}
-          >
-            <div className="nav-icon">{option.icon}</div>
-            <p>{option.name}</p>
-            {/* Badge for notifications */}
-            {option.badge > 0 && (
-              <span className="notif-badge">{option.badge}</span>
-            )}
-          </div>
-        ))}
+  .filter((option) => !option.isAdmin || (option.isAdmin && user?.role === "ADMIN"))
+  .map((option) => {
+    const active = (() => {
+      if (option.path === "/") return location.pathname === "/";
+      return location.pathname === option.path || location.pathname.startsWith(option.path + "/");
+    })();
+
+    return (
+      <div
+        key={option.path}
+        className={active ? "active-option" : "nav-option"}
+        onClick={() => {
+          navigate(option.path);
+          setShowSettingOptions(false);
+          if (isMobile) closeMobileMenu();
+        }}
+      >
+        <div className="nav-icon">{option.icon}</div>
+        <p>{option.name}</p>
+        {option.badge > 0 && <span className="notif-badge">{option.badge}</span>}
+      </div>
+    );
+  })}
+
 
       {/* Settings Dropdown */}
       {user?.role === "ADMIN" && (

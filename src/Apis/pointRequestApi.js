@@ -13,6 +13,15 @@ const getAllrequest = async(url) =>{
     }
 }
 
+const getSingleRequestApi = async(id) => {
+    try{
+        const res = await axiosInstance.get(`/point-requests/${id}/`)
+        return res; 
+    }catch(err){
+        throw err
+    }
+}   
+
 
 const createRequestApi = async(data) => {
     try{
@@ -59,4 +68,4 @@ const deleteRequestApi = async(id) => {
     }
 }
 
-export {getAllrequest,createRequestApi,approveRequestApi,rejectRequestApi,deleteRequestApi}
+export {getAllrequest,createRequestApi,approveRequestApi,rejectRequestApi,deleteRequestApi,getSingleRequestApi}

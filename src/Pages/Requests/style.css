@@ -146,14 +146,14 @@
 }
 
 /* Reason column */
-.requestsComp-table th:nth-child(5),
+/* .requestsComp-table th:nth-child(5),
 .requestsComp-table td:nth-child(5) {
   min-width: 240px;
   max-width: 400px;
   white-space: normal !important;
   word-break: break-word;
   overflow-wrap: break-word;
-}
+} */
 
 /* Status tags */
 .requestsComp-status {

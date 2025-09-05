@@ -14,6 +14,8 @@ import AllPoints from "../Pages/All Points/AllPoints";
 import AdminRoute from "./AdmiRoute";
 import AuditLogs from "../Pages/AuditLogs/AuditLogs";
 import Notifications from "../Pages/Notifications/Notification";
+import SingleRequestPage from "../Pages/SingleRequestPage/SingleRequestPage";
+import SingleEntryPage from "../Pages/SingleEntryPage/SingleEntryPage";
 
 
 
@@ -31,7 +33,9 @@ const router = createBrowserRouter([
       { index: true, element: <Home />},
       { path: "/home", element: <Home /> },
          {path: "/requests",element: <Requests />},
+         {path: "/requests/:id",element: <SingleRequestPage />},
          {path: "/points-entries",element: <Entries/>},
+         {path: "/points-entries/:id",element: <SingleEntryPage/>},
          {path: "/audit-log",element: <AuditLogs/>},
          {path: "/notifications",element: <Notifications/>},
       {path: "/settings/manage-user",element: <AdminRoute><UserManagement /> </AdminRoute> },

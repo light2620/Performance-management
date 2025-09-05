@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../Utils/AuthContext";
 import { createEntriesApi, getAllEntriesApi, reverseEntryApi } from "../../Apis/EntriesApi";
 import RequestModal from "../../Components/RequestModal.jsx/RequestModal";
-import { FaTrashRestore } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import "./style.css";
 
-const API_URL = "/point-entries/";
 
+const API_URL = "/point-entries/";
 const Entries = () => {
   const { user } = useAuth();
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   // filters
   const [type, setType] = useState("");
@@ -73,18 +74,7 @@ const Entries = () => {
     }
   };
 
-  const handleReverseEntry = async (id) => {
-    try {
-      await reverseEntryApi(id);
-      await fetchEntries(API_URL);
-      setType("");
-      setOrdering("");
-      setEmployee("");
-      setEmployeeSearch("");
-    } catch (err) {
-      console.log(err);
-    }
-  };
+
 
   if (!user) {
     return <p className="entriesComp-loading">Loading user...</p>;
@@ -202,16 +192,16 @@ const Entries = () => {
                   <th>Operation</th>
                  { user?.role === "ADMIN" && <th>Employee</th>}
                   <th>Points</th>
-                  <th>Reason</th>
                   <th>Created By</th>
                   <th>Created</th>
-                  <th>Updated</th>
-                  {user.role === "ADMIN" && <th>Action</th>}
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {entries.map((entry) => (
-                  <tr key={entry.id}>
+                  <tr key={entry.id } style={{cursor:"pointer"}} onClick={()=>{
+                    navigate(`/points-entries/${entry.id}`)
+                  }}>
                     <td>{entry.type}</td>
                     <td>
                       <span
@@ -226,21 +216,20 @@ const Entries = () => {
                       </td>
                     )}
                     <td>{entry.points}</td>
-                    <td className="entriesComp-reason">{entry.reason}</td>
                     <td>
                       {entry.created_by?.first_name}{" "}
                       {entry.created_by?.last_name}
                     </td>
 <td>{new Date(entry.created_at).toLocaleDateString()}</td>
-<td>{new Date(entry.updated_at).toLocaleDateString()}</td>
-                    {user.role === "ADMIN" && (
+                    {/* {user.role === "ADMIN" && (
                       <td
                         onClick={() => handleReverseEntry(entry.id)}
                         className="entriesComp-reverse"
                       >
                         <FaTrashRestore size={18} />
                       </td>
-                    )}
+                    )} */}
+                    <td style={{cursor:"pointer",textDecoration:"underline"}}> View</td>
                   </tr>
                 ))}
               </tbody>

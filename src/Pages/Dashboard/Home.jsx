@@ -6,6 +6,7 @@ import QuickAction from '../../Components/QuickAction/QuickAction'
 import { getPerformanceApi } from '../../Apis/Points'
 import TotalPoints from '../../Components/Performance/TotalPoints'
 import { useAuth } from '../../Utils/AuthContext'
+import NotificationListener from '../../Components/NotificationListener/NotificationListener'
 const Home= () => {
 
   const [performance,setPerformance] = useState({
@@ -50,6 +51,7 @@ const Home= () => {
           <div>
             <QuickAction />
           </div>
+          <NotificationListener />
       </div>
     </div>
   )

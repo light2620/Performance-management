@@ -16,6 +16,7 @@ import AuditLogs from "../Pages/AuditLogs/AuditLogs";
 import Notifications from "../Pages/Notifications/Notification";
 import SingleRequestPage from "../Pages/SingleRequestPage/SingleRequestPage";
 import SingleEntryPage from "../Pages/SingleEntryPage/SingleEntryPage";
+import DashboardSelector from "./DashboardSelector";
 
 
 
@@ -30,17 +31,16 @@ const router = createBrowserRouter([
     ),
     children: [
       // when user hits "/", push them to /dashboard
-      { index: true, element: <Home />},
-      { path: "/home", element: <Home /> },
+         { index: true, element: <DashboardSelector /> },
+         { path: "/home", element: <DashboardSelector /> },
          {path: "/requests",element: <Requests />},
          {path: "/requests/:id",element: <SingleRequestPage />},
          {path: "/points-entries",element: <Entries/>},
          {path: "/points-entries/:id",element: <SingleEntryPage/>},
-         {path: "/audit-log",element: <AuditLogs/>},
          {path: "/notifications",element: <Notifications/>},
-      {path: "/settings/manage-user",element: <AdminRoute><UserManagement /> </AdminRoute> },
-      {path: "/settings/manage-department",element: <AdminRoute><ManageDepartment /> </AdminRoute>},
-      {path: "/points-summary",element: <AdminRoute><AllPoints /></AdminRoute>},
+         {path: "/settings/manage-user",element: <AdminRoute><UserManagement /> </AdminRoute> },
+         {path: "/settings/manage-department",element: <AdminRoute><ManageDepartment /> </AdminRoute>},
+
       
  
    

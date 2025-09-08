@@ -10,74 +10,150 @@ const uid = () =>
 const NotificationListener = () => {
   const [items, setItems] = useState([]);
   const socketRef = useRef(null);
+  const tokenRef = useRef(tokenService.getAccess?.() ?? null);
+  const reconnectingRef = useRef(false);
 
+  // utility to cleanly close socket
+  const closeSocket = () => {
+    try {
+      if (socketRef.current) {
+        socketRef.current.onmessage = null;
+        socketRef.current.onopen = null;
+        socketRef.current.onclose = null;
+        socketRef.current.onerror = null;
+        socketRef.current.close();
+        socketRef.current = null;
+      }
+    } catch (e) {
+      console.warn("Error closing socket", e);
+    }
+  };
+
+  // open socket for a given token
+  const openSocket = (token) => {
+    if (!token) return;
+    try {
+      const ws = new WebSocket(`${WS_URL}?token=${token}`);
+      socketRef.current = ws;
+
+      ws.onopen = () => {
+        console.info("✅ Notification WS connected");
+      };
+
+      ws.onmessage = (evt) => {
+        try {
+          const data = JSON.parse(evt.data);
+          console.log("📩 Notification WS message", data);
+          if (data?.type === "notification" && data.notification) {
+            const n = data.notification;
+            const id = n.id ?? uid();
+            const title = n.title ?? "Notification";
+            const message = n.message ?? n.preview ?? "";
+            const status = n.status ?? "";
+            const ntype = n.type ?? "";
+            const navigate_url = n.navigate_url ?? n.metadata?.navigate_url ?? null;
+            const meta = n.metadata ?? null;
+
+            let kind = "info";
+            if (typeof ntype === "string") {
+              if (ntype.includes("MERIT") || ntype.toUpperCase().includes("MERIT")) kind = "success";
+              if (ntype.includes("DEMERIT") || ntype.toUpperCase().includes("DEMERIT")) kind = "error";
+              if (ntype.includes("REQUEST") || ntype.toUpperCase().includes("REQUEST")) kind = "warning";
+            }
+
+            const newItem = {
+              id,
+              title,
+              message,
+              kind,
+              status,
+              type: ntype,
+              navigate_url,
+              meta,
+              createdAt: Date.now(),
+            };
+
+            // prepend and avoid duplicates by id
+            setItems((prev) => {
+              if (prev.some(p => p.id === id)) return prev;
+              return [newItem, ...prev];
+            });
+          }
+        } catch (err) {
+          console.error("❌ Failed to parse WS message", err);
+        }
+      };
+
+      ws.onclose = (ev) => {
+        console.info("🔌 Notification WS closed", ev.reason || "");
+        socketRef.current = null;
+      };
+
+      ws.onerror = (err) => {
+        console.error("❌ Notification WS error", err);
+      };
+    } catch (e) {
+      console.error("Failed to open WS", e);
+    }
+  };
+
+  // effect: manage socket lifecycle based on tokenRef.current
   useEffect(() => {
     const token = tokenService.getAccess?.();
-    if (!token) {
-      console.error("No token for notification WS");
-      return;
+    tokenRef.current = token ?? null;
+
+    if (tokenRef.current) {
+      openSocket(tokenRef.current);
     }
 
-    const ws = new WebSocket(`${WS_URL}?token=${token}`);
-    socketRef.current = ws;
-
-    ws.onopen = () => {
-      console.info("✅ Notification WS connected");
-    };
-
-    ws.onmessage = (evt) => {
-      try {
-        const data = JSON.parse(evt.data);
-        console.log("📩 Notification WS message", data);
-        if (data?.type === "notification" && data.notification) {
-          const n = data.notification;
-          const id = n.id ?? uid();
-          const title = n.title ?? "Notification";
-          const message = n.message ?? n.preview ?? "";
-          const status = n.status ?? "";
-          const ntype = n.type ?? "";
-          const navigate_url = n.navigate_url ?? n.metadata?.navigate_url ?? null;
-          const meta = n.metadata ?? null;
-
-          let kind = "info";
-          if (ntype?.includes("MERIT")) kind = "success";
-          if (ntype?.includes("DEMERIT")) kind = "error";
-          if (ntype?.includes("REQUEST")) kind = "warning";
-
-          const newItem = {
-            id,
-            title,
-            message,
-            kind,
-            status,
-            type: ntype,
-            navigate_url,
-            meta,
-            createdAt: Date.now(),
-          };
-
-          setItems((prev) => [newItem, ...prev]);
+    // storage event handler: detect token changes from other tabs (common logout flow)
+    const onStorage = () => {
+      const newToken = tokenService.getAccess?.() ?? null;
+      // if token removed => logout happened
+      if (!newToken && tokenRef.current) {
+        tokenRef.current = null;
+        // close socket & clear notifications
+        closeSocket();
+        setItems([]);
+        console.info("NotificationListener: token removed -> closing socket & clearing items");
+      } else if (newToken && newToken !== tokenRef.current) {
+        // token changed (login or token refresh) -> reconnect
+        tokenRef.current = newToken;
+        closeSocket();
+        // small debounce to avoid quick reconnect loops
+        if (!reconnectingRef.current) {
+          reconnectingRef.current = true;
+          setTimeout(() => {
+            openSocket(newToken);
+            reconnectingRef.current = false;
+          }, 250);
         }
-      } catch (err) {
-        console.error("❌ Failed to parse WS message", err);
       }
     };
 
-    ws.onclose = () => {
-      console.info("🔌 Notification WS closed");
+    // custom event listener (if your logout flow emits window.dispatchEvent(new Event('auth:logout')))
+    const onAuthLogout = () => {
+      tokenRef.current = null;
+      closeSocket();
+      setItems([]);
+      console.info("NotificationListener: auth:logout -> closed socket & cleared items");
     };
 
-    ws.onerror = (err) => {
-      console.error("❌ Notification WS error", err);
-    };
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("auth:logout", onAuthLogout);
 
+    // cleanup on unmount
     return () => {
-      try {
-        ws.close();
-      } catch (e) {}
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("auth:logout", onAuthLogout);
+      closeSocket();
     };
+    // run once (we rely on storage / auth events to change token)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // explicit logout helper (optional) — you can call window.dispatchEvent(new Event('auth:logout')) from your logout code
+  // remove single item
   const removeItem = (id) => {
     setItems((prev) => prev.filter((p) => p.id !== id));
   };
@@ -104,6 +180,19 @@ const NotificationListener = () => {
   return (
     <div className="nl-root" aria-live="polite" aria-atomic="true">
       <div className="nl-container" role="list">
+        {/* optional "clear all" button shown when items exist */}
+        {items.length > 0 && (
+          <div className="nl-clear-all">
+            <button
+              className="nl-clear-btn"
+              onClick={() => setItems([])}
+              aria-label="Clear all notifications"
+            >
+              Clear All
+            </button>
+          </div>
+        )}
+
         {items.map((it) => (
           <div
             key={it.id}

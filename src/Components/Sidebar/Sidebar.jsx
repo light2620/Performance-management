@@ -12,6 +12,7 @@ import useIsMobile from "../../CustomHook/useMobile";
 import { useAuth } from "../../Utils/AuthContext";
 import { AiOutlineAudit } from "react-icons/ai";
 import { IoMdNotifications } from "react-icons/io";
+import AdminDashbaord from "../../Pages/AdminDashboard/AdminDashbaord";
 
 // import your notification API
 import { getUnreadCount } from "../../Apis/NotificationApis";
@@ -62,20 +63,6 @@ const Sidebar = ({ closeMobileMenu }) => {
       name: "Points Entries",
       icon: <GrDocumentPerformance size={22} />,
       className: "nav-entries",
-      isAdmin: false,
-    },
-    {
-      path: "/points-summary",
-      name: "Total Points",
-      icon: <FaRegFilePowerpoint size={22} />,
-      className: "nav-points-summary",
-      isAdmin: true,
-    },
-    {
-      path: "/audit-log",
-      name: "Audit Log",
-      icon: <AiOutlineAudit size={22} />,
-      className: "nav-audit-log",
       isAdmin: false,
     },
     {

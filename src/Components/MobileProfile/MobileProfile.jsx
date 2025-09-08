@@ -16,9 +16,8 @@ const MobileProfile = () => {
     : "";
 
   const handleLogout = () => {
-    logout(); // clear tokens
+logout(); // clear tokens
     setIsLoggedIn(false); // update context
-    navigate("/"); // redirect to home
   };
   
 

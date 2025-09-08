@@ -1,6 +1,7 @@
 import axios from "axios";
 import axiosInstance from "./axiosInstance";
 import { tokenService } from "./tokenService";
+import { Navigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const BASE = axiosInstance.defaults.baseURL || "";
@@ -17,12 +18,12 @@ export async function login(credentials) {
 export async function logout() {
 
   const refreshToken = tokenService.getRefresh();
-  console.log(refreshToken)
   try{
     const logout = await axiosInstance.post("logout/",{refresh: refreshToken})
-    console.log(logout);
     toast.success(logout?.data?.details || "logout");
-      tokenService.clear();
+    tokenService.clear();
+  
+    
   }catch(err){
     throw err
   }

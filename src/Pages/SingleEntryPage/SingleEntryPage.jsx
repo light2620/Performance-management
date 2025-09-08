@@ -7,6 +7,7 @@ import {
 } from "../../Apis/EntriesApi";
 import ConfirmModal from "../../Components/ConfirmModal/ConfirmModal";
 import { useAuth } from "../../Utils/AuthContext";
+import toast from "react-hot-toast";
 import "./style.css";
 
 const API_URL = "/point-entries/";
@@ -75,8 +76,7 @@ const SingleEntryPage = () => {
 
           alert("↩️ Entry reversed");
         } catch (err) {
-          console.error("Reverse failed:", err);
-          alert("Failed to reverse entry");
+          toast.error(err.response.data?.detail || "Reverse entry failed");
         } finally {
           setBusy(false);
         }

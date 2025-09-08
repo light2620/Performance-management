@@ -7,6 +7,7 @@ import { getPerformanceApi } from '../../Apis/Points'
 import TotalPoints from '../../Components/Performance/TotalPoints'
 import { useAuth } from '../../Utils/AuthContext'
 import NotificationListener from '../../Components/NotificationListener/NotificationListener'
+import SetupWebSocket from '../../Components/Test'
 const Home= () => {
 
   const [performance,setPerformance] = useState({
@@ -52,6 +53,7 @@ const Home= () => {
             <QuickAction />
           </div>
           <NotificationListener />
+          <SetupWebSocket />
       </div>
     </div>
   )

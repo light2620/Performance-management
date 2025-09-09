@@ -306,6 +306,13 @@
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+.entry-btn.create-ticket {
+ background-color: white;
+  color: #111827;
+  border: 2px solid #111827;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(217,119,6,0.08);
+}
 
 /* -------------------- Responsive breakpoints -------------------- */
 

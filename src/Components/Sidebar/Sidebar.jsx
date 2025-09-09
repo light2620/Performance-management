@@ -12,7 +12,9 @@ import useIsMobile from "../../CustomHook/useMobile";
 import { useAuth } from "../../Utils/AuthContext";
 import { AiOutlineAudit } from "react-icons/ai";
 import { IoMdNotifications } from "react-icons/io";
-import AdminDashbaord from "../../Pages/AdminDashboard/AdminDashbaord";
+import { RiMessage2Fill } from "react-icons/ri";
+
+
 
 // import your notification API
 import { getUnreadCount } from "../../Apis/NotificationApis";
@@ -72,6 +74,13 @@ const Sidebar = ({ closeMobileMenu }) => {
       className: "nav-notifications",
       isAdmin: false,
       badge: unreadCount, // ✅ attach badge count
+    },
+    {
+      path: "/tickets",
+      name: "Tickets",
+      icon: <RiMessage2Fill size={22} />,
+      className: "nav-tickets",
+      isAdmin: false,
     },
   ];
 

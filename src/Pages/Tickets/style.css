@@ -1,0 +1,149 @@
+/* pages/Tickets.css */
+
+.tickets-page {
+  max-width: 980px;
+  margin: 20px auto;
+  padding: 18px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #0f172a;
+}
+
+/* header */
+.tickets-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.tickets-title {
+  font-size: 20px;
+  margin: 0;
+  font-weight: 700;
+}
+.tickets-sub {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* list */
+.conversation-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+/* item */
+.conversation-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #eef2ff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms;
+  align-items: flex-start;
+}
+
+.conversation-item:focus,
+.conversation-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+  outline: none;
+  background: linear-gradient(180deg, #ffffff, #fbfbff);
+}
+
+/* avatar */
+.conv-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(99,102,241,0.08);
+  flex-shrink: 0;
+}
+.avatar-text {
+  font-weight: 700;
+  color: #3730a3;
+  font-size: 16px;
+}
+
+/* main column */
+.conversation-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.conv-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.conv-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 64%;
+}
+.conv-meta {
+  font-size: 12px;
+  color: #475569;
+}
+
+.conv-body {
+  margin-top: 8px;
+}
+.conv-preview {
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* clamp to 2 lines */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conv-bottom {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.conv-participants {
+  color: #64748b;
+  font-size: 13px;
+}
+.conv-date {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+/* empty / loading */
+.tickets-loading,
+.tickets-empty {
+  max-width: 980px;
+  margin: 40px auto;
+  text-align: center;
+  color: #64748b;
+  font-size: 15px;
+}
+
+/* responsive */
+@media (max-width: 720px) {
+  .conv-title { max-width: 52%; }
+  .conv-avatar { width: 46px; height: 46px; border-radius: 10px; }
+  .tickets-page { padding: 12px; }
+}

@@ -17,6 +17,8 @@ import Notifications from "../Pages/Notifications/Notification";
 import SingleRequestPage from "../Pages/SingleRequestPage/SingleRequestPage";
 import SingleEntryPage from "../Pages/SingleEntryPage/SingleEntryPage";
 import DashboardSelector from "./DashboardSelector";
+import Tickets from "../Pages/Tickets/Tickets";
+import SingleTicketPage from "../Pages/SingleTicketPage/SingleTicketPage";
 
 
 
@@ -38,6 +40,8 @@ const router = createBrowserRouter([
          {path: "/points-entries",element: <Entries/>},
          {path: "/points-entries/:id",element: <SingleEntryPage/>},
          {path: "/notifications",element: <Notifications/>},
+         {path: "/tickets",element: <Tickets/>},
+         {path: "/tickets/:id",element: <SingleTicketPage/>},
          {path: "/settings/manage-user",element: <AdminRoute><UserManagement /> </AdminRoute> },
          {path: "/settings/manage-department",element: <AdminRoute><ManageDepartment /> </AdminRoute>},
 

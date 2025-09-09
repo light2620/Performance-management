@@ -5,6 +5,7 @@ import {
   reverseEntryApi,
   getAllEntriesApi,
 } from "../../Apis/EntriesApi";
+import { createConversationApi } from "../../Apis/CreateConversation";
 import ConfirmModal from "../../Components/ConfirmModal/ConfirmModal";
 import { useAuth } from "../../Utils/AuthContext";
 import toast from "react-hot-toast";
@@ -29,19 +30,21 @@ const SingleEntryPage = () => {
     action: null,
   });
 
-   const fetchSingleEntry = async () => {
-      try {
-        const res = await getSingleEntryApi(id);
-        setEntry(res.data);
-      } catch (err) {
-        console.error("Fetch entry error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchSingleEntry = async () => {
+    try {
+      const res = await getSingleEntryApi(id);
+      setEntry(res.data);
+    } catch (err) {
+      console.error("Fetch entry error:", err);
+      toast.error("Failed to load entry");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-   
     fetchSingleEntry();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const markReversedLocally = () => {
@@ -73,16 +76,68 @@ const SingleEntryPage = () => {
           await reverseEntryApi(entryId);
           await getAllEntriesApi(API_URL);
           await fetchSingleEntry();
-
-          alert("↩️ Entry reversed");
+          toast.success("↩️ Entry reversed");
         } catch (err) {
-          toast.error(err.response.data?.detail || "Reverse entry failed");
+          console.error("Reverse entry failed:", err);
+          toast.error(err.response?.data?.detail || "Reverse entry failed");
         } finally {
           setBusy(false);
         }
       },
     });
   };
+
+  // -------- NEW: Create Ticket for DEMERIT entries ----------
+  const handleCreateTicket = async () => {
+    if (!entry) return;
+    setBusy(true);
+    try {
+      const employeeId = entry.employee?.id;
+      const currentUserId = user?.id;
+
+      // tolerate both "DEMERIT" and "DMERIT" type values
+      const typeCheck = String(entry.type || "").toUpperCase();
+      if (typeCheck !== "DEMERIT" && typeCheck !== "DMERIT") {
+        toast.error("Ticket can only be created for demerit entries");
+        setBusy(false);
+        return;
+      }
+
+      // Build participants per simple rule:
+      // - if admin creates: include the employee
+      // - if non-admin creates: include the current user (server may add admin)
+      let participant_ids = ["4459e8ab-3ce6-4dae-9f86-c16cce6c9abb"];
+      // if (isAdmin) {
+      //   if (!employeeId) throw new Error("Missing employee id on entry");
+      //   participant_ids = [employeeId];
+      // } else {
+      //   if (!currentUserId) throw new Error("Missing current user id");
+      //   participant_ids = [currentUserId];
+      // }
+
+      // conversation_type and content_object_id match PDF/api expectation
+      const payload = {
+        conversation_type: "point_discussion",
+        content_object_id: entry.id, // tie conversation to this entry
+        participant_ids,
+      };
+
+      const res = await createConversationApi(payload);
+      const conversation = res.data;
+      toast.success("Ticket created — opening conversation");
+      navigate(`/tickets/${conversation.id}`);
+    } catch (err) {
+      console.error("create ticket error:", err);
+      toast.error(
+        err.response?.data?.detail ||
+          err.message ||
+          "Failed to create ticket"
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+  // ---------------------------------------------------------
 
   if (loading) return <div className="single-entry-page">Loading…</div>;
   if (!entry) return <div className="single-entry-page">Entry not found</div>;
@@ -197,9 +252,7 @@ const SingleEntryPage = () => {
               <div className="entry-ts-row">
                 <div className="entry-ts-label">Updated</div>
                 <div className="entry-ts-value">
-                  {new Date(
-                    entry.updated_at || entry.created_at
-                  ).toLocaleString()}
+                  {new Date(entry.updated_at || entry.created_at).toLocaleString()}
                 </div>
               </div>
             </div>
@@ -225,7 +278,7 @@ const SingleEntryPage = () => {
             </div>
 
             <div className="entry-cta-block">
-              {isAdmin   && (
+              {isAdmin && (
                 <>
                   <button
                     className="entry-btn reverse"
@@ -235,7 +288,9 @@ const SingleEntryPage = () => {
                       String(entry.operation || "").toUpperCase() === "REVERSAL"
                     }
                   >
-                    {  String(entry.operation || "").toUpperCase() === "REVERSAL" ? "Entry Reversed" : "Reverse Entry"}
+                    {String(entry.operation || "").toUpperCase() === "REVERSAL"
+                      ? "Entry Reversed"
+                      : "Reverse Entry"}
                   </button>
                   <button
                     className="entry-btn back"
@@ -245,6 +300,17 @@ const SingleEntryPage = () => {
                     ← Back
                   </button>
                 </>
+              )}
+
+              {/* NEW: Show Create Ticket button for DEMERIT entries (also supports "DMERIT" typo) */}
+              {["DEMERIT", "DMERIT"].includes(String(entry.type || "").toUpperCase()) && (
+                <button
+                  className="entry-btn create-ticket"
+                  onClick={handleCreateTicket}
+                  disabled={busy}
+                >
+                   Create Ticket
+                </button>
               )}
             </div>
           </aside>

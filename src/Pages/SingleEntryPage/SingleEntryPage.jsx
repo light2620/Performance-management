@@ -127,12 +127,15 @@ const SingleEntryPage = () => {
       toast.success("Ticket created — opening conversation");
       navigate(`/tickets/${conversation.id}`);
     } catch (err) {
-      console.error("create ticket error:", err);
-      toast.error(
-        err.response?.data?.detail ||
+  
+      await toast.error(
+        err.response?.data?.participant_ids || err.response?.data?.content_object_id ||
           err.message ||
           "Failed to create ticket"
       );
+      if(err.response?.data?.content_object_id){
+         navigate(`/tickets/${id}`);
+      }
     } finally {
       setBusy(false);
     }

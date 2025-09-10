@@ -5,7 +5,11 @@ import { getAllUserApi } from "../../Apis/UserApi";
 import { getAllrequest } from "../../Apis/pointRequestApi";
 import axiosInstance from "../../Apis/axiosInstance"; // adjust path if needed
 import PointsTable from "../All Points/AllPoints"; // adjust path if needed
+import { FaTicketSimple } from "react-icons/fa6"
+import { BiSupport } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { getAllConversationsApi } from "../../Apis/CreateConversation";
+import UserDetailModal from "../../Components/UserDetailModal/UserDetailModal";
 import {
   FiUsers,
   FiLayers,
@@ -30,7 +34,7 @@ const BigStatCard = ({ colorClass, label, value, sub, icon }) => (
 );
 
 /* User row */
-const UserRow = ({ user, rank }) => {
+const UserRow = ({ user, rank,setShowUserDetailModal,setSelectedUserId }) => {
   const points = user.net_points ?? user.netPoints ?? 0;
   const name =
     (user.first_name || user.employee?.first_name || "") +
@@ -39,7 +43,11 @@ const UserRow = ({ user, rank }) => {
   const email =
     user.company_email || user.employee?.company_email || user.email || "";
   return (
-    <div className="user-row">
+    <div className="user-row" 
+    onClick={() => { 
+      setShowUserDetailModal();
+      setSelectedUserId();
+      }}  style={{cursor:"pointer"}}>
       <div className="user-left">
         <div className="user-rank">{rank}</div>
         <div className="user-info">
@@ -87,14 +95,27 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [requests, setRequests] = useState([]);
   const [pointsAgg, setPointsAgg] = useState([]);
+  const [totalActiveTickets, setTotalActiveTickets] = useState(0);
+  const [showUserDetailModal, setShowUserDetailModal] = useState(false);
   const [loading, setLoading] = useState({
     users: false,
     requests: false,
     points: false,
   });
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const fetchAllConversations = async () => {
+    try {
+      const res = await getAllConversationsApi();
+      setTotalActiveTickets(res?.data?.results?.length || 0);
+  
+    } catch (err) {
+      console.error("Failed fetching conversations:", err);
+      return [];
+    }
+  };
   const fetchAllUsers = async () => {
     setLoading((s) => ({ ...s, users: true }));
     try {
@@ -135,6 +156,7 @@ export default function AdminDashboard() {
     fetchAllUsers();
     fetchAllRequests();
     fetchPointsAgg();
+    fetchAllConversations();
   }, []);
 
   const totalUsers = users.length;
@@ -192,6 +214,13 @@ export default function AdminDashboard() {
           sub="Needs review"
           icon={<FiClock />}
         />
+        <BigStatCard
+          colorClass="c-purple"
+          label="Active Tickets"
+          value={loading.points ? "…" : totalActiveTickets}
+          sub="Tickets tracked"
+          icon={<BiSupport />}
+        />
       </div>
 
       {/* NEW: Four cards in one row */}
@@ -202,9 +231,12 @@ export default function AdminDashboard() {
             <div className="placeholder">No data</div>
           ) : (
             <div className="list">
-              {topFive.map((u, idx) => (
-                <UserRow key={u.id ?? idx} user={u} rank={idx + 1} />
-              ))}
+              {topFive.map((u, idx) => 
+              
+                {
+                    console.log(u)
+                  return <UserRow key={u.id ?? idx} user={u} rank={idx + 1 } setShowUserDetailModal={() => setShowUserDetailModal(true)}  setSelectedUserId={() => setSelectedUserId(u.employee.id)} />}
+              )}
             </div>
           )}
         </section>
@@ -216,7 +248,7 @@ export default function AdminDashboard() {
           ) : (
             <div className="list">
               {bottomFive.map((u, idx) => (
-                <UserRow key={u.id ?? idx} user={u} rank={idx + 1} />
+                <UserRow key={u.id ?? idx} user={u} rank={idx + 1} setShowUserDetailModal={() => setShowUserDetailModal(true)} setSelectedUserId={() => setSelectedUserId(u.employee.id)} />
               ))}
             </div>
           )}
@@ -244,6 +276,8 @@ export default function AdminDashboard() {
       </div>
 
       {error && <div className="error">Error loading data</div>}
+      {showUserDetailModal && <UserDetailModal onClose={() => setShowUserDetailModal(false)}  userId={selectedUserId} />}
     </div>
   );
 }
+

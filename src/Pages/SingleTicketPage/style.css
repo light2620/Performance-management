@@ -1,80 +1,95 @@
-/* ---------------------------------------------------------------------------
-conversation-page.redesign.css
-Copy this into a file and import it beside the component.
-Compact, modern, minimal styles with CSS variables and responsive layout.
---------------------------------------------------------------------------- */
+/* single-ticket-page.min.css
+   Minimal styles used by SingleTicketPage component only.
+   All classes use the "stp-" prefix.
+*/
 
-:root{
+/* basic theme vars */
+:root {
   --bg: #ffffff;
-  --muted: #6b7280;
   --text: #0f172a;
-  --panel: #f8fafc;
-  --accent: #2563eb;
+  --muted: #6b7280;
   --glass: rgba(15,23,42,0.04);
+  --accent: #2563eb;
   --radius: 12px;
 }
 
-.cp-root{ max-width:1200px; margin:28px auto; background:var(--bg); border-radius:16px; box-shadow:0 10px 30px rgba(2,6,23,0.06); padding:18px; font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:var(--text); }
-
-.cp-topbar{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 6px; border-radius:10px; background:linear-gradient(180deg,rgba(2,6,23,0.02), rgba(255,255,255,0.02)); margin-bottom:16px; }
-.cp-topbar-left{ display:flex; align-items:center; gap:12px; }
-.cp-toggle{ background:transparent; border:none; font-size:18px; padding:6px 8px; border-radius:8px; cursor:pointer; }
-.cp-title-main{ font-weight:700; font-size:17px; }
-.cp-title-sub{ color:var(--muted); font-size:13px; }
-.cp-ws{ padding:6px 12px; border-radius:999px; font-weight:700; font-size:13px; }
-.cp-ws.online{ background:linear-gradient(90deg,var(--accent), #3b82f6); color:white; }
-.cp-ws.offline{ background:#ef4444; color:white; }
-
-.cp-layout{ display:grid; grid-template-columns: 320px 1fr; gap:18px; align-items:start; }
-
-.cp-sidebar{ background:var(--panel); border-radius:12px; padding:14px; border:1px solid var(--glass); display:flex; flex-direction:column; gap:14px; transition: all 240ms ease; }
-.cp-sidebar.closed{ transform: translateX(-8px); opacity:0.98; width:0; padding:12px 8px; overflow:hidden; }
-
-.cp-related .label, .cp-participants .label{ font-weight:700; margin-bottom:8px; }
-.cp-related dl{ margin:0; }
-.cp-related .row{ display:flex; justify-content:space-between; margin:8px 0; font-size:13px; color:var(--text); }
-.cp-related dt{ color:var(--muted); font-weight:700; width:110px; }
-.cp-related dd{ color:var(--text); text-align:right; }
-.cp-related .reason{ margin-top:8px; color:var(--muted); font-size:13px; line-height:1.45; white-space:pre-wrap; }
-
-.cp-participants .plist{ display:flex; flex-direction:column; gap:10px; }
-.participant{ display:flex; gap:10px; align-items:center; }
-.avatar{ width:44px; height:44px; border-radius:10px; background:linear-gradient(180deg,#0f172a,#111827); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; }
-.meta .name{ font-weight:700; }
-.email{ font-size:12px; color:var(--muted); }
-
-.cp-chat{ display:flex; flex-direction:column; gap:12px; min-height:520px; }
-.messages{ flex:1; background:linear-gradient(180deg,#fff, #fbfdff); padding:18px; border-radius:14px; border:1px solid var(--glass); overflow:auto; max-height:68vh; box-shadow:0 10px 30px rgba(2,6,23,0.03); }
-.empty{ padding:18px; text-align:center; color:var(--muted); }
-
-.msg-row{ display:flex; gap:12px; align-items:flex-end; margin-bottom:12px; }
-.msg-row.theirs{ flex-direction:row; }
-.msg-row.mine{ flex-direction:row-reverse; }
-.avatar-small{ width:36px; height:36px; border-radius:8px; background:linear-gradient(180deg,#0f172a,#111827); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; }
-
-.bubble{ max-width:78%; padding:12px 14px; border-radius:12px; background:#f1f5f9; color:var(--text); box-shadow:0 6px 18px rgba(2,6,23,0.03); border:1px solid rgba(2,6,23,0.03); }
-.msg-row.mine .bubble{background-color: white; }
-.meta{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
-.who{ font-weight:700; font-size:13px; }
-.time{ font-size:12px; color:var(--muted); }
-.text{ font-size:15px; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
-.mstatus{ margin-top:8px; display:flex; gap:8px; align-items:center; }
-.pending{ color:#f59e0b; font-weight:700; }
-.failed{ color:#ef4444; font-weight:700; }
-.retry{ background:transparent; border:1px solid rgba(2,6,23,0.06); padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:700; }
-
-.composer{ display:flex; gap:12px; align-items:flex-end; padding-top:8px; }
-.ta{ flex:1 1 auto; min-height:48px; max-height:240px; padding:12px 14px; border-radius:12px; border:1px solid rgba(2,6,23,0.06); resize:none; font-size:15px; line-height:1.4; }
-.actions{ display:flex; align-items:center; }
-.btn-send{ background:var(--accent); color:white; border:none; padding:10px 16px; border-radius:12px; font-weight:700; cursor:pointer; }
-.btn-send:disabled{ opacity:0.6; cursor:not-allowed; }
-
-/* responsiveness */
-@media (max-width:920px){ .cp-layout{ grid-template-columns: 1fr; } .cp-sidebar{ order:2; } .cp-chat{ order:1; } .cp-sidebar.closed{ transform:none; width:100%; }
-  .bubble{ max-width:92%; }
+/* top-level wrapper for SingleTicketPage */
+.stp-root {
+  max-width: 1200px;
+  margin: 28px auto;
+  border-radius: 12px;
+  color: var(--text);
+  height: 70vh;
 }
 
-@media (max-width:520px){ .cp-root{ margin:12px; padding:12px; } .cp-topbar{ padding:8px; } .avatar{ width:40px; height:40px; } }
+/* topbar */
+.stp-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 6px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
 
-/* small helpers */
-.cp-loading, .cp-empty{ padding:18px; text-align:center; color:var(--muted); }
+/* actions wrapper inside the topbar (back, show details) */
+.stp-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* content area */
+.stp-content {
+  display: block; /* ChatArea manages its own internal layout */
+}
+
+/* main/right column where ChatArea sits */
+.stp-right {
+  width: 100%;
+}
+
+/* generic button base (prefixed) */
+.stp-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  border: 1px solid var(--glass);
+  background: transparent;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ghost style (used for Back button) */
+.stp-btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(15,23,42,0.04);
+}
+
+/* black ticket info button (Show Ticket Details) */
+.stp-btn-black {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* small responsive tweaks */
+@media (max-width: 920px) {
+  .stp-root {
+    margin: 0;
+  }
+  .stp-topbar {
+    padding: 8px;
+  }
+  .stp-btn {
+    padding: 7px 10px;
+  }
+}

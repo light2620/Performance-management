@@ -16,16 +16,14 @@
 /* top-level wrapper for SingleTicketPage */
 .stp-root {
   max-width: 1200px;
-  margin: 28px auto;
   border-radius: 12px;
   color: var(--text);
-  height: 70vh;
+  height: 80vh;
 }
 
 /* topbar */
 .stp-topbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 12px;
   padding: 10px 6px;
@@ -79,6 +77,20 @@
   border-radius: 8px;
   cursor: pointer;
   font-weight: 700;
+}
+
+.stp-btn-close {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.stp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* small responsive tweaks */

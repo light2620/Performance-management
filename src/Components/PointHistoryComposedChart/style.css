@@ -1,0 +1,142 @@
+/* basic styling for the table component (scoped with pht- prefixes) */
+
+.pht-root {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+  margin: 12px 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.pht-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.pht-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.pht-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pht-controls label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: #374151;
+  gap: 6px;
+}
+
+.pht-controls select,
+.pht-controls input {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-size: 13px;
+  min-width: 120px;
+}
+
+.pht-controls button {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+}
+
+.pht-body {
+  margin-top: 8px;
+}
+
+.pht-message {
+  color: #6b7280;
+  padding: 12px 0;
+}
+
+.pht-error {
+  color: #b91c1c;
+  padding: 12px 0;
+}
+
+.pht-table-wrap {
+  overflow-x: auto;
+}
+
+.pht-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 960px;
+}
+
+.pht-table th,
+.pht-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  text-align: left;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.pht-table th {
+  background: #fbfdff;
+  color: #374151;
+  font-weight: 700;
+}
+
+.pht-neg {
+  color: #ef4444;
+  font-weight: 700;
+}
+.pht-pos {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.pht-reason {
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #374151;
+  font-style: normal;
+}
+
+/* pagination */
+.pht-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.pht-page-buttons button {
+  padding: 8px 10px;
+  margin-left: 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+}
+.pht-page-buttons button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* responsive */
+@media (max-width: 820px) {
+  .pht-controls { flex-direction: column; align-items: stretch; gap: 10px; }
+  .pht-controls label { width: 100%; }
+  .pht-table { min-width: 720px; }
+}

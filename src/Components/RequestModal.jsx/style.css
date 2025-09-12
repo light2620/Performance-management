@@ -1,18 +1,18 @@
-.request-modal {
+.request-modal-container {
   position: fixed;
   top: 0;
   right: 0;
   width: 420px;
   height: 100vh;
   background: #fff;
-  box-shadow: -2px 0 10px rgba(0,0,0,0.15);
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.15);
   z-index: 2000;
   display: flex;
   flex-direction: column;
-  animation: slideIn 0.3s ease-out;
+  animation: request-modal-slideIn 0.3s ease-out;
 }
 
-.modal-header {
+.request-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -20,13 +20,13 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
-.modal-header h3 {
+.request-modal-header h3 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
 }
 
-.close-btn {
+.request-modal-close-btn {
   background: transparent;
   border: none;
   font-size: 18px;
@@ -34,7 +34,7 @@
   color: #6b7280;
 }
 
-.modal-body {
+.request-modal-body {
   flex: 1;
   padding: 20px;
   display: flex;
@@ -42,40 +42,35 @@
   gap: 12px;
 }
 
-.modal-body label {
+.request-modal-body label {
   font-size: 14px;
   font-weight: 500;
   color: #374151;
 }
 
-.modal-body select,
-.modal-body input,
-.modal-body textarea {
+.request-modal-body select,
+.request-modal-body input,
+.request-modal-body textarea {
   padding: 8px 10px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 14px;
   width: 100%;
-  outline:none;
+  outline: none;
 }
 
-.modal-body input:focus,
-.modal-body textarea:focus{
-    border: 2px solid  #111827;
-}
-.modal-body textarea {
-  padding: 8px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  width: 100%;
-  resize: both;          /* allow resizing */
-  min-height: 100px;     /* ✅ prevent being too short */
-  min-width: 100%;       /* ✅ always span modal width */
+.request-modal-body input:focus,
+.request-modal-body textarea:focus {
+  border: 2px solid #111827;
 }
 
+.request-modal-body textarea {
+  resize: vertical;
+  min-height: 100px;
+}
 
-.submit-btn {
+/* Buttons */
+.request-modal-submit-btn {
   background: #111827;
   color: white;
   padding: 10px;
@@ -85,33 +80,33 @@
   font-size: 14px;
 }
 
-.submit-btn:disabled {
+.request-modal-submit-btn:disabled {
   background: #9ca3af;
   cursor: not-allowed;
 }
 
-.error {
+/* Error states */
+.request-modal-error {
   border: 1px solid #ef4444 !important;
 }
 
-.error-text {
+.request-modal-error-text {
   font-size: 12px;
   color: #ef4444;
   margin-top: -4px;
   margin-bottom: 8px;
 }
 
-.char-count {
+/* Character counter */
+.request-modal-char-count {
   font-size: 12px;
   color: #6b7280;
   margin-top: 4px;
-  display: block;
   text-align: right;
+  display: block;
 }
 
-
-
-@keyframes slideIn {
+@keyframes request-modal-slideIn {
   from {
     transform: translateX(100%);
   }

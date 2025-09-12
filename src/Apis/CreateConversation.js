@@ -25,3 +25,7 @@ export const getConversationMessagesApi = (conversationId, params = {}) =>
   export const postMessageApi = (conversationId, body) =>
   // Optional fallback to post messages via REST if you prefer server-side send
   axiosInstance.post(`/conversations/${conversationId}/messages`, body);
+
+
+  export const closeConversationApi = (conversationId,reason) =>
+  axiosInstance.post(`/conversations/${conversationId}/close/`, {reason});

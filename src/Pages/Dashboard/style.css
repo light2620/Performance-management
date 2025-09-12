@@ -1,34 +1,206 @@
+/* Home / Dashboard combined styles with 'home-' prefix */
 
-.info-column{
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    height: 90vh;
-   
-}
-.welcome-title{
-    display: flex;
-    flex-direction: column;
-    gap: 10px
+/* existing info column styles reduced and adapted for dashboard */
+.home-dashboard-cont,
+.home-home-dashboard {
+  color: #111827;
 }
 
-.welcome-title h1{
-    font-weight: 700;
-    font-size: 1.875rem;
+/* Header */
+.home-dashboard-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.home-dashboard-header h2 {
+  font-size: 22px;
+  color: #0f172a;
+}
+.home-muted {
+  color: #6b7280;
+  margin: 0;
 }
 
-.welcome-title p{
-    color: #76767B;
+/* Big square-like colorful stat cards */
+.home-big-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
-
-.performance-cont{
-    display: flex;
-    gap: 10px;
+.home-big-stat-card {
+  border-radius: 12px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
 }
 
-@media(max-width: 769px){
-    .performance-cont{
-        flex-direction: column;
-    }
+.home-big-stat-inner {
+  text-align: left;
+  padding: 16px;
+  width: 100%;
+}
+
+.home-big-stat-icon {
+  font-size: 26px;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.home-big-stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.home-big-stat-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.home-big-stat-sub {
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Color variants (prefixed) */
+.home-c-blue {
+  background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+}
+.home-c-green {
+  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+}
+.home-c-orange {
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+}
+.home-c-purple {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+/* Four cards row */
+.home-grid-row-4 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+/* Cards */
+.home-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.home-medium-card {
+  min-height: 200px;
+}
+
+/* Section title */
+.home-section-title {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+/* Reuse your performance container */
+.home-performance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+/* List & user rows */
+.home-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home-user-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fbfdff;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+.home-user-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-user-rank {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(180deg,#eef2ff, #e0e7ff);
+  color: #3730a3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.home-user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.home-user-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.home-user-email {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.home-user-points {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* Placeholder */
+.home-placeholder {
+  color: #6b7280;
+  padding: 12px 0;
+}
+
+/* responsive */
+@media (max-width: 1200px) {
+  .home-big-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .home-grid-row-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .home-performance-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-big-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .home-grid-row-4 {
+    grid-template-columns: 1fr;
+  }
 }

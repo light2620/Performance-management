@@ -1,422 +1,90 @@
-/* SingleEntryPage.css - complete file */
+/* Entry-namespaced styles: all classes include `entry` to avoid overrides */
 
-/* -------------------- Base / Layout -------------------- */
+/* --- Root & container --- */
+.srp-entry-root { min-height: 80vh; padding: 28px 20px; overflow: auto; color: #1f2937; box-sizing: border-box; }
+.srp-entry-container { max-width: 980px; margin: 0 auto; }
 
+/* Header */
+.srp-entry-header { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:18px; }
+.srp-entry-title { margin:0; font-size:22px; font-weight:700; color:#0b1220; }
+.srp-entry-sub { color:#64748b; margin-top:4px; }
+.srp-entry-code { background:#ffffff; border:1px solid #e6eef9; padding:2px 6px; border-radius:6px; color:#0b1220; }
 
-.single-entry-page {
-  min-height: 100vh;
-  padding: 28px 20px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+/* Actions & badge */
+.srp-entry-actions { display:flex; align-items:center; gap:12px; }
+.srp-entry-badge { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; font-weight:700; font-size:12px; }
+.srp-entry-badge-pending { background:#fff7ed; color:#b45309; border:1px solid rgba(180,83,9,0.08); }
+.srp-entry-badge-approved { background:#ecfdf5; color:#065f46; border:1px solid rgba(4,108,75,0.08); }
+.srp-entry-badge-rejected { background:#fff1f2; color:#991b1b; border:1px solid rgba(185,28,28,0.06); }
+.srp-entry-badge-cancelled { background:#f3f4f6; color:#374151; }
 
-  color: #233043;
+.srp-entry-action-buttons { display:flex; gap:8px; align-items:center; }
+
+/* Buttons (entry-namespaced) */
+.entry-btn-primary, .entry-btn-danger, .entry-btn-muted, .entry-btn-ghost, .entry-btn-outline { border: none; padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; }
+.entry-btn-primary { background:#059669; color:#fff; box-shadow:0 8px 20px rgba(5,150,105,0.12); }
+.entry-btn-danger { background:#dc2626; color:#fff; box-shadow:0 8px 20px rgba(220,38,38,0.12); }
+.entry-btn-muted { background:#e6eef9; color:#0b1220; }
+.entry-btn-ghost { background:#fff; border:1px solid #e6eef9; }
+.entry-btn-outline { background:transparent; border:1px solid #cbd5e1; padding:8px 10px; border-radius:8px; }
+.entry-btn-primary[disabled], .entry-btn-danger[disabled], .entry-btn-muted[disabled] { opacity:0.6; cursor:not-allowed; }
+
+/* Grid layout */
+.srp-entry-grid { display:grid; grid-template-columns: 1fr 320px; gap:18px; }
+@media (max-width: 1100px) {
+  .srp-entry-grid { grid-template-columns: 1fr; }
+  .srp-entry-actions { flex-direction:column; align-items:flex-end; gap:6px; }
 }
 
-/* Card */
-.entry-card {
-  position: relative;
-  width: 100%;
-  max-width: 980px;             /* desktop max width */
-  border-radius: 12px;
-  overflow: hidden;
-  background: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
-  box-shadow: 0 10px 30px rgba(31,41,55,0.09);
-  display: flex;
-  flex-direction: column;
-  transition: border-color 0.3s ease, transform 0.12s ease;
-}
+/* Main area */
+.srp-entry-main { background:#fff; border:1px solid #eef6ff; padding:18px; border-radius:10px; box-shadow:0 8px 18px rgba(15,23,42,0.04); }
+.srp-entry-person { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+.srp-entry-avatar { width:56px; height:56px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; background:linear-gradient(135deg,#60a5fa,#34d399); box-shadow:0 8px 20px rgba(96,165,250,0.08); }
+.srp-entry-muted { color:#64748b; font-weight:600; }
+.srp-entry-small { font-size:12px; }
+.srp-entry-strong { font-weight:700; color:#0b1220; }
 
-/* subtle hover lift on larger screens */
-@media (hover: hover) and (min-width: 900px) {
-  .entry-card:hover { transform: translateY(-4px); }
-}
+.srp-entry-section { margin-top:14px; }
+.srp-entry-section-title { margin:0 0 8px 0; font-size:14px; font-weight:700; color:#334155; }
 
-/* -------------------- Left accent -------------------- */
+/* Reason box */
+.srp-entry-reason { background:#fbfdff; border:1px solid #e8eef8; padding:16px; border-radius:8px; color:#233043; line-height:1.5; min-height:120px; max-height:320px; overflow-y:auto; }
 
-.entry-left-accent {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 10px;
-  background: #9ca3af;
-  z-index: 0;
-  transition: background 0.25s ease, width 0.25s ease;
-}
+/* Stats */
+.srp-entry-stats { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-top:14px; }
+.srp-entry-stat { background:#fff; border:1px solid #eef6ff; padding:12px; border-radius:8px; }
+.srp-entry-large { font-size:20px; }
 
-.entry-status-approved .entry-left-accent { background: #16a34a; }
-.entry-status-rejected .entry-left-accent { background: #ef4444; }
-.entry-status-pending .entry-left-accent { background: #9ca3af; }
+/* Activity */
+.srp-entry-activity { margin-top:16px; }
+.srp-entry-activity-item { display:flex; gap:10px; align-items:center; padding:8px 0; }
+.srp-entry-activity-avatar { width:40px; height:40px; border-radius:50%; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-weight:700; }
 
-/* -------------------- Header -------------------- */
+/* Aside (right column) */
+.srp-entry-aside .srp-entry-card { background:#fff; border:1px solid #eef6ff; padding:14px; border-radius:10px; box-shadow:0 6px 18px rgba(59,130,246,0.02); }
+.srp-entry-card-row { display:flex; justify-content:space-between; align-items:center; }
+.srp-entry-card-divider { height:1px; background:#f1f5f9; margin:12px 0; }
+.srp-entry-card-details { display:flex; flex-direction:column; gap:8px; }
+.srp-entry-detail-row { display:flex; justify-content:space-between; }
+.srp-entry-card-actions { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+.entry-full { width:100%; padding:10px 12px; }
 
-.entry-card-header {
-  z-index: 2;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 18px;
-  border-bottom: 1px solid #f0f4f8;
-  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
-  gap: 12px;
-}
+/* Tip & footer */
+.srp-entry-tip { margin-top:8px; color:#94a3b8; font-size:12px; }
+.srp-entry-footer { margin-top:18px; color:#64748b; font-size:13px; }
 
-/* Title & status */
-.entry-title-block {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  min-width: 0;
-}
+/* Empty & loading */
+.srp-entry-empty { min-height:60vh; display:flex; align-items:center; justify-content:center; }
+.srp-entry-empty-box { background:#fff; padding:18px; border-radius:10px; border:1px solid #eef6ff; }
+.srp-entry-loading { min-height:40vh; display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:center; }
+.srp-entry-skeleton { background:#eef2f7; border-radius:8px; }
+.srp-entry-skeleton.header { width:60%; height:16px; }
+.srp-entry-skeleton.card { width:100%; height:220px; }
 
-.entry-type {
-  margin: 0;
-  font-size: 18px;
-  letter-spacing: 0.4px;
-  color: #0f1724;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 60vw;
-}
-
-.entry-big-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 12px;
-  text-transform: uppercase;
-  box-shadow: 0 6px 18px rgba(31,41,55,0.06);
-  white-space: nowrap;
-}
-.entry-big-status .status-emoji { font-size: 14px; }
-
-.entry-big-status.pending { background: #fff7ed; color: #b45309; }
-.entry-big-status.approved { background: #ecfdf5; color: #046c4b; }
-.entry-big-status.rejected { background: #fff1f2; color: #b91c1c; }
-
-/* -------------------- Meta (avatars + who) -------------------- */
-
-.entry-meta-block {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  min-width: 0;
-}
-
-.entry-for-block,
-.entry-by-block {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  min-width: 0;
-}
-
-/* Avatar */
-.entry-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 700;
-  color: white;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.entry-avatar-employee { background: linear-gradient(135deg,#60a5fa,#34d399); }
-.entry-avatar-creator  { background: linear-gradient(135deg,#f97316,#f43f5e); }
-
-.entry-who {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
-  min-width: 0;
-}
-.entry-who-label {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 600;
-}
-.entry-who-value {
-  font-size: 13px;
-  font-weight: 700;
-  color: #0b1220;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.entry-who-sub {
-  margin-top: 4px;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  color: #475569;
-}
-.entry-who-email { font-weight: 600; color: #0f1724; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;}
-.entry-who-dept  { font-weight: 700; color: #334155; }
-
-/* -------------------- Body -------------------- */
-
-.entry-body {
-  display: flex;
-  gap: 18px;
-  padding: 18px;
-  z-index: 2;
-  align-items: flex-start;
-  flex-wrap: wrap; /* allow wrapping to avoid overflow */
-}
-
-/* Left column */
-.entry-left-column {
-  flex: 1.4;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;
-}
-
-/* Points pill */
-.entry-points-pill {
-  align-self: flex-start;
-  background: linear-gradient(90deg,#60a5fa,#7c3aed);
-  color: #fff;
-  padding: 8px 10px;
-  border-radius: 999px;
-  font-weight: 800;
-  box-shadow: 0 8px 20px rgba(99,102,241,0.12);
-  font-size: 13px;
-}
-
-/* Reason (square box) */
-.entry-reason-box {
-  background: #fff;
-  border: 1px solid #e8eef8;
-  padding: 14px;
-  border-radius: 10px;
-  min-height: 100px;
-  box-shadow: 0 6px 18px rgba(31,41,55,0.03);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.entry-reason-title { font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 8px; }
-.entry-reason-content {
-  font-size: 15px;
-  color: #263544;
-  line-height: 1.45;
-  overflow-y: auto;
-  max-height: 260px;
-  padding-right: 6px;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  hyphens: auto;
-}
-
-/* Timestamps row */
-.entry-timestamps { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
-.entry-ts-row {
-  background: #fff;
-  border: 1px dashed #e6eef9;
-  padding: 10px 12px;
-  border-radius: 8px;
-  flex: 1 1 140px;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.entry-ts-label { font-size: 12px; color: #64748b; font-weight: 700; }
-.entry-ts-value { font-size: 13px; color: #123; margin-top: 6px; }
-
-/* Right column */
-.entry-right-column {
-  flex: 0.85;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 220px;
-  flex-shrink: 1;
-}
-
-/* Additional card */
-.entry-additional-card {
-  padding: 12px;
-  border-radius: 10px;
-  background: #fff;
-  border: 1px solid #eef6ff;
-  box-shadow: 0 6px 18px rgba(59,130,246,0.04);
-}
-.entry-add-title { font-weight: 800; font-size: 14px; margin-bottom: 8px; }
-.entry-add-row { display:flex; justify-content: space-between; padding: 6px 0; color:#334155; }
-.entry-add-row .k { font-weight: 700; color:#64748b; font-size: 13px; }
-.entry-add-row .v { font-weight: 700; }
-
-/* -------------------- Buttons -------------------- */
-
-.entry-cta-block { display:flex; flex-direction: column; gap: 10px; }
-.entry-btn {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 10px 20px rgba(15,23,42,0.06);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.entry-btn:active { transform: translateY(1px); }
-
-.entry-btn.reverse { background: linear-gradient(90deg,#ef4444,#dc2626); color: #fff; }
-.entry-btn.back    { background: linear-gradient(90deg,#9ca3af,#6b7280); color: #fff; }
-.entry-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
-
-/* -------------------- Footer -------------------- */
-
-.entry-footer {
-  display:flex;
-  justify-content:space-between;
-  gap: 12px;
-  padding: 12px 18px;
-  border-top: 1px solid #f0f4f8;
-  font-size: 13px;
-  color: #64748b;
-  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
-}
-.entry-footer code { background: #f8fafc; padding: 2px 6px; border-radius: 6px; color: #0b1220; }
-
-/* -------------------- Accessibility / small tweaks -------------------- */
-
-.entry-card { box-sizing: border-box; }
-.entry-title-block, .entry-meta-block, .entry-for-block, .entry-by-block { min-width: 0; }
-.entry-type { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.entry-big-status { flex: 0 0 auto; max-width: 40%; min-width: 0; }
-
-/* Make sure long/unbroken strings wrap instead of causing overflow */
-.entry-who-value,
-.entry-who-email,
-.entry-add-row .v,
-.entry-add-row .k,
-.entry-ts-value {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-.entry-btn.create-ticket {
- background-color: white;
-  color: #111827;
-  border: 2px solid #111827;
-  font-weight: 600;
-  box-shadow: 0 6px 18px rgba(217,119,6,0.08);
-}
-
-/* -------------------- Responsive breakpoints -------------------- */
-
-/* Tablet and below */
+/* Utilities & responsive */
 @media (max-width: 900px) {
-  .single-entry-page { padding: 22px 14px; }
-
-  .entry-card { max-width: 720px; }
-  .entry-left-accent { width: 8px; }
-
-  .entry-card-header { padding: 14px 14px; gap: 8px; }
-  .entry-type { font-size: 17px; max-width: 50vw; }
-  .entry-big-status { font-size: 12px; padding: 7px 10px; }
-
-  /* stack body columns */
-  .entry-body { flex-direction: column; padding: 16px; gap: 16px; }
-  .entry-right-column { min-width: 100%; width: 100%; order: 2; }
-  .entry-left-column { order: 1; }
-
-  /* make buttons more tap-friendly */
-  .entry-cta-block { flex-direction: row; }
-  .entry-cta-block .entry-btn { flex: 1; }
-  .entry-cta-block .entry-btn + .entry-btn { margin-left: 8px; }
-
-  /* show less meta detail on smaller tablets */
-  .entry-meta-block { gap: 10px; }
-  .entry-who-sub { display: none; } /* hide extra creator info on tablet */
+  .srp-entry-grid { grid-template-columns: 1fr; }
+  .srp-entry-aside { order: 2; }
+  .srp-entry-main { order: 1; }
 }
-
-/* Mobile */
-@media (max-width: 520px) {
-  .single-entry-page { padding: 16px 12px; }
-  .entry-card { border-radius: 10px; }
-
-  .entry-left-accent { width: 6px; }
-  .entry-card-header { padding: 12px 12px; }
-
-  .entry-avatar { width: 36px; height: 36px; font-size: 13px; border-radius: 8px; }
-  .entry-type { font-size: 16px; max-width: 54vw; }
-
-  /* stack header items: title on top, meta below */
-  .entry-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .entry-title-block { width: 100%; display:flex; justify-content:space-between; align-items:center; gap:8px; }
-  .entry-meta-block { width: 100%; display:flex; justify-content: flex-start; gap: 12px; }
-
-  /* body stacks */
-  .entry-body { padding: 12px; gap: 12px; }
-  .entry-left-column { gap: 12px; }
-  .entry-right-column { min-width: 100%; width: 100%; }
-
-  /* reason box smaller, font slightly reduced */
-  .entry-reason-box { padding: 12px; min-height: 90px; }
-  .entry-reason-content { font-size: 14px; max-height: 170px; }
-
-  /* Make CTA buttons full width stacked */
-  .entry-cta-block { flex-direction: column; }
-  .entry-cta-block .entry-btn { width: 100%; }
-  .entry-cta-block .entry-btn + .entry-btn { margin-left: 0; }
-
-  /* hide small non-essential text that clutters mobile */
-  .entry-who-sub { display: none; }
-  .entry-add-row .k { font-size: 12px; }
-}
-
-/* Very small phones */
-@media (max-width: 380px) {
-  .entry-left-accent { width: 5px; }
-  .entry-avatar { width: 34px; height: 34px; font-size: 12px; }
-  .entry-type { font-size: 15px; }
-  .entry-points-pill { padding: 6px 8px; font-size: 12px; }
-  .entry-reason-content { font-size: 13px; }
-}
-
-/* -------------------- Overflow / safety fixes (prevent right-gap) -------------------- */
-
-/* ensure header/meta title area shrink if space is tight */
-.entry-title-block,
-.entry-meta-block,
-.entry-for-block,
-.entry-by-block {
-  min-width: 0;
-}
-
-/* ensure big-status doesn't push layout — allow it to shrink */
-.entry-big-status {
-  flex-shrink: 0;
-  min-width: 0;
-}
-
-/* right column should be allowed to shrink / wrap on smaller screens */
-.entry-right-column {
-  min-width: 0;
-
-}
-
-/* left column should be flexible too */
-.entry-left-column {
-  min-width: 0;
-
-}
-
-/* Final safety: prevent accidental horizontal scroll for this page */
 

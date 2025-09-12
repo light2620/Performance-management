@@ -11,7 +11,8 @@ import { useAuth } from "../../Utils/AuthContext";
 import toast from "react-hot-toast";
 import "./style.css";
 
-const SingleRequestPage = () => {
+// React component using plain CSS (file: SingleRequestPageRefactor.css)
+export default function SingleRequestPageRefactor() {
   const { user } = useAuth();
   const isAdmin = user?.role === "ADMIN";
   const { id } = useParams();
@@ -29,94 +30,113 @@ const SingleRequestPage = () => {
   });
 
   useEffect(() => {
+    let mounted = true;
     const fetch = async () => {
       try {
         const res = await getSingleRequestApi(id);
-        setRequest(res.data);
+        if (mounted) setRequest(res.data);
       } catch (err) {
         console.error(err);
+        toast.error("Failed to load request");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     fetch();
+    return () => (mounted = false);
   }, [id]);
 
-  const updateLocalStatus = (newStatus) => {
+  const updateLocalStatus = (newStatus, meta = {}) => {
     setRequest((prev) =>
       prev
-        ? { ...prev, status: newStatus, updated_at: new Date().toISOString() }
+        ? {
+            ...prev,
+            status: newStatus,
+            updated_at: new Date().toISOString(),
+            ...meta,
+          }
         : prev
     );
   };
 
-  const handleApprove = (reqId) => {
-    setConfirmModal({
-      open: true,
-      title: "Approve Request",
-      message: "Are you sure you want to approve this request?",
-      action: async () => {
-        setBusy(true);
-        try {
-          await approveRequestApi(reqId);
-          updateLocalStatus("APPROVED");
-          toast.success("✅ Request approved");
-        } catch (err) {
-          console.error(err);
-          toast.error(err.response?.data?.detail || "Failed to approve");
-        } finally {
-          setBusy(false);
-        }
+  const handleAction = (type, reqId) => {
+    const map = {
+      approve: {
+        title: "Approve request",
+        message: "Approve this request and award points?",
+        fn: async () => {
+          setBusy(true);
+          try {
+            await approveRequestApi(reqId);
+            updateLocalStatus("APPROVED", { approved_by: { first_name: user.first_name, last_name: user.last_name } });
+            toast.success("Request approved");
+          } catch (err) {
+            console.error(err);
+            toast.error(err?.response?.data?.detail || "Failed to approve");
+          } finally {
+            setBusy(false);
+          }
+        },
       },
-    });
+      reject: {
+        title: "Reject request",
+        message: "Reject this request? The requester will be notified.",
+        fn: async () => {
+          setBusy(true);
+          try {
+            await rejectRequestApi(reqId);
+            updateLocalStatus("REJECTED", { rejected_at: new Date().toISOString(), approved_by: { first_name: user.first_name, last_name: user.last_name } });
+            toast.success("Request rejected");
+          } catch (err) {
+            console.error(err);
+            toast.error(err?.response?.data?.detail || "Failed to reject");
+          } finally {
+            setBusy(false);
+          }
+        },
+      },
+      delete: {
+        title: "Delete request",
+        message: "Delete permanently? This cannot be undone.",
+        fn: async () => {
+          setBusy(true);
+          try {
+            await deleteRequestApi(reqId);
+            toast.success("Request deleted");
+            navigate(-1);
+          } catch (err) {
+            console.error(err);
+            toast.error(err?.response?.data?.detail || "Failed to delete");
+          } finally {
+            setBusy(false);
+          }
+        },
+      },
+    };
+
+    const item = map[type];
+    if (!item) return;
+
+    setConfirmModal({ open: true, title: item.title, message: item.message, action: item.fn });
   };
 
-  const handleReject = (reqId) => {
+  if (loading)
+    return (
+      <div className="srp-loading">
+        <div className="srp-skeleton header" />
+        <div className="srp-skeleton card" />
+      </div>
+    );
 
-    setConfirmModal({
-      open: true,
-      title: "Reject Request",
-      message: "Are you sure you want to reject this request?",
-      action: async () => {
-        setBusy(true);
-        try {
-          await rejectRequestApi(reqId);
-          updateLocalStatus("REJECTED");
-          toast.success("❌ Request rejected");
-        } catch (err) {
-          console.error(err);
-          toast.error(err.response?.data?.detail || "Failed to approve");
-        } finally {
-          setBusy(false);
-        }
-      },
-    });
-  };
-
-  const handleDelete = (reqId) => {
-    setConfirmModal({
-      open: true,
-      title: "Delete Request",
-      message:
-        "Delete this request permanently? This action cannot be undone.",
-      action: async () => {
-        setBusy(true);
-        try {
-          await deleteRequestApi(reqId);
-          toast.success("🗑️ Request deleted");
-          navigate(-1);
-        } catch (err) {
-          console.error(err);
-          toast.error(err.response?.data?.detail || "Failed to approve");
-        } finally {
-          setBusy(false);
-        }
-      },
-    });
-  };
-
-  if (loading) return <div className="single-request-page">Loading…</div>;
-  if (!request) return <div className="single-request-page">Request not found</div>;
+  if (!request)
+    return (
+      <div className="srp-empty">
+        <div className="srp-empty-box">
+          <h3>Request not found</h3>
+          <button className="btn-outline" onClick={() => navigate(-1)}>Go back</button>
+        </div>
+      </div>
+    );
 
   const initials = (first, last) => {
     const a = first?.[0] ?? "";
@@ -124,205 +144,152 @@ const SingleRequestPage = () => {
     return (a + b).toUpperCase();
   };
 
-  // 👇 statusClass will be used for right border color
-  const statusClass = request?.status
-    ? `status-${request.status.toLowerCase()}`
-    : "";
-
   return (
-    <div className="single-request-page">
-      <div className={`request-card lively ${statusClass}`}>
-        <div className="left-accent" aria-hidden />
-
-        <header className="request-card-header">
-          <div className="title-block">
-            <h1 className="request-type">
-              {request.type?.toUpperCase() ?? "REQUEST"}
-            </h1>
-            <div className={`big-status ${request.status?.toLowerCase() ?? ""}`}>
-              <span className="status-emoji">
-                {request.status === "APPROVED"
-                  ? "✅"
-                  : request.status === "REJECTED"
-                  ? "❌"
-                  : request.status === "CANCELLED"
-                  ? "🚫"
-                  : "⏳"}
-              </span>
-              <span className="status-text">{request.status}</span>
-            </div>
+    <div className="srp-root">
+      <div className="srp-container">
+        <div className="srp-header">
+          <div>
+            <h2 className="srp-title">{request.type ?? "Request"}</h2>
+            <div className="srp-sub">ID: <code className="srp-code">{request.id}</code></div>
           </div>
 
-          <div className="meta-block">
-            <div className="for-block">
-              <div className="avatar avatar-employee">
-                {initials(
-                  request.employee?.first_name,
-                  request.employee?.last_name
-                )}
-              </div>
-              <div className="who">
-                <div className="who-label">Created for</div>
-                <div className="who-value">
-                  {request.employee?.first_name} {request.employee?.last_name}
-                </div>
+          <div className="srp-actions">
+            <div className={`srp-badge srp-badge-${request.status?.toLowerCase()}`}>{request.status}</div>
+
+            <div className="srp-action-buttons">
+              {isAdmin && request.status === "PENDING" && (
+                <>
+                  <button className="btn-primary" disabled={busy} onClick={() => handleAction('approve', request.id)}>✅ Approve</button>
+                  <button className="btn-danger" disabled={busy} onClick={() => handleAction('reject', request.id)}>❌ Reject</button>
+                </>
+              )}
+
+              {request.status === "PENDING" && (
+                <button className="btn-muted" disabled={busy} onClick={() => handleAction('delete', request.id)}>🗑 Delete</button>
+              )}
+
+              <button className="btn-ghost" onClick={() => navigate(-1)}>Back</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="srp-grid">
+          <main className="srp-main">
+            <div className="srp-person">
+              <div className="srp-avatar">{initials(request.employee?.first_name, request.employee?.last_name)}</div>
+              <div>
+                <div className="muted">Created for</div>
+                <div className="strong">{request.employee?.first_name} {request.employee?.last_name}</div>
+                <div className="muted small">{request.employee?.email}</div>
               </div>
             </div>
 
-            {user.role === "ADMIN" && (
-              <div className="by-block">
-                <div className="avatar avatar-creator">
-                  {initials(
-                    request.created_by?.first_name,
-                    request.created_by?.last_name
-                  )}
+            <section className="srp-section">
+              <h4 className="srp-section-title">Reason</h4>
+              <div className="srp-reason">{request.reason || "— No reason provided —"}</div>
+            </section>
+
+            <section className="srp-stats">
+              <div className="srp-stat">
+                <div className="muted">Points</div>
+                <div className="strong large">{request.points}</div>
+              </div>
+
+              <div className="srp-stat">
+                <div className="muted">Last updated</div>
+                <div className="strong">{new Date(request.updated_at || request.created_at).toLocaleString()}</div>
+              </div>
+
+              <div className="srp-stat">
+                <div className="muted">Created at</div>
+                <div className="strong">{new Date(request.created_at).toLocaleString()}</div>
+              </div>
+
+              <div className="srp-stat">
+                <div className="muted">Type</div>
+                <div className="strong">{request.type}</div>
+              </div>
+            </section>
+
+            <section className="srp-activity">
+              <h4 className="srp-section-title">Activity</h4>
+              <div className="activity-item">
+                <div className="activity-avatar">{initials(request.created_by?.first_name, request.created_by?.last_name)}</div>
+                <div>
+                  <div className="strong">Created</div>
+                  <div className="muted small">{new Date(request.created_at).toLocaleString()}</div>
                 </div>
-                <div className="who">
-                  <div className="who-label">Created by</div>
-                  <div className="who-value">
-                    {request.created_by?.first_name}{" "}
-                    {request.created_by?.last_name}
+              </div>
+
+              {request.status !== 'PENDING' && (
+                <div className="activity-item">
+                  <div className="activity-avatar">{request.approved_by?.first_name ? initials(request.approved_by.first_name, request.approved_by.last_name) : '-'}</div>
+                  <div>
+                    <div className="strong">{request.status === 'APPROVED' ? 'Approved' : 'Rejected'}</div>
+                    <div className="muted small">{new Date(request.updated_at || request.rejected_at || request.created_at).toLocaleString()}</div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </header>
+              )}
+            </section>
+          </main>
 
-        <section className="request-body">
-          <div className="left-column">
-            <div className="points-pill">
-              Points <strong>{request.points}</strong>
-            </div>
-
-            <div className="reason-box">
-              <div className="reason-title">Reason</div>
-              <div className="reason-content">
-                {request.reason || "— No reason provided —"}
-              </div>
-            </div>
-
-            <div className="timestamps">
-              <div className="ts-row">
-                <div className="ts-label">Created</div>
-                <div className="ts-value">
-                  {new Date(request.created_at).toLocaleString()}
+          <aside className="srp-aside">
+            <div className="card">
+              <div className="card-row">
+                <div>
+                  <div className="muted">Requested by</div>
+                  <div className="strong">{request.created_by?.first_name} {request.created_by?.last_name}</div>
                 </div>
+                <div className="muted small">{new Date(request.created_at).toLocaleDateString()}</div>
               </div>
-              <div className="ts-row">
-                <div className="ts-label">Updated</div>
-                <div className="ts-value">
-                  {new Date(
-                    request.updated_at || request.created_at
-                  ).toLocaleString()}
-                </div>
+
+              <div className="card-divider" />
+
+              <div className="card-details">
+                <div className="detail-row"><span className="muted">Status</span><span>{request.status}</span></div>
+                <div className="detail-row"><span className="muted">Status changed</span><span>{new Date(request.updated_at || request.created_at).toLocaleString()}</span></div>
+                <div className="detail-row"><span className="muted">Approved/Rejected by</span><span>{request.approved_by?.first_name ? `${request.approved_by.first_name} ${request.approved_by.last_name}` : '—'}</span></div>
+              </div>
+
+              <div className="card-actions">
+                {isAdmin && request.status === 'PENDING' ? (
+                  <>
+                    <button className="btn-primary full" disabled={busy} onClick={() => handleAction('approve', request.id)}>Approve</button>
+                    <button className="btn-danger full" disabled={busy} onClick={() => handleAction('reject', request.id)}>Reject</button>
+                  </>
+                ) : (
+                  <div className="muted small">No actions available</div>
+                )}
+
+                {request.status === 'PENDING' && (
+                  <button className="btn-ghost full" disabled={busy} onClick={() => handleAction('delete', request.id)}>Delete</button>
+                )}
               </div>
             </div>
-          </div>
 
-          <aside className="right-column">
-            <div className="additional-card">
-              <div className="add-title">Request Details</div>
-              <div className="add-row">
-                <span className="k">Type</span>
-                <span className="v">{request.type}</span>
-              </div>
-              <div className="add-row">
-                <span className="k">Status</span>
-                <span className="v">{request.status}</span>
-              </div>
-              {(request.status === "APPROVED" || request.status === "REJECTED" ) && <div className="add-row">
-                <span className="k">{request.status === "APPROVED" ? "Approved by" : "Rejected By"}</span>
-                <span className="v">
-                  {request.approved_by?.first_name
-                    ? `${request.approved_by.first_name} ${request.approved_by.last_name}`
-                    : "—"}
-                </span>
-              </div>}
-
-              {(request.status === "APPROVED" || request.status === "REJECTED" ) &&<div className="add-row">
-                <span className="k">Rejected at</span>
-                <span className="v">
-                  {request.rejected_at
-                    ? new Date(request.rejected_at).toLocaleString()
-                    : "—"}
-                </span>
-              </div>}
-            </div>
-
-            <div className="cta-block">
-              {(isAdmin && request.status === "PENDING") ? (
-                <>
-                  <button
-                    className="btn approve"
-                    onClick={() => handleApprove(request.id)}
-                    disabled={busy || request.status === "APPROVED"}
-                  >
-                    ✅ Approve
-                  </button>
-                  <button
-                    className="btn reject"
-                    onClick={() => handleReject(request.id)}
-                    disabled={busy || request.status === "REJECTED"}
-                  >
-                    ❌ Reject
-                  </button>
-                </>
-              ) : 
-              request.status !== "PENDING" && <p>{`This Request is ${request.status}`}</p>
-              }
-              {request.status === "PENDING" && <button
-                className="btn delete"
-                onClick={() => handleDelete(request.id)}
-                disabled={busy}
-              >
-                🗑 Delete
-              </button>}
-            </div>
+           { request.status === 'PENDING' && <div className="tip">Tip: Use the actions above to change request state. All actions are audited.</div>}
           </aside>
-        </section>
+        </div>
 
-        <footer className="request-footer">
-          <div className="small-muted">
-            Request ID: <code>{request.id}</code>
-          </div>
-          <div className="small-muted">
-            Status last changed:{" "}
-            {new Date(request.updated_at || request.created_at).toLocaleString()}
-          </div>
-        </footer>
+        <div className="srp-footer">Status last changed: {new Date(request.updated_at || request.created_at).toLocaleString()}</div>
       </div>
 
-      {/* Confirm modal */}
       <ConfirmModal
         open={confirmModal.open}
-        title={confirmModal.title || "Confirm Action"}
-        message={confirmModal.message || "Are you sure you want to proceed?"}
+        title={confirmModal.title || 'Confirm Action'}
+        message={confirmModal.message || 'Are you sure?'}
         onConfirm={() => {
           try {
             confirmModal.action?.();
           } catch (err) {
-            console.error("Confirm action error:", err);
+            console.error('Confirm action error:', err);
           } finally {
-            setConfirmModal({
-              open: false,
-              title: "",
-              message: "",
-              action: null,
-            });
+            setConfirmModal({ open: false, title: '', message: '', action: null });
           }
         }}
-        onCancel={() =>
-          setConfirmModal({
-            open: false,
-            title: "",
-            message: "",
-            action: null,
-          })
-        }
+        onCancel={() => setConfirmModal({ open: false, title: '', message: '', action: null })}
       />
     </div>
   );
-};
+}
 
-export default SingleRequestPage;

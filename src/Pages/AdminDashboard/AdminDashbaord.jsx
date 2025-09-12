@@ -106,16 +106,18 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const fetchAllConversations = async () => {
-    try {
-      const res = await getAllConversationsApi();
-      setTotalActiveTickets(res?.data?.results?.length || 0);
-  
-    } catch (err) {
-      console.error("Failed fetching conversations:", err);
-      return [];
-    }
-  };
+ const fetchAllConversations = async () => {
+  try {
+    const res = await getAllConversationsApi();
+    const results = res?.data?.results ?? [];
+    // ✅ Only count conversations where is_active is true
+    const activeCount = results.filter(c => c.is_active === true).length;
+    setTotalActiveTickets(activeCount);
+  } catch (err) {
+    console.error("Failed fetching conversations:", err);
+    return [];
+  }
+};
   const fetchAllUsers = async () => {
     setLoading((s) => ({ ...s, users: true }));
     try {
@@ -176,7 +178,7 @@ export default function AdminDashboard() {
   const topFive = sortedByPoints.slice(0, 5);
   const bottomFive = sortedByPoints.slice(-5).reverse();
 
-  const aggregatesCountDisplay = 3;
+  const aggregatesCountDisplay = 4;
 
   // requests by status counts
   const statusCounts = {
@@ -187,9 +189,6 @@ export default function AdminDashboard() {
 
   return (
         <div className="admin-dashboard colorful">
-      <div className="dashboard-header">
-        <h2>Admin Dashboard</h2>
-      </div>
 
       {/* Big colorful stat cards */}
       <div className="big-stats-grid">
@@ -220,6 +219,8 @@ export default function AdminDashboard() {
           value={loading.points ? "…" : totalActiveTickets}
           sub="Tickets tracked"
           icon={<BiSupport />}
+
+
         />
       </div>
 

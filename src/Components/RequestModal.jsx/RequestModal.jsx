@@ -1,11 +1,9 @@
 import { useState } from "react";
-import axiosInstance from "../../Apis/axiosInstance";
 import { useSelector } from "react-redux";
 import EmployeeSelector from "../EmployeeSelector/EmployeeSelector";
 import "./style.css";
 
-
-const RequestModal = ({ onClose,getApi,postApi }) => {
+const RequestModal = ({ onClose, getApi, postApi }) => {
   const allEmployees = useSelector((state) => state.allUser.allUsers);
 
   const [type, setType] = useState("MERIT");
@@ -19,8 +17,7 @@ const RequestModal = ({ onClose,getApi,postApi }) => {
     const newErrors = {};
     if (!type) newErrors.type = "Type is required";
     if (!employee) newErrors.employee = "Employee is required";
-    if (!points || points <= 0)
-      newErrors.points = "Points must be greater than 0";
+    if (!points || points <= 0) newErrors.points = "Points must be greater than 0";
     if (!reason) {
       newErrors.reason = "Reason is required";
     } else if (reason.length < 50) {
@@ -43,8 +40,8 @@ const RequestModal = ({ onClose,getApi,postApi }) => {
         reason,
       };
 
-      const res = await postApi(body)
-      setTimeout(async () => await getApi(),1000 )
+      await postApi(body);
+      setTimeout(async () => await getApi(), 1000);
       onClose();
     } catch (err) {
       console.error("Error creating request:", err);
@@ -54,7 +51,6 @@ const RequestModal = ({ onClose,getApi,postApi }) => {
     }
   };
 
-  // Utility to clear specific field error
   const clearError = (field) => {
     if (errors[field]) {
       setErrors((prev) => {
@@ -66,15 +62,15 @@ const RequestModal = ({ onClose,getApi,postApi }) => {
   };
 
   return (
-    <div className="request-modal">
-      <div className="modal-header">
+    <div className="request-modal-container">
+      <div className="request-modal-header">
         <h3>Create New Point Request</h3>
-        <button className="close-btn" onClick={onClose}>
+        <button className="request-modal-close-btn" onClick={onClose}>
           ✕
         </button>
       </div>
 
-      <form className="modal-body" onSubmit={handleSubmit}>
+      <form className="request-modal-body" onSubmit={handleSubmit}>
         {/* Type */}
         <label>Type</label>
         <select
@@ -83,13 +79,13 @@ const RequestModal = ({ onClose,getApi,postApi }) => {
             setType(e.target.value);
             clearError("type");
           }}
-          className={errors.type ? "error" : ""}
+          className={errors.type ? "request-modal-error" : ""}
           required
         >
           <option value="MERIT">Merit</option>
           <option value="DEMERIT">Demerit</option>
         </select>
-        {errors.type && <p className="error-text">{errors.type}</p>}
+        {errors.type && <p className="request-modal-error-text">{errors.type}</p>}
 
         {/* Employee */}
         <EmployeeSelector
@@ -100,7 +96,7 @@ const RequestModal = ({ onClose,getApi,postApi }) => {
             clearError("employee");
           }}
         />
-        {errors.employee && <p className="error-text">{errors.employee}</p>}
+        {errors.employee && <p className="request-modal-error-text">{errors.employee}</p>}
 
         {/* Points */}
         <label>Points</label>
@@ -111,10 +107,10 @@ const RequestModal = ({ onClose,getApi,postApi }) => {
             setPoints(e.target.value);
             clearError("points");
           }}
-          className={errors.points ? "error" : ""}
+          className={errors.points ? "request-modal-error" : ""}
           required
         />
-        {errors.points && <p className="error-text">{errors.points}</p>}
+        {errors.points && <p className="request-modal-error-text">{errors.points}</p>}
 
         {/* Reason */}
         <label>Reason</label>
@@ -125,13 +121,15 @@ const RequestModal = ({ onClose,getApi,postApi }) => {
             clearError("reason");
           }}
           rows="3"
-          className={errors.reason ? "error" : ""}
+          className={errors.reason ? "request-modal-error" : ""}
           required
         />
-        <small className="char-count">{reason.length}/50 min characters</small>
-        {errors.reason && <p className="error-text">{errors.reason}</p>}
+        <small className="request-modal-char-count">
+          {reason.length}/50 min characters
+        </small>
+        {errors.reason && <p className="request-modal-error-text">{errors.reason}</p>}
 
-        <button type="submit" className="submit-btn" disabled={loading}>
+        <button type="submit" className="request-modal-submit-btn" disabled={loading}>
           {loading ? "Submitting..." : "Create Request"}
         </button>
       </form>

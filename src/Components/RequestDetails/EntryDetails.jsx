@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+
 import "./style.css";
 
 /**
@@ -89,7 +90,7 @@ const EntryDetails = ({
             </div>
             <div className="modal-heading">
               <div id="ed-title" className="modal-title">{title}</div>
-              <div className="modal-sub">Request ID: <span className="modal-id">{requestId || "—"}</span></div>
+             {isAdmin && <div className="modal-sub">Request ID: <span className="modal-id">{requestId || "—"}</span></div>}
             </div>
           </div>
 

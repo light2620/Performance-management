@@ -46,7 +46,7 @@ const EmployeeSelector = ({ allEmployees, value, onChange }) => {
             <small>({selectedEmployee.company_email})</small>
           </span>
         ) : (
-          <span className="placeholder">Select Employee</span>
+          <span className="">Select Employee</span>
         )}
         <span className="arrow">{open ? "▲" : "▼"}</span>
       </div>

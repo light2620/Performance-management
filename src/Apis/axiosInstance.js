@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// attach access
+// ---- attach access token
 axiosInstance.interceptors.request.use((config) => {
   const at = tokenService.getAccess();
   if (at) config.headers.Authorization = `Bearer ${at}`;
@@ -45,8 +45,7 @@ axiosInstance.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      // ---- THIS is the important change:
-      // send refresh token in the body to /accounts/refresh/
+      // ---- Refresh token flow
       const refresh = tokenService.getRefresh();
       if (!refresh) throw new Error("No refresh token available");
 
@@ -57,14 +56,13 @@ axiosInstance.interceptors.response.use(
         { headers: { "Content-Type": "application/json" } }
       );
 
-      // API doc shows: { access: "...", refresh: "..." }
       const newAccess = data?.access;
       const newRefresh = data?.refresh;
 
       if (!newAccess) throw new Error("No access token in refresh response");
 
       tokenService.setAccess(newAccess);
-      if (newRefresh) tokenService.setRefresh(newRefresh); // support rotation
+      if (newRefresh) tokenService.setRefresh(newRefresh); // if rotation supported
 
       flushQueue(null, newAccess);
 
@@ -73,6 +71,12 @@ axiosInstance.interceptors.response.use(
     } catch (e) {
       flushQueue(e, null);
       tokenService.clear();
+
+      // 🚨 redirect to login when refresh fails
+      setTimeout(() => {
+        window.location.href = "/auth/login";
+      }, 200); // small delay to flush UI/toasts
+
       return Promise.reject(e);
     } finally {
       isRefreshing = false;

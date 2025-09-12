@@ -1,128 +1,221 @@
-.login-container{
-    max-width: 500px;
-    width: 90%;
-    background-color: white;
-    border-radius: 20px;
-   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+/* Login.css - fully scoped with lf- prefix */
+
+/* Page layout */
+.lf-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 520px;
+  gap: 0;
+  background: #ffffff;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-.logo-cont{
-     width: 200px;
-     align-self: center;
+/* Left hero (large) */
+.lf-hero {
+  background: linear-gradient(180deg,#3b37c9 0%, #2c3be0 60%);
+  color: #fff;
+  padding: 64px 72px;
+  display: flex;
+  align-items: center;
 }
 
-
-.login-form{
-     display: flex;
- flex-direction: column;
-text-align: center;
-    padding: 40px ;
-    gap: 30px
+.lf-hero-inner {
+  max-width: 700px;
+}
+.lf-star {
+  font-size: 36px;
+  margin-bottom: 24px;
+  opacity: 0.95;
+}
+.lf-hero-title {
+  font-size: 56px;
+  margin: 0 0 16px 0;
+  line-height: 1;
+  font-weight: 800;
+}
+.lf-brand { display:inline-block; margin-left:6px; }
+.lf-hero-sub {
+  font-size: 18px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.92);
+  max-width: 520px;
+  margin-top: 18px;
+}
+.lf-hero-footer {
+  margin-top: 36px;
+  opacity: 0.85;
+  font-size: 13px;
 }
 
-.login-form h1{
-    font-weight: 700;
-    font-size: 2rem;
-    color: rgb(42, 42, 42);
+/* Right form area */
+.lf-form-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  background: linear-gradient(90deg, #ffffff 0%, #fafafa 100%);
 }
 
-.login-form p{
-    font-size: .875rem;
-    color: hsl(240 4% 46%);
+.lf-form-card {
+  width: 100%;
+  max-width: 420px;
+  background: transparent; /* card blends with panel */
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
-.login-form form{
+
+/* logo top-right */
+.lf-logo {
+  width: 110px;
+  height: auto;
+  align-self: flex-end;
+  margin-bottom: 8px;
+}
+
+/* header text */
+.lf-title-block h2 {
+  margin: 6px 0 0;
+  font-size: 28px;
+  color: #111827;
+  font-weight: 800;
+}
+.lf-help {
+  margin: 6px 0 18px 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+.lf-help a { text-decoration: underline; color: #111827; }
+
+/* form */
+.lf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+/* labels */
+.lf-label {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 600;
+}
+
+/* inputs: use #111827 for border and button */
+.lf-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: 1px solid #111827; /* requested color */
+  outline: none;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.lf-input:focus {
+  box-shadow: 0 8px 20px rgba(17,24,39,0.06);
+  border-color: #111827;
+}
+
+/* error */
+.lf-err-input {
+  border-color: #ef4444 !important;
+  box-shadow: 0 6px 18px rgba(239,68,68,0.06);
+}
+
+/* password row with toggle */
+.lf-password-row {
+  position: relative;
+}
+.lf-pass-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 6px;
+  font-size: 18px;
+}
+
+/* inline errors */
+.lf-error {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: -6px;
+}
+
+/* submit button uses #111827 */
+.lf-submit {
+  margin-top: 8px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1px solid #111827;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.lf-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* alt row */
+.lf-alt {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #6b7280;
+}
+.lf-forgot { text-decoration: underline; color: #111827; }
+/* Hero icon */
+.lf-hero-icon {
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+/* Bigger Authority Entrepreneurs logo */
+.lf-logo {
+  width: 180px; /* increased from ~120px */
+  height: auto;
+  margin: 0 auto 12px;
+  display: block;
+}
+
+/* responsive: collapse to single column on small screens */
+@media (max-width: 920px) {
+  .lf-page {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+  }
+  .lf-hero {
+    order: -1; /* hero first on mobile */
+    padding: 20px;
+    text-align: center;
+
+  }
+  .lf-form-wrap {
+    padding: 28px;
+    flex: 1;
+  }
+    .lf-hero-title {
+    font-size: 24px;
+  }
+  .lf-form-card { max-width: 680px; margin: 0 auto; }
+  .lf-title-block h2 { font-size: 26px; }
 }
 
-.login-form-group{
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 6px
-}
-
-
-.login-form-group label{
-    align-self: start;
-    font-size: .875rem;
-    font-weight: 500;
-    
-}
-
-.login-form-group input{
-    padding: .75rem .75rem;
-    border: none;
-    border: 1px solid rgba(146, 142, 142, 0.438);
-    border-radius: 6px ;
-    font-size: .875rem;
-   
-    
-}
-.login-form-group input.input-error{
-    border: 1px solid red;
-}
-.login-form-group input:focus {
-    outline: 2px solid hsl(249 47% 48%);
-    border: none;
-}
-
-.login-form-group small{
-    align-self: flex-start;
-    color : red;
-}
-
-.login-form form button {
-    color: white;
-    font-weight: 500;
-    border-radius: 6px;
-        padding: .75rem .75rem;
-        background-color: #5638B0;
-        border: none;
-        width: 100%;
-        font-size: 1rem;
-        font-weight: 700;
-        cursor: pointer;
-        display: flex
-;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
-
-.login-form form button:hover{
-     background-color: #5638b0c4;
-}
-
-.login-form form button:disabled{
-    background-color: #7654ddc4 ;
-    cursor: not-allowed
-}
-.show-pass{
-    position: absolute;
-    right:20px;
-    top: 30px;
-    cursor: pointer;
-    font-size: 1.4rem;
-   
-}
-.show-pass-error{
-    color : red;
-}
-
-
-
-@media(max-width:769px){
-    .login-container{
-      grid-template-columns: 1fr; /* one column */
-    grid-auto-rows: auto;  
-    }
-
-    .login-form{
-        padding: 30px;
-    }
-
-
+/* very small screens */
+@media (max-width: 480px) {
+  .lf-form-wrap { padding: 18px; }
+  .lf-logo { width: 120px; }
+  .lf-hero-title { font-size: 32px; }
 }

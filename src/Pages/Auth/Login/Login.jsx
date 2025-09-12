@@ -134,11 +134,7 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="lf-alt">
-            <a className="lf-forgot" href="/auth/forgot-password">
-              Forgot password? Click here
-            </a>
-          </div>
+        
         </div>
       </main>
     </div>

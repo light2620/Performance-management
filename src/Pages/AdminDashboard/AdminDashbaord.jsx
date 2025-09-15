@@ -105,7 +105,7 @@ export default function AdminDashboard() {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
+  const pendingRequest = requests.filter((req) => req.status === "PENDING");
  const fetchAllConversations = async () => {
   try {
     const res = await getAllConversationsApi();
@@ -227,7 +227,7 @@ export default function AdminDashboard() {
       {/* NEW: Four cards in one row */}
       <div className="grid-row-4">
         <section className="card medium-card">
-          <h3 className="section-title">Top 5 Users</h3>
+          <h3 className="section-title">Top 5 Employees</h3>
           {topFive.length === 0 ? (
             <div className="placeholder">No data</div>
           ) : (
@@ -235,7 +235,7 @@ export default function AdminDashboard() {
               {topFive.map((u, idx) => 
               
                 {
-                    console.log(u)
+            
                   return <UserRow key={u.id ?? idx} user={u} rank={idx + 1 } setShowUserDetailModal={() => setShowUserDetailModal(true)}  setSelectedUserId={() => setSelectedUserId(u.employee.id)} />}
               )}
             </div>
@@ -243,7 +243,7 @@ export default function AdminDashboard() {
         </section>
 
         <section className="card medium-card">
-          <h3 className="section-title">Bottom 5 Users</h3>
+          <h3 className="section-title">Bottom 5 Employees</h3>
           {bottomFive.length === 0 ? (
             <div className="placeholder">No data</div>
           ) : (
@@ -256,8 +256,10 @@ export default function AdminDashboard() {
         </section>
 
         <section className="card medium-card">
-          <h3 className="section-title">Recent Activity</h3>
-          {requests.length === 0 ? (
+          <h3 className="section-title">Pending Request</h3>
+         
+
+          {pendingRequest.length === 0 ? (
             <div className="placeholder">No requests</div>
           ) : (
             <div className="list" style={{cursor:"pointer"}}>

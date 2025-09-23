@@ -1,24 +1,21 @@
 import { useEffect, useState } from "react";
 import { getAllNotifications, markAsRead } from "../../Apis/NotificationApis";
 import NotificationModal from "../../Components/NotificationModal/NotificationModal";
-import NotificationListener from "../../Components/NotificationListener/NotificationListener";
 import "./style.css";
 
 const API_URL = "/notifications/";
 
-
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedId, setSelectedId] = useState(null);
   const [selectedNotif, setSelectedNotif] = useState(null);
 
-  // filters
-  const [isRead, setIsRead] = useState("");
+  // Filters
+  const [isRead, setIsRead] = useState(""); // "", "true", "false"
   const [type, setType] = useState("");
   const [ordering, setOrdering] = useState("-created_at");
 
-  // pagination
+  // Pagination
   const [nextUrl, setNextUrl] = useState(null);
   const [prevUrl, setPrevUrl] = useState(null);
   const [count, setCount] = useState(0);
@@ -30,7 +27,6 @@ const Notifications = () => {
   const fetchNotifications = async (url) => {
     try {
       setLoading(true);
-
       let query = "";
       if (isRead) query += `&is_read=${isRead}`;
       if (type) query += `&type=${type}`;
@@ -41,7 +37,6 @@ const Notifications = () => {
         : `${url}?${query.startsWith("&") ? query.slice(1) : query}`;
 
       const res = await getAllNotifications(finalUrl);
-      
       setNotifications(res.data.results);
       setCount(res.data.count);
       setNextUrl(res.data.next);
@@ -56,7 +51,7 @@ const Notifications = () => {
   const handleMarkAsRead = async (id) => {
     try {
       await markAsRead(id);
-      await fetchNotifications(API_URL);
+      fetchNotifications(API_URL);
     } catch (err) {
       console.log(err);
     }
@@ -90,10 +85,14 @@ const Notifications = () => {
 
         <select value={type} onChange={(e) => setType(e.target.value)}>
           <option value="">All Types</option>
+          <option value="DEMERIT_AWARDED">Demerit Awarded</option>
           <option value="MERIT_AWARDED">Merit Awarded</option>
-          <option value="DEMERIT_GIVEN">Demerit Given</option>
-          <option value="REQUEST_APPROVED">Request Approved</option>
-          <option value="REQUEST_REJECTED">Request Rejected</option>
+          <option value="MERIT_REVERSED">Merit Reversed</option>
+          <option value="POINT_REQUEST_APPROVED">Point Request Approved</option>
+          <option value="POINT_REQUEST_REJECTED">Point Request Rejected</option>
+          <option value="POINT_REQUEST_CANCELLED">Point Request Cancelled</option>
+          <option value="POINT_REQUEST_SUBMITTED">Point Request Submitted</option>
+          <option value="POINT_REQUEST_MODIFIED">Point Request Modified</option>
         </select>
 
         <select value={ordering} onChange={(e) => setOrdering(e.target.value)}>
@@ -112,7 +111,6 @@ const Notifications = () => {
           <table className="notifications-table">
             <thead>
               <tr>
-                
                 <th>Type</th>
                 <th>Status</th>
                 <th>Created</th>
@@ -122,24 +120,19 @@ const Notifications = () => {
             <tbody>
               {notifications.map((n) => (
                 <tr key={n.id} className={n.is_read ? "read" : "unread"}>
-                 
                   <td>{n.type_display}</td>
                   <td>{n.is_read ? "Read" : "Unread"}</td>
                   <td>{new Date(n.created_at).toLocaleString()}</td>
                   <td>
-                   <button
-  className="mark-read-btn"
-  onClick={() => {
-    if (!n.is_read) {
-      // only mark unread notifications
-      markAsRead(n.id).catch(console.error);
-    }
-    setSelectedNotif({ id: n.id, message: n.message });
-  }}
->
-  View
-</button>
-
+                    <button
+                      className="mark-read-btn"
+                      onClick={() => {
+                        if (!n.is_read) handleMarkAsRead(n.id);
+                        setSelectedNotif({ id: n.id, message: n.message });
+                      }}
+                    >
+                      View
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -170,17 +163,15 @@ const Notifications = () => {
           </button>
         </div>
       </div>
-{selectedNotif && (
-  <NotificationModal
-    id={selectedNotif.id}
-    previewMessage={selectedNotif.message} // pass message from list
-    fetchNotifications={() => fetchNotifications(API_URL)}
-    onClose={() => {
-        fetchNotifications(API_URL);
-        setSelectedNotif(null)}}
-  />
-)}
 
+      {selectedNotif && (
+        <NotificationModal
+          id={selectedNotif.id}
+          previewMessage={selectedNotif.message}
+          fetchNotifications={() => fetchNotifications(API_URL)}
+          onClose={() => setSelectedNotif(null)}
+        />
+      )}
     </div>
   );
 };

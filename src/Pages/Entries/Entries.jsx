@@ -193,7 +193,7 @@ const Entries = () => {
                   <th>Operation</th>
                   {user?.role === "ADMIN" && <th>Employee</th>}
                   <th>Points</th>
-                  <th>Created By</th>
+              
                   <th>Created</th>
                   <th>Action</th>
                 </tr>
@@ -221,10 +221,7 @@ const Entries = () => {
                       </td>
                     )}
                     <td>{entry.points}</td>
-                    <td>
-                      {entry.created_by?.first_name}{" "}
-                      {entry.created_by?.last_name}
-                    </td>
+                    
                     <td>{new Date(entry.created_at).toLocaleDateString()}</td>
                     <td style={{ cursor: "pointer", textDecoration: "underline" }}>
                       View

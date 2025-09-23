@@ -244,7 +244,7 @@ export default function SingleRequestPageRedesign() {
               </button>
             )}
 
-           {(request.status === "PENDING" || request.status === "APPROVED") &&  <button onClick={() => setShowRequestTimeline(true)} className="srdr-btn srdr-btn-history">
+           {  <button onClick={() => setShowRequestTimeline(true)} className="srdr-btn srdr-btn-history">
               <FaHistory /> Point History
             </button>}
 

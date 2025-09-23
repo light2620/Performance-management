@@ -28,8 +28,6 @@ const formatDate = (iso) => {
 const EntryDetails = ({
   isOpen,
   onClose = () => {},
-  onApprove = () => {},
-  onReject = () => {},
   createdBy,
   isAdmin,
   reason,
@@ -85,9 +83,9 @@ const EntryDetails = ({
       >
         <header className="modal-header">
           <div className="modal-left">
-            <div className="modal-avatar" aria-hidden>
+            {/* <div className="modal-avatar" aria-hidden>
               {forUser?.first_name?.[0]?.toUpperCase() || "U"}
-            </div>
+            </div> */}
             <div className="modal-heading">
               <div id="ed-title" className="modal-title">{title}</div>
              {isAdmin && <div className="modal-sub">Request ID: <span className="modal-id">{requestId || "—"}</span></div>}
@@ -96,7 +94,7 @@ const EntryDetails = ({
 
           <div className="modal-controls">
             <div className="modal-badges" aria-hidden>
-              <span className="badge op">{operation || "N/A"}</span>
+
               <span className="badge type">{type || "N/A"}</span>
               <span className="badge points">{points ?? 0} pts</span>
             </div>
@@ -116,7 +114,7 @@ const EntryDetails = ({
             {isAdmin && (
               <div className="person-row">
                 <div className="person-left">
-                  <div className="person-avatar">{forUser?.first_name?.[0]?.toUpperCase() || "U"}</div>
+                  {/* <div className="person-avatar">{forUser?.first_name?.[0]?.toUpperCase() || "U"}</div> */}
                 </div>
                 <div className="person-right">
                   <div className="person-name">{forUser?.first_name} {forUser?.last_name}</div>
@@ -145,7 +143,7 @@ const EntryDetails = ({
 
               <div className="meta-item">
                 <div className="meta-key">Operation</div>
-                <div className="meta-val">{operation || "—"}</div>
+                {/* <div className="meta-val">{operation || "—"}</div> */}
               </div>
             </div>
           </aside>

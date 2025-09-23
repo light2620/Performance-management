@@ -106,7 +106,7 @@ export default function SingleEntryPageRedesign() {
           setEntry((prev) =>
             prev ? { ...prev, operation: "REVERSED", is_reversed: true, updated_at: new Date().toISOString() } : prev
           );
-          toast.success("↩️ Entry reversed");
+          toast.success("Entry reversed");
         } catch (err) {
           console.error(err);
           toast.error(err.response?.data?.detail || "Reverse entry failed");
@@ -170,10 +170,10 @@ export default function SingleEntryPageRedesign() {
               <button
                 disabled={busy}
                 onClick={handleReverse}
-                className="sepr-btn sepr-btn-primary"
+                className="sepr-btn sepr-btn-primary "
               >
                 Reverse Entry
-              </button> : <div className="sepr-reversed">Entry is Reversed</div>}
+              </button> : <div className="sepr-reversed reverse-text">Entry is Reversed</div>}
 
             <button
               onClick={() => setTimelineOpen(true)}
@@ -215,12 +215,12 @@ export default function SingleEntryPageRedesign() {
                 </div>
               )}
 
-              <div className="sep-aside-row">
+              {isAdmin && <div className="sep-aside-row">
                 <div className="sep-muted" >Created by</div>
                 <div onClick={() => {
                   isAdmin && setUserDetailModal(true)
                   isAdmin && setUserId(entry.created_by?.id)}}className={`sep-strong ${isAdmin && "sep-clickable"}`}>{entry.created_by?.first_name} {entry.created_by?.last_name}</div>
-              </div>
+              </div>}
 
               <div className="sep-aside-row">
                 <div className="sep-muted">Created at</div>

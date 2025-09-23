@@ -67,3 +67,9 @@
   cursor: pointer;
   text-decoration: underline;
 }
+
+.reverse-text{
+  border: 2px solid red;
+  color : red;
+  padding: 2px 10px;
+}

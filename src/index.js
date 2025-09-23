@@ -12,6 +12,7 @@ import { ThemeProvider } from './Utils/ThemeContext';
 import NotificationListener from './Components/NotificationListener/NotificationListener';
 import { WebSocketProvider } from './Provider/WebSocketProvider';
 import NewMessageNotification from './Components/NewMessageNotification/NewMessageNotification';
+import { NotificationProvider } from './Provider/NotificationProvider';
 
 
 
@@ -20,12 +21,13 @@ root.render(
  <ThemeProvider>
 
     <AuthProvider>
+      <NotificationProvider>
       <WebSocketProvider>
-      <NotificationListener />
       <Provider store={store}>
        <App />
     </Provider>
     </WebSocketProvider>
+   </NotificationProvider>
      </AuthProvider>
     
     </ThemeProvider >

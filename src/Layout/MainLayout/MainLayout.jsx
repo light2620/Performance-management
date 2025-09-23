@@ -14,6 +14,7 @@ import MobileProfile from '../../Components/MobileProfile/MobileProfile'
 import ProfileModal from '../../Components/Profile/Profile'
 import ThemeToggle from '../../Utils/ThemeToggle.js/ThemeToggle'
 import NewMessageNotification from '../../Components/NewMessageNotification/NewMessageNotification'
+import NotificationListener from '../../Components/NotificationListener/NotificationListener'
 
 
 import "./style.css"
@@ -80,6 +81,7 @@ const fetchAllUsers = async() => {
           </div>
           {showProfileModal && <ProfileModal  onClose={() => setShowProfileModal(false)} />}
             {<NewMessageNotification />}
+            {<NotificationListener />}
     </div>
   )
 }

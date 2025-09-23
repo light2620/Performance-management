@@ -14,6 +14,7 @@ import { AiOutlineAudit } from "react-icons/ai";
 import { IoMdNotifications } from "react-icons/io";
 import { RiMessage2Fill } from "react-icons/ri";
 import { useWebSocket } from "../../Provider/WebSocketProvider";
+import { useNotifications } from "../../Provider/NotificationProvider";
 
 
 
@@ -28,7 +29,7 @@ const Sidebar = ({ closeMobileMenu }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const {unreadCount: unreadConversation} = useWebSocket();
-  console.log(unreadConversation , "unread conversation")
+  const {unreadCount: unreadNotification} = useNotifications();
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -42,11 +43,7 @@ const Sidebar = ({ closeMobileMenu }) => {
     };
 
     fetchCount();
-
-    // optional polling every 30s
-    const interval = setInterval(fetchCount, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  }, [unreadNotification]);
 
   const navOption = [
     {

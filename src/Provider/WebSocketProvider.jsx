@@ -17,12 +17,9 @@ export const WebSocketProvider = ({ children }) => {
 
   const connect = useCallback(() => {
     const token = tokenService.getAccess();
-    if (!token) {
-      console.warn("WebSocketProvider: no token found, skipping ws connect");
-      return;
-    }
+    if (!token) return;
+
     const url = WS_URL_BASE + token;
-    console.log("WS: attempting to connect →", url);
 
     try {
       const socket = new WebSocket(url);
@@ -30,62 +27,43 @@ export const WebSocketProvider = ({ children }) => {
 
       socket.onopen = () => {
         setSocketReady(true);
-        console.log("WS: ✅ connected");
       };
 
       socket.onmessage = (ev) => {
-        console.log("WS: 📩 incoming message →", ev.data);
         try {
           const payload = JSON.parse(ev.data);
 
           if (payload.type === "connection_confirmed") {
-            console.log("WS: connection confirmed", payload);
-         
-              setUnreadCount(payload.total_unread_conversations);
-        
+            setUnreadCount(payload.total_unread_conversations);
           } else if (payload.type === "unread_status_update") {
-            console.log("WS: unread count updated", payload);
-            
-              setUnreadCount(payload.total_unread_conversations);
-            
+            setUnreadCount(payload.total_unread_conversations);
           }
 
           for (const cb of subscribersRef.current.values()) {
             try {
               cb(payload);
-            } catch (e) {
-              console.error("WS subscriber callback error:", e);
-            }
+            } catch {}
           }
-        } catch (e) {
-          console.error("WS parse error:", e);
-        }
+        } catch {}
       };
 
-      socket.onclose = (ev) => {
-        console.log("WS: ❌ closed →", ev.reason || ev.code);
+      socket.onclose = () => {
         setSocketReady(false);
         if (!reconnectTimer.current) {
           reconnectTimer.current = setTimeout(() => {
-            console.log("WS: 🔄 reconnecting...");
             reconnectTimer.current = null;
             connect();
           }, 3000);
         }
       };
 
-      socket.onerror = (err) => {
-        console.error("WS: ⚠️ error →", err);
-      };
-    } catch (e) {
-      console.error("WS connect error", e);
-    }
+      socket.onerror = () => {};
+    } catch {}
   }, []);
 
   useEffect(() => {
     connect();
     return () => {
-      console.log("WS: provider unmounted → closing socket");
       if (reconnectTimer.current) {
         clearTimeout(reconnectTimer.current);
         reconnectTimer.current = null;
@@ -97,22 +75,13 @@ export const WebSocketProvider = ({ children }) => {
   }, [connect]);
 
   const sendPayload = useCallback((payload) => {
-    console.log("WS: ✉️ sending payload →", payload);
     const socket = wsRef.current;
-    if (!socket) {
-      console.error("WS: no socket instance to send");
-      return false;
-    }
-    if (socket.readyState !== WebSocket.OPEN) {
-      console.error("WS: socket not open yet (state:", socket.readyState, ")");
-      return false;
-    }
+    if (!socket) return false;
+    if (socket.readyState !== WebSocket.OPEN) return false;
     try {
       socket.send(JSON.stringify(payload));
-      console.log("WS: ✅ payload sent");
       return true;
-    } catch (e) {
-      console.error("WS send error", e);
+    } catch {
       return false;
     }
   }, []);
@@ -120,13 +89,11 @@ export const WebSocketProvider = ({ children }) => {
   const subscribe = useCallback((cb) => {
     const id = String(nextSubscriberId.current++);
     subscribersRef.current.set(id, cb);
-    console.log("WS: 👀 new subscriber added (id:", id, ")");
     return id;
   }, []);
 
   const unsubscribe = useCallback((id) => {
     subscribersRef.current.delete(id);
-    console.log("WS: 🗑️ subscriber removed (id:", id, ")");
   }, []);
 
   return (

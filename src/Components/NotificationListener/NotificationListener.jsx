@@ -1,228 +1,142 @@
-import React, { useEffect, useRef, useState } from "react";
-import { tokenService } from "../../Apis/tokenService";
+// src/Components/NotificationListener/NotificationListener.jsx
+import React from "react";
+import { useNotifications } from "../../Provider/NotificationProvider";
+import { useNavigate } from "react-router-dom";
 import "./style.css";
 
-const WS_URL = "wss://demerits.authorityentrepreneurs.com/ws/notifications/";
-
-const uid = () =>
-  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
-
+/**
+ * NotificationListener
+ * - Navigates based on notification.type and notification.meta fields (request_id, object_id, reversal_entry_id)
+ * - View button / clicking row will navigate and mark read locally
+ * - Dismiss button removes notification only
+ */
 const NotificationListener = () => {
-  const [items, setItems] = useState([]);
-  const socketRef = useRef(null);
-  const tokenRef = useRef(tokenService.getAccess?.() ?? null);
-  const reconnectingRef = useRef(false);
+  const { notifications, removeNotification, clearNotifications, markReadLocal } = useNotifications();
+  const navigate = useNavigate();
 
-  // utility to cleanly close socket
-  const closeSocket = () => {
-    try {
-      if (socketRef.current) {
-        socketRef.current.onmessage = null;
-        socketRef.current.onopen = null;
-        socketRef.current.onclose = null;
-        socketRef.current.onerror = null;
-        socketRef.current.close();
-        socketRef.current = null;
+  // derive app route & whether to open in new tab from notification
+  const getNavigationTarget = (n) => {
+    const meta = n.meta || {};
+    const type = String(n.type || "").toUpperCase();
+
+    // helper to coerce ids
+    const objId = meta.object_id ?? meta.objectId ?? meta.entry_id ?? null;
+    const requestId = meta.request_id ?? meta.requestId ?? null;
+    const reversalId = meta.reversal_entry_id ?? meta.reversal_entryId ?? null;
+
+    switch (type) {
+      case "DEMERIT_AWARDED":
+      case "MERIT_AWARDED":
+        // points entries show the object_id (entry id)
+        if (objId) return { route: `/points-entries/${objId}`, external: false };
+        break;
+
+      case "MERIT_REVERSED":
+        // prefer reversal_entry_id, fallback to object_id
+        if (reversalId) return { route: `/points-entries/${reversalId}`, external: false };
+        if (objId) return { route: `/points-entries/${objId}`, external: false };
+        break;
+
+      case "POINT_REQUEST_APPROVED":
+      case "POINT_REQUEST_REJECTED":
+      case "POINT_REQUEST_CANCELLED":
+      case "POINT_REQUEST_SUBMITTED":
+      case "POINT_REQUEST_MODIFIED":
+        // go to requests page (use request_id)
+        if (requestId) return { route: `/requests/${requestId}`, external: false };
+        // fallback: sometimes object_id contains request id
+        if (objId) return { route: `/requests/${objId}`, external: false };
+        break;
+
+      default:
+        break;
+    }
+
+    // final fallback: if server supplied a relative navigate_url, use it as internal route.
+    if (n.navigate_url && typeof n.navigate_url === "string") {
+      const url = n.navigate_url;
+      // If absolute URL to another domain -> open in new tab.
+      const isAbsolute = /^https?:\/\//i.test(url);
+      if (isAbsolute) return { route: url, external: true };
+      // treat as internal relative route
+      return { route: url, external: false };
+    }
+
+    return null;
+  };
+
+  const handleOpen = (n) => {
+    const target = getNavigationTarget(n);
+
+    if (!target) {
+      // No route target known: mark read locally and remove
+      markReadLocal(n.id);
+      removeNotification(n.id);
+      return;
+    }
+
+    // mark read locally
+    markReadLocal(n.id);
+    // remove from the list
+    removeNotification(n.id);
+
+    if (target.external) {
+      // open absolute urls in new tab
+      window.open(target.route, "_blank", "noopener,noreferrer");
+    } else {
+      // internal navigate
+      try {
+        // If the route is absolute path string starting with http(s) but same origin, fall back to location
+        navigate(target.route);
+      } catch (e) {
+        // fallback
+        window.location.href = target.route;
       }
-    } catch (e) {
-      console.warn("Error closing socket", e);
     }
   };
 
-  // open socket for a given token
-  const openSocket = (token) => {
-    if (!token) return;
-    try {
-      const ws = new WebSocket(`${WS_URL}?token=${token}`);
-      socketRef.current = ws;
-
-      ws.onopen = () => {
-        console.info("✅ Notification WS connected");
-      };
-
-      ws.onmessage = (evt) => {
-        try {
-          const data = JSON.parse(evt.data);
-          console.log("📩 Notification WS message", data);
-          if (data?.type === "notification" && data.notification) {
-            const n = data.notification;
-            const id = n.id ?? uid();
-            const title = n.title ?? "Notification";
-            const message = n.message ?? n.preview ?? "";
-            const status = n.status ?? "";
-            const ntype = n.type ?? "";
-            const navigate_url = n.navigate_url ?? n.metadata?.navigate_url ?? null;
-            const meta = n.metadata ?? null;
-
-            let kind = "info";
-            if (typeof ntype === "string") {
-              if (ntype.includes("MERIT") || ntype.toUpperCase().includes("MERIT")) kind = "success";
-              if (ntype.includes("DEMERIT") || ntype.toUpperCase().includes("DEMERIT")) kind = "error";
-              if (ntype.includes("REQUEST") || ntype.toUpperCase().includes("REQUEST")) kind = "warning";
-            }
-
-            const newItem = {
-              id,
-              title,
-              message,
-              kind,
-              status,
-              type: ntype,
-              navigate_url,
-              meta,
-              createdAt: Date.now(),
-            };
-
-            // prepend and avoid duplicates by id
-            setItems((prev) => {
-              if (prev.some(p => p.id === id)) return prev;
-              return [newItem, ...prev];
-            });
-          }
-        } catch (err) {
-          console.error("❌ Failed to parse WS message", err);
-        }
-      };
-
-      ws.onclose = (ev) => {
-        console.info("🔌 Notification WS closed", ev.reason || "");
-        socketRef.current = null;
-      };
-
-      ws.onerror = (err) => {
-        console.error("❌ Notification WS error", err);
-      };
-    } catch (e) {
-      console.error("Failed to open WS", e);
-    }
-  };
-
-  // effect: manage socket lifecycle based on tokenRef.current
-  useEffect(() => {
-    const token = tokenService.getAccess?.();
-    tokenRef.current = token ?? null;
-
-    if (tokenRef.current) {
-      openSocket(tokenRef.current);
-    }
-
-    // storage event handler: detect token changes from other tabs (common logout flow)
-    const onStorage = () => {
-      const newToken = tokenService.getAccess?.() ?? null;
-      // if token removed => logout happened
-      if (!newToken && tokenRef.current) {
-        tokenRef.current = null;
-        // close socket & clear notifications
-        closeSocket();
-        setItems([]);
-        console.info("NotificationListener: token removed -> closing socket & clearing items");
-      } else if (newToken && newToken !== tokenRef.current) {
-        // token changed (login or token refresh) -> reconnect
-        tokenRef.current = newToken;
-        closeSocket();
-        // small debounce to avoid quick reconnect loops
-        if (!reconnectingRef.current) {
-          reconnectingRef.current = true;
-          setTimeout(() => {
-            openSocket(newToken);
-            reconnectingRef.current = false;
-          }, 250);
-        }
-      }
-    };
-
-    // custom event listener (if your logout flow emits window.dispatchEvent(new Event('auth:logout')))
-    const onAuthLogout = () => {
-      tokenRef.current = null;
-      closeSocket();
-      setItems([]);
-      console.info("NotificationListener: auth:logout -> closed socket & cleared items");
-    };
-
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("auth:logout", onAuthLogout);
-
-    // cleanup on unmount
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener("auth:logout", onAuthLogout);
-      closeSocket();
-    };
-    // run once (we rely on storage / auth events to change token)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // explicit logout helper (optional) — you can call window.dispatchEvent(new Event('auth:logout')) from your logout code
-  // remove single item
-  const removeItem = (id) => {
-    setItems((prev) => prev.filter((p) => p.id !== id));
-  };
-
-  const handleClick = (it) => {
-    try {
-      if (it.navigate_url) {
-        window.open(it.navigate_url, "_blank", "noopener,noreferrer");
-      } else if (it.meta?.request_id) {
-        window.open(`/request/${it.meta.request_id}`, "_self");
-      }
-    } catch (e) {
-      console.error("Open notification target failed", e);
-    }
-  };
-
-  const kindIcon = (kind) => {
-    if (kind === "success") return "✅";
-    if (kind === "error") return "⚠️";
-    if (kind === "warning") return "⚠️";
-    return "🔔";
-  };
+  if (!notifications || notifications.length === 0) return null;
 
   return (
-    <div className="nl-root" aria-live="polite" aria-atomic="true">
-      <div className="nl-container" role="list">
-        {/* optional "clear all" button shown when items exist */}
-        {items.length > 0 && (
-          <div className="nl-clear-all">
-            <button
-              className="nl-clear-btn"
-              onClick={() => setItems([])}
-              aria-label="Clear all notifications"
-            >
-              Clear All
-            </button>
-          </div>
-        )}
+    <div className="nl-root-simple" aria-live="polite">
+      <div className="nl-header">
+        <strong>Notifications</strong>
+        <button className="nl-clear" onClick={clearNotifications} aria-label="Clear notifications">Clear</button>
+      </div>
 
-        {items.map((it) => (
-          <div
-            key={it.id}
-            role="listitem"
-            className={`nl-item nl-${it.kind}`}
-          >
-            <button
-              className="nl-close-btn"
-              aria-label="Dismiss"
-              onClick={() => removeItem(it.id)}
-            >
-              ✕
-            </button>
-
+      <div className="nl-list">
+        {notifications.map((n) => (
+          <div key={n.id} className={`nl-row ${n.is_read ? "read" : "unread"}`}>
             <div className="nl-left">
-              <div className="nl-icon">{kindIcon(it.kind)}</div>
+              <div className="nl-dot" aria-hidden />
             </div>
 
             <div
-              className="nl-main"
-              onClick={() => handleClick(it)}
-              tabIndex={0}
+              className="nl-body"
+              onClick={() => handleOpen(n)}
               role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleOpen(n); }}
             >
-              <div className="nl-title">{it.title}</div>
-              <div className="nl-msg">{it.message}</div>
-              <div className="nl-meta">
-                {it.type && <span className="nl-type">{it.type}</span>}
-                {it.status && <span className="nl-status-txt">{it.status}</span>}
-              </div>
+              <div className="nl-title">{n.title || (n.type ?? "Notification")}</div>
+              <div className="nl-msg">{n.message}</div>
+            </div>
+
+            <div className="nl-actions">
+              <button
+                className="nl-view"
+                onClick={(ev) => { ev.stopPropagation(); handleOpen(n); }}
+                aria-label="View notification"
+              >
+                View
+              </button>
+              <button
+                className="nl-dismiss"
+                onClick={(ev) => { ev.stopPropagation(); removeNotification(n.id); }}
+                aria-label="Dismiss"
+              >
+                ×
+              </button>
             </div>
           </div>
         ))}

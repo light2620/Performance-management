@@ -66,7 +66,7 @@ const NotificationModal = ({ id, onClose, previewMessage, fetchNotification }) =
 
   const getActionUrl = () => {
     if (!notification) return null;
-    const { type, related_object_id, metadata } = notification;
+    const { type, related_object_id, metadata,object_id } = notification;
 
     switch (type) {
       case "DEMERIT_AWARDED":
@@ -79,7 +79,7 @@ const NotificationModal = ({ id, onClose, previewMessage, fetchNotification }) =
       case "POINT_REQUEST_CANCELLED":
       case "POINT_REQUEST_SUBMITTED":
       case "POINT_REQUEST_MODIFIED":
-        return `/requests/${metadata.request_id}`;
+        return `/requests/${metadata?.request_id || object_id}`;
       default:
         return null;
     }

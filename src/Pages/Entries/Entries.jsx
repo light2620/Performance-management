@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../Utils/AuthContext";
-import { createEntriesApi, getAllEntriesApi, reverseEntryApi } from "../../Apis/EntriesApi";
+import { createEntriesApi, getAllEntriesApi } from "../../Apis/EntriesApi";
 import RequestModal from "../../Components/RequestModal.jsx/RequestModal";
 import { useNavigate } from "react-router-dom";
-
 import "./style.css";
 
-
 const API_URL = "/point-entries/";
+
 const Entries = () => {
   const { user } = useAuth();
   const [entries, setEntries] = useState([]);
@@ -17,7 +16,7 @@ const Entries = () => {
 
   // filters
   const [type, setType] = useState("");
-  const [operation, setOperation] = useState("");
+  const [operation, setOperation] = useState(""); // GRANT / REVERSAL
   const [ordering, setOrdering] = useState("");
   const [employee, setEmployee] = useState("");
   const [employeeSearch, setEmployeeSearch] = useState("");
@@ -54,9 +53,12 @@ const Entries = () => {
 
       let query = "";
       if (type) query += `&type=${type}`;
-      if (operation) query += `&operation=${operation}`;
       if (ordering) query += `&ordering=${ordering}`;
       if (user?.role === "ADMIN" && employee) query += `&employee=${employee}`;
+
+      // Map operation to is_reversed
+      if (operation === "GRANT") query += `&is_reversed=false`;
+      else if (operation === "REVERSAL") query += `&is_reversed=true`;
 
       const finalUrl = url.includes("?")
         ? url
@@ -74,8 +76,6 @@ const Entries = () => {
       setLoading(false);
     }
   };
-
-
 
   if (!user) {
     return <p className="entriesComp-loading">Loading user...</p>;
@@ -191,7 +191,7 @@ const Entries = () => {
                 <tr>
                   <th>Type</th>
                   <th>Operation</th>
-                 { user?.role === "ADMIN" && <th>Employee</th>}
+                  {user?.role === "ADMIN" && <th>Employee</th>}
                   <th>Points</th>
                   <th>Created By</th>
                   <th>Created</th>
@@ -200,18 +200,22 @@ const Entries = () => {
               </thead>
               <tbody>
                 {entries.map((entry) => (
-                  <tr key={entry.id } style={{cursor:"pointer"}} onClick={()=>{
-                    navigate(`/points-entries/${entry.id}`)
-                  }}>
+                  <tr
+                    key={entry.id}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate(`/points-entries/${entry.id}`)}
+                  >
                     <td>{entry.type}</td>
                     <td>
                       <span
-                        className={`entriesComp-tag ${entry.is_reversed ? "reversal" : "grant"}`}
+                        className={`entriesComp-tag ${
+                          entry.is_reversed ? "reversal" : "grant"
+                        }`}
                       >
-                        {entry.is_reversed ? "Reversed" : "Grant"}
+                        {entry.is_reversed ? "Reversal" : "Grant"}
                       </span>
                     </td>
-                   { user?.role === "ADMIN" && (
+                    {user?.role === "ADMIN" && (
                       <td>
                         {entry.employee?.first_name} {entry.employee?.last_name}
                       </td>
@@ -221,16 +225,10 @@ const Entries = () => {
                       {entry.created_by?.first_name}{" "}
                       {entry.created_by?.last_name}
                     </td>
-<td>{new Date(entry.created_at).toLocaleDateString()}</td>
-                    {/* {user.role === "ADMIN" && (
-                      <td
-                        onClick={() => handleReverseEntry(entry.id)}
-                        className="entriesComp-reverse"
-                      >
-                        <FaTrashRestore size={18} />
-                      </td>
-                    )} */}
-                    <td style={{cursor:"pointer",textDecoration:"underline"}}> View</td>
+                    <td>{new Date(entry.created_at).toLocaleDateString()}</td>
+                    <td style={{ cursor: "pointer", textDecoration: "underline" }}>
+                      View
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -245,16 +243,10 @@ const Entries = () => {
           Showing {entries.length} of {count} entries
         </p>
         <div className="entriesComp-pageBtns">
-          <button
-            disabled={!prevUrl}
-            onClick={() => fetchEntries(prevUrl)}
-          >
+          <button disabled={!prevUrl} onClick={() => fetchEntries(prevUrl)}>
             ← Prev
           </button>
-          <button
-            disabled={!nextUrl}
-            onClick={() => fetchEntries(nextUrl)}
-          >
+          <button disabled={!nextUrl} onClick={() => fetchEntries(nextUrl)}>
             Next →
           </button>
         </div>

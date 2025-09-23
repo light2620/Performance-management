@@ -13,6 +13,7 @@ import { useAuth } from "../../Utils/AuthContext";
 import { AiOutlineAudit } from "react-icons/ai";
 import { IoMdNotifications } from "react-icons/io";
 import { RiMessage2Fill } from "react-icons/ri";
+import { useWebSocket } from "../../Provider/WebSocketProvider";
 
 
 
@@ -26,6 +27,8 @@ const Sidebar = ({ closeMobileMenu }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const {unreadCount: unreadConversation} = useWebSocket();
+  console.log(unreadConversation , "unread conversation")
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -81,6 +84,7 @@ const Sidebar = ({ closeMobileMenu }) => {
       icon: <RiMessage2Fill size={22} />,
       className: "nav-tickets",
       isAdmin: false,
+      badge: unreadConversation
     },
   ];
 

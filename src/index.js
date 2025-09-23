@@ -10,17 +10,23 @@ import { Provider } from 'react-redux';
 import { store } from './Redux/store';
 import { ThemeProvider } from './Utils/ThemeContext';
 import NotificationListener from './Components/NotificationListener/NotificationListener';
+import { WebSocketProvider } from './Provider/WebSocketProvider';
+
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
  <ThemeProvider>
+
     <AuthProvider>
+      <WebSocketProvider>
       <NotificationListener />
       <Provider store={store}>
-    <App />
+       <App />
     </Provider>
+    </WebSocketProvider>
      </AuthProvider>
+    
     </ThemeProvider >
  
 );

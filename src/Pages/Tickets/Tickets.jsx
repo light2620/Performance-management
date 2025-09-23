@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllConversationsApi } from "../../Apis/CreateConversation";
 import { useAuth } from "../../Utils/AuthContext";
 import { useWebSocket } from "../../Provider/WebSocketProvider";
+import axiosInstance from "../../Apis/axiosInstance";
 import "./style.css";
 
 const formatDate = (iso) => {
@@ -32,28 +32,30 @@ const Tickets = () => {
     let mounted = true;
 
     const fetchConversations = async () => {
-      if (!user?.role) return; // fetch only after user role is defined
+      if (!user?.role) return;
+
+      setLoading(true);
       try {
-        const res = await getAllConversationsApi();
+        const isActiveParam = filter === "active" ? "true" : "false";
+        const res = await axiosInstance.get(`/conversations/?is_active=${isActiveParam}`);
         const data = res?.data?.results || [];
         if (mounted) setConversations(data);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching conversations:", err);
       } finally {
         if (mounted) setLoading(false);
       }
     };
 
     fetchConversations();
-    return () => (mounted = false);
-  }, [user?.role, subscribe, unsubscribe]);
+
+    return () => {
+      mounted = false;
+    };
+  }, [user?.role, filter, subscribe, unsubscribe]);
 
   if (!user?.role) return null;
   if (loading) return <div className="tickets-loading">Loading conversations…</div>;
-
-  const filteredConversations = conversations.filter(
-    (c) => (filter === "active" ? c.is_active : !c.is_active)
-  );
 
   return (
     <div className="tickets-page">
@@ -81,7 +83,7 @@ const Tickets = () => {
       {/* Scrollable container */}
       <div className="tickets-list-container">
         <ul className="conversation-list">
-          {filteredConversations.map((c) => {
+          {conversations.map((c) => {
             const lastMsg = c.last_message || {};
             const isUnread = c.has_unread_msgs;
             const preview = lastMsg.message || lastMsg.content || "No messages yet";

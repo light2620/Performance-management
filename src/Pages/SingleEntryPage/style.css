@@ -40,7 +40,7 @@
 /* Card & Grid */
 .sep-card { background: var(--sep-bg); border:1px solid var(--sep-card-border); padding:22px; border-radius:12px; box-shadow: var(--sep-shadow); }
 .sep-grid { display:grid; grid-template-columns:1fr 300px; gap:20px; }
-@media (max-width:900px) { .sep-grid { grid-template-columns:1fr; } .sep-aside { order:2; } .sep-main { order:1; } }
+@media (max-width:900px) { .sep-grid { grid-template-columns:1fr; } .sep-aside { order:2; } .sep-main { order:1; } .sep-header{flex-direction:column;} .sepr-actions{order: -1;} }
 
 /* Main Content */
 .sep-points .sep-muted { color:var(--sep-muted); font-weight:500; font-size: 20px; }

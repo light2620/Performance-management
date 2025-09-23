@@ -36,7 +36,7 @@
 /* Card & grid */
 .srdr-card { background: var(--srdr-bg); border: 1px solid var(--srdr-card-border); padding: 22px; border-radius: 12px; box-shadow: var(--srdr-shadow); }
 .srdr-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
-@media (max-width: 1100px) { .srdr-grid { grid-template-columns: 1fr; } .srdr-actions { flex-direction: column; gap: 8px; } }
+@media (max-width: 1100px) { .srdr-grid { grid-template-columns: 1fr; } .srdr-actions { gap: 8px; order:-1; justify-content: space-between; } .srdr-header{flex-direction: column;}  }
 
 /* Main */
 .srdr-points { font-weight: 700; font-size: 20px; color: var(--srdr-black); }

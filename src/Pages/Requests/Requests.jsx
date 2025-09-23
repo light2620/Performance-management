@@ -6,6 +6,7 @@ import {
 } from "../../Apis/pointRequestApi";
 import RequestModal from "../../Components/RequestModal.jsx/RequestModal";
 import { useNavigate } from "react-router-dom";
+import UserDetailModal from "../../Components/UserDetailModal/UserDetailModal";
 import "./style.css";
 
 const API_URL = "/point-requests/";
@@ -17,6 +18,7 @@ const Requests = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const [lastUrl, setLastUrl] = useState(API_URL);
+
 
   // filters
   const [status, setStatus] = useState("");
@@ -295,6 +297,7 @@ const Requests = () => {
           postApi={createRequestApi}
         />
       )}
+      
     </div>
   );
 };

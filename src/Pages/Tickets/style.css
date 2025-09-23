@@ -10,16 +10,22 @@
 
 .tickets-page {
   padding: 20px;
-  max-height: 90vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
 }
 
-/* Sticky header */
+/* Header container */
+.tickets-header-container {
+  flex-shrink: 0;
+}
+
+/* Header */
 .tickets-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .tickets-title {
@@ -28,17 +34,52 @@
   margin: 0;
 }
 
+/* Tabs */
+.tickets-tabs {
+  display: flex;
+  gap: 12px;
+}
+
+.tab-btn {
+  padding: 6px 14px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.tab-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* Scrollable list container */
+.tickets-list-container {
+  flex: 1;
+  max-height: 70vh; /* Adjust height as needed */
+  overflow-y: auto;
+}
+
 /* Conversation list */
 .conversation-list {
   list-style: none;
   padding: 0;
-  margin: 12px 0 0 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* Item */
+/* Conversation item */
 .conversation-item {
   display: flex;
   align-items: flex-start;
@@ -55,7 +96,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Unread highlight */
 .conversation-item.unread {
   border-left: 4px solid var(--primary);
 }

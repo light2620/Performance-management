@@ -6,6 +6,7 @@ import { useAuth } from "../../Utils/AuthContext";
 import toast from "react-hot-toast";
 import TimelineModal from "../../Components/TimelineModal/TimelineModal";
 import ConfirmModal from "../../Components/ConfirmModal/ConfirmModal";
+import UserDetailModal from "../../Components/UserDetailModal/UserDetailModal";
 import "./style.css";
 
 export default function SingleEntryPageRedesign() {
@@ -18,6 +19,8 @@ export default function SingleEntryPageRedesign() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [timelineOpen, setTimelineOpen] = useState(false);
+     const [showUserDetailModal, setUserDetailModal] = useState(false)
+     const [userId,setUserId] = useState("")
 
   // Confirm modal for reversal
   const [confirmModal, setConfirmModal] = useState({
@@ -205,14 +208,18 @@ export default function SingleEntryPageRedesign() {
             <aside className="sep-aside">
               {isAdmin && (
                 <div className="sep-aside-row">
-                  <div className="sep-muted">Created for</div>
-                  <div className="sep-strong">{entry.employee?.first_name} {entry.employee?.last_name}</div>
+                  <div className="sep-muted" >Created for</div>
+                  <div className={`sep-strong ${isAdmin && "sep-clickable"}`} onClick={() => {
+                  isAdmin && setUserDetailModal(true)
+                  isAdmin && setUserId(entry.employee?.id)}}>{entry.employee?.first_name} {entry.employee?.last_name}</div>
                 </div>
               )}
 
               <div className="sep-aside-row">
-                <div className="sep-muted">Created by</div>
-                <div className="sep-strong">{entry.created_by?.first_name} {entry.created_by?.last_name}</div>
+                <div className="sep-muted" >Created by</div>
+                <div onClick={() => {
+                  isAdmin && setUserDetailModal(true)
+                  isAdmin && setUserId(entry.created_by?.id)}}className={`sep-strong ${isAdmin && "sep-clickable"}`}>{entry.created_by?.first_name} {entry.created_by?.last_name}</div>
               </div>
 
               <div className="sep-aside-row">
@@ -243,6 +250,9 @@ export default function SingleEntryPageRedesign() {
         }}
         onCancel={() => setConfirmModal({ open: false, title: "", message: "", action: null })}
       />
+      {
+        showUserDetailModal && <UserDetailModal onClose={() => setUserDetailModal(false)} userId={userId}/>
+      }
     </div>
   );
 }

@@ -175,3 +175,8 @@
   outline-offset: 2px;
 }
 
+.srdr-clicable{
+  cursor: pointer;
+  text-decoration: underline;
+}
+

@@ -62,3 +62,8 @@
 .sep-skel-header { height:16px; background:#eef2f7; border-radius:6px; margin-bottom:12px; }
 .sep-skel-body { height:220px; background:#eef2f7; border-radius:8px; }
 .sep-muted { color: var(--sep-muted); }
+
+.sep-clickable{
+  cursor: pointer;
+  text-decoration: underline;
+}

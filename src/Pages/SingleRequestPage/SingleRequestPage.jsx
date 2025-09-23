@@ -11,6 +11,7 @@ import ConfirmModal from "../../Components/ConfirmModal/ConfirmModal";
 import { useAuth } from "../../Utils/AuthContext";
 import toast from "react-hot-toast";
 import RequestTimelineModal from "../../Components/RequestTimeline/RequestTimeline";
+import UserDetailModal from "../../Components/UserDetailModal/UserDetailModal";
 import { FaCheck, FaTimes, FaTrash, FaHistory, FaArrowLeft, FaPencilAlt } from "react-icons/fa";
 
 import "./style.css";
@@ -24,6 +25,8 @@ export default function SingleRequestPageRedesign() {
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+   const [showUserDetailModal, setUserDetailModal] = useState(false)
+   const [userId,setUserId] = useState("")
 
   const [confirmModal, setConfirmModal] = useState({
     open: false,
@@ -282,7 +285,11 @@ export default function SingleRequestPageRedesign() {
               {isAdmin && (
                 <div className="srdr-aside-row">
                   <div className="srdr-muted">Requested By</div>
-                  <div className="srdr-strong">
+                  <div className={`srdr-strong ${isAdmin && "srdr-clicable"}`} onClick={ () => {
+                    setUserDetailModal(true)
+                    setUserId(request.created_by?.id)}
+                    
+                    }>
                     {request.created_by?.first_name} {request.created_by?.last_name}
                   </div>
                 </div>
@@ -294,7 +301,9 @@ export default function SingleRequestPageRedesign() {
 
               <div className="srdr-aside-row">
                 <div className="srdr-muted">Created For</div>
-                <div className="srdr-strong">
+                <div className={`srdr-strong ${isAdmin && "srdr-clicable"}`} onClick={() => {
+                  isAdmin && setUserDetailModal(true)
+                  isAdmin && setUserId(request.employee?.id)}}>
                   {request.employee?.first_name} {request.employee?.last_name}
                 </div>
               </div>
@@ -371,6 +380,9 @@ export default function SingleRequestPageRedesign() {
     onClose={() => setShowRequestTimeline(false)}
   />
 )}
+{
+        showUserDetailModal && <UserDetailModal onClose={() => setUserDetailModal(false)} userId={userId}/>
+      }
     </div>
   );
 }

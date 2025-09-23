@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { addDepartment } from "../../Apis/DepartmentApis";
-import "./style.css"
+import "./style.css";
+
 const AddDepartment = ({ onAdd }) => {
   const [deptName, setDeptName] = useState("");
   const [touched, setTouched] = useState(false);
@@ -18,21 +19,21 @@ const AddDepartment = ({ onAdd }) => {
   };
 
   return (
-    <form className="card add-dept" onSubmit={handleSubmit}>
-      <label className="label">Add Department</label>
-      <div className="row">
+    <form className="add-dept-card" onSubmit={handleSubmit}>
+      <label className="add-dept-label">Add Department</label>
+      <div className="add-dept-row">
         <input
-          className={`input ${touched && !valid ? "input-error" : ""}`}
+          className={`add-dept-input ${touched && !valid ? "add-dept-input-error" : ""}`}
           placeholder="e.g. Engineering"
           value={deptName}
           onChange={(e) => setDeptName(e.target.value)}
         />
-        <button className="btn primary" type="submit">
+        <button className="add-dept-btn add-dept-btn-primary" type="submit">
           Add
         </button>
       </div>
       {touched && !valid && (
-        <div className="hint">Department name is required.</div>
+        <div className="add-dept-hint">Department name is required.</div>
       )}
     </form>
   );

@@ -12,7 +12,6 @@ import Requests from "../Pages/Requests/Requests";
 import Entries from "../Pages/Entries/Entries";
 import AllPoints from "../Pages/All Points/AllPoints";
 import AdminRoute from "./AdmiRoute";
-import AuditLogs from "../Pages/AuditLogs/AuditLogs";
 import Notifications from "../Pages/Notifications/Notification";
 import SingleRequestPage from "../Pages/SingleRequestPage/SingleRequestPage";
 import SingleEntryPage from "../Pages/SingleEntryPage/SingleEntryPage";

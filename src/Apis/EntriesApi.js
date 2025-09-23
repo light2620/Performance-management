@@ -39,4 +39,8 @@ const reverseEntryApi = async(id) => {
         throw err
     }
 }
-export {getAllEntriesApi,createEntriesApi,reverseEntryApi,getSingleEntryApi}
+
+const getHistoryOfEntryApi = async(id) => {
+     return  axiosInstance.get(`/point-entries/${id}/history/`)
+}
+export {getAllEntriesApi,createEntriesApi,reverseEntryApi,getSingleEntryApi,getHistoryOfEntryApi}

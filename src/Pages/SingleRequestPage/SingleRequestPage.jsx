@@ -5,14 +5,17 @@ import {
   deleteRequestApi,
   approveRequestApi,
   rejectRequestApi,
+  editRequestedPointApi,
 } from "../../Apis/pointRequestApi";
 import ConfirmModal from "../../Components/ConfirmModal/ConfirmModal";
 import { useAuth } from "../../Utils/AuthContext";
 import toast from "react-hot-toast";
+import RequestTimelineModal from "../../Components/RequestTimeline/RequestTimeline";
+import { FaCheck, FaTimes, FaTrash, FaHistory, FaArrowLeft, FaPencilAlt } from "react-icons/fa";
+
 import "./style.css";
 
-// React component using plain CSS (file: SingleRequestPageRefactor.css)
-export default function SingleRequestPageRefactor() {
+export default function SingleRequestPageRedesign() {
   const { user } = useAuth();
   const isAdmin = user?.role === "ADMIN";
   const { id } = useParams();
@@ -27,6 +30,12 @@ export default function SingleRequestPageRefactor() {
     title: "",
     message: "",
     action: null,
+  });
+  const [showRequestTimeline,setShowRequestTimeline] = useState(false)
+  const [editPointsModal, setEditPointsModal] = useState({
+    open: false,
+    points: "",
+    admin_reason: "",
   });
 
   useEffect(() => {
@@ -68,7 +77,9 @@ export default function SingleRequestPageRefactor() {
           setBusy(true);
           try {
             await approveRequestApi(reqId);
-            updateLocalStatus("APPROVED", { approved_by: { first_name: user.first_name, last_name: user.last_name } });
+            updateLocalStatus("APPROVED", {
+              approved_by: { first_name: user.first_name, last_name: user.last_name },
+            });
             toast.success("Request approved");
           } catch (err) {
             console.error(err);
@@ -85,7 +96,10 @@ export default function SingleRequestPageRefactor() {
           setBusy(true);
           try {
             await rejectRequestApi(reqId);
-            updateLocalStatus("REJECTED", { rejected_at: new Date().toISOString(), approved_by: { first_name: user.first_name, last_name: user.last_name } });
+            updateLocalStatus("REJECTED", {
+              rejected_at: new Date().toISOString(),
+              approved_by: { first_name: user.first_name, last_name: user.last_name },
+            });
             toast.success("Request rejected");
           } catch (err) {
             console.error(err);
@@ -120,176 +134,243 @@ export default function SingleRequestPageRefactor() {
     setConfirmModal({ open: true, title: item.title, message: item.message, action: item.fn });
   };
 
-  if (loading)
-    return (
-      <div className="srp-loading">
-        <div className="srp-skeleton header" />
-        <div className="srp-skeleton card" />
-      </div>
-    );
-
-  if (!request)
-    return (
-      <div className="srp-empty">
-        <div className="srp-empty-box">
-          <h3>Request not found</h3>
-          <button className="btn-outline" onClick={() => navigate(-1)}>Go back</button>
-        </div>
-      </div>
-    );
-
-  const initials = (first, last) => {
-    const a = first?.[0] ?? "";
-    const b = last?.[0] ?? "";
-    return (a + b).toUpperCase();
+  const handleEditPointsSubmit = async () => {
+    if (!editPointsModal.points || Number(editPointsModal.points) <= 0) {
+      toast.error("Points must be a positive number");
+      return;
+    }
+    setBusy(true);
+    try {
+      await editRequestedPointApi(id, {
+        points: Number(editPointsModal.points),
+        admin_reason: editPointsModal.admin_reason,
+      });
+      setRequest((prev) => ({
+        ...prev,
+        points: Number(editPointsModal.points),
+      }));
+      toast.success("Points updated successfully");
+      setEditPointsModal({ open: false, points: "", admin_reason: "" });
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.detail || "Failed to update points");
+    } finally {
+      setBusy(false);
+    }
   };
 
+  if (loading) {
+    return (
+      <div className="srdr-root srdr-center">
+        <div className="srdr-skeleton">
+          <div className="srdr-skel-header" />
+          <div className="srdr-skel-body" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!request) {
+    return (
+      <div className="srdr-root srdr-center">
+        <div className="srdr-empty">
+          <h3>Request not found</h3>
+          <p className="srdr-muted">We couldn't find the request you're looking for.</p>
+          <div className="srdr-actions">
+            <button className="srdr-btn srdr-btn-outline" onClick={() => navigate(-1)}>
+              Go back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const statusVal = request.status?.toUpperCase() || "PENDING";
+
   return (
-    <div className="srp-root">
-      <div className="srp-container">
-        <div className="srp-header">
-          <div>
-            <h2 className="srp-title">{request.type ?? "Request"}</h2>
-            <div className="srp-sub">ID: <code className="srp-code">{request.id}</code></div>
+    <div className="srdr-root">
+      <div className="srdr-container">
+        {/* Header */}
+        <div className="srdr-header">
+          <div className="srdr-title-block">
+            <h1 className="srdr-title">{request.type ?? "Request"}</h1>
+            <div className="srdr-meta">
+              <div
+                className={`srdr-badge ${
+                  statusVal === "APPROVED"
+                    ? "srdr-badge-approved"
+                    : statusVal === "REJECTED"
+                    ? "srdr-badge-rejected"
+                    : "srdr-badge-pending"
+                }`}
+              >
+                {statusVal}
+              </div>
+              <div className="srdr-id">{request.id}</div>
+            </div>
           </div>
 
-          <div className="srp-actions">
-            <div className={`srp-badge srp-badge-${request.status?.toLowerCase()}`}>{request.status}</div>
+          <div className="srdr-actions">
+            {isAdmin && request.status === "PENDING" && (
+              <>
+                <button
+                  disabled={busy}
+                  onClick={() => handleAction("approve", request.id)}
+                  className="srdr-btn srdr-btn-approve"
+                >
+                  <FaCheck /> Approve
+                </button>
+                <button
+                  disabled={busy}
+                  onClick={() => handleAction("reject", request.id)}
+                  className="srdr-btn srdr-btn-reject"
+                >
+                  <FaTimes /> Reject
+                </button>
+              </>
+            )}
 
-            <div className="srp-action-buttons">
-              {isAdmin && request.status === "PENDING" && (
-                <>
-                  <button className="btn-primary" disabled={busy} onClick={() => handleAction('approve', request.id)}>✅ Approve</button>
-                  <button className="btn-danger" disabled={busy} onClick={() => handleAction('reject', request.id)}>❌ Reject</button>
-                </>
-              )}
+            {request.status === "PENDING" && (
+              <button
+                disabled={busy}
+                onClick={() => handleAction("delete", request.id)}
+                className="srdr-btn srdr-btn-delete"
+              >
+                <FaTrash /> Delete
+              </button>
+            )}
 
-              {request.status === "PENDING" && (
-                <button className="btn-muted" disabled={busy} onClick={() => handleAction('delete', request.id)}>🗑 Delete</button>
-              )}
+           {(request.status === "PENDING" || request.status === "APPROVED") &&  <button onClick={() => setShowRequestTimeline(true)} className="srdr-btn srdr-btn-history">
+              <FaHistory /> Point History
+            </button>}
 
-              <button className="btn-ghost" onClick={() => navigate(-1)}>Back</button>
-            </div>
+            <button className="srdr-btn srdr-btn-back" onClick={() => navigate(-1)}>
+              <FaArrowLeft /> Back
+            </button>
           </div>
         </div>
 
-        <div className="srp-grid">
-          <main className="srp-main">
-            <div className="srp-person">
-              <div className="srp-avatar">{initials(request.employee?.first_name, request.employee?.last_name)}</div>
-              <div>
-                <div className="muted">Created for</div>
-                <div className="strong">{request.employee?.first_name} {request.employee?.last_name}</div>
-                <div className="muted small">{request.employee?.email}</div>
+        {/* Main Card */}
+        <div className="srdr-card">
+          <div className="srdr-grid">
+            <div className="srdr-main">
+              <div className="srdr-points">
+                <div className="srdr-muted">Points</div>
+               <div className="srdr-points-value">
+  {request.points}
+  {isAdmin && (
+    <FaPencilAlt
+      size={14} // smaller icon
+      style={{ marginLeft: 6, cursor: "pointer", verticalAlign: "middle" }}
+      onClick={() =>
+        setEditPointsModal({ open: true, points: request.points, admin_reason: "" })
+      }
+    />
+  )}
+</div>
+
+              </div>
+
+              <div className="srdr-reason">
+                <div className="srdr-muted">Note / Reason</div>
+                <div className="srdr-reason-box">{request.reason || "— No reason provided —"}</div>
               </div>
             </div>
 
-            <section className="srp-section">
-              <h4 className="srp-section-title">Reason</h4>
-              <div className="srp-reason">{request.reason || "— No reason provided —"}</div>
-            </section>
-
-            <section className="srp-stats">
-              <div className="srp-stat">
-                <div className="muted">Points</div>
-                <div className="strong large">{request.points}</div>
-              </div>
-
-              <div className="srp-stat">
-                <div className="muted">Last updated</div>
-                <div className="strong">{new Date(request.updated_at || request.created_at).toLocaleString()}</div>
-              </div>
-
-              <div className="srp-stat">
-                <div className="muted">Created at</div>
-                <div className="strong">{new Date(request.created_at).toLocaleString()}</div>
-              </div>
-
-              <div className="srp-stat">
-                <div className="muted">Type</div>
-                <div className="strong">{request.type}</div>
-              </div>
-            </section>
-
-            <section className="srp-activity">
-              <h4 className="srp-section-title">Activity</h4>
-              <div className="activity-item">
-                <div className="activity-avatar">{initials(request.created_by?.first_name, request.created_by?.last_name)}</div>
-                <div>
-                  <div className="strong">Created</div>
-                  <div className="muted small">{new Date(request.created_at).toLocaleString()}</div>
-                </div>
-              </div>
-
-              {request.status !== 'PENDING' && (
-                <div className="activity-item">
-                  <div className="activity-avatar">{request.approved_by?.first_name ? initials(request.approved_by.first_name, request.approved_by.last_name) : '-'}</div>
-                  <div>
-                    <div className="strong">{request.status === 'APPROVED' ? 'Approved' : 'Rejected'}</div>
-                    <div className="muted small">{new Date(request.updated_at || request.rejected_at || request.created_at).toLocaleString()}</div>
+            <aside className="srdr-aside">
+              {isAdmin && (
+                <div className="srdr-aside-row">
+                  <div className="srdr-muted">Requested By</div>
+                  <div className="srdr-strong">
+                    {request.created_by?.first_name} {request.created_by?.last_name}
                   </div>
                 </div>
               )}
-            </section>
-          </main>
+              <div className="srdr-aside-row">
+                <div className="srdr-muted">Created At</div>
+                <div className="srdr-small">{new Date(request.created_at).toLocaleString()}</div>
+              </div>
 
-          <aside className="srp-aside">
-            <div className="card">
-              <div className="card-row">
-                <div>
-                  <div className="muted">Requested by</div>
-                  <div className="strong">{request.created_by?.first_name} {request.created_by?.last_name}</div>
+              <div className="srdr-aside-row">
+                <div className="srdr-muted">Created For</div>
+                <div className="srdr-strong">
+                  {request.employee?.first_name} {request.employee?.last_name}
                 </div>
-                <div className="muted small">{new Date(request.created_at).toLocaleDateString()}</div>
               </div>
 
-              <div className="card-divider" />
-
-              <div className="card-details">
-                <div className="detail-row"><span className="muted">Status</span><span>{request.status}</span></div>
-                <div className="detail-row"><span className="muted">Status changed</span><span>{new Date(request.updated_at || request.created_at).toLocaleString()}</span></div>
-                <div className="detail-row"><span className="muted">Approved/Rejected by</span><span>{request.approved_by?.first_name ? `${request.approved_by.first_name} ${request.approved_by.last_name}` : '—'}</span></div>
+              <div className="srdr-aside-row">
+                <div className="srdr-muted">Last Updated</div>
+                <div className="srdr-small">{new Date(request.updated_at || request.created_at).toLocaleString()}</div>
               </div>
-
-              <div className="card-actions">
-                {isAdmin && request.status === 'PENDING' ? (
-                  <>
-                    <button className="btn-primary full" disabled={busy} onClick={() => handleAction('approve', request.id)}>Approve</button>
-                    <button className="btn-danger full" disabled={busy} onClick={() => handleAction('reject', request.id)}>Reject</button>
-                  </>
-                ) : (
-                  <div className="muted small">No actions available</div>
-                )}
-
-                {request.status === 'PENDING' && (
-                  <button className="btn-ghost full" disabled={busy} onClick={() => handleAction('delete', request.id)}>Delete</button>
-                )}
-              </div>
-            </div>
-
-           { request.status === 'PENDING' && <div className="tip">Tip: Use the actions above to change request state. All actions are audited.</div>}
-          </aside>
+            </aside>
+          </div>
         </div>
 
-        <div className="srp-footer">Status last changed: {new Date(request.updated_at || request.created_at).toLocaleString()}</div>
+        <div className="srdr-footer">Last updated: {new Date(request.updated_at || request.created_at).toLocaleString()}</div>
       </div>
 
+      {/* Confirm Modal */}
       <ConfirmModal
         open={confirmModal.open}
-        title={confirmModal.title || 'Confirm Action'}
-        message={confirmModal.message || 'Are you sure?'}
+        title={confirmModal.title || "Confirm Action"}
+        message={confirmModal.message || "Are you sure?"}
         onConfirm={() => {
-          try {
-            confirmModal.action?.();
-          } catch (err) {
-            console.error('Confirm action error:', err);
-          } finally {
-            setConfirmModal({ open: false, title: '', message: '', action: null });
-          }
+          confirmModal.action?.();
+          setConfirmModal({ open: false, title: "", message: "", action: null });
         }}
-        onCancel={() => setConfirmModal({ open: false, title: '', message: '', action: null })}
+        onCancel={() => setConfirmModal({ open: false, title: "", message: "", action: null })}
       />
+
+      {/* Edit Points Modal */}
+      {editPointsModal.open && (
+        <div className="srdr-modal-backdrop">
+          <div className="srdr-modal">
+            <h2>Edit Points</h2>
+            <label>
+              Points (positive number)
+              <input
+                type="number"
+                value={editPointsModal.points}
+                onChange={(e) => setEditPointsModal({ ...editPointsModal, points: e.target.value })}
+                min={1}
+              />
+            </label>
+            <label>
+              Reason (optional)
+              <textarea
+                value={editPointsModal.admin_reason}
+                onChange={(e) =>
+                  setEditPointsModal({ ...editPointsModal, admin_reason: e.target.value })
+                }
+              />
+            </label>
+            <div className="srdr-modal-actions">
+              <button
+                className="srdr-btn srdr-btn-primary"
+                onClick={handleEditPointsSubmit}
+                disabled={busy}
+              >
+                Save
+              </button>
+              <button
+                className="srdr-btn srdr-btn-outline"
+                onClick={() => setEditPointsModal({ open: false, points: "", admin_reason: "" })}
+                disabled={busy}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showRequestTimeline && (
+  <RequestTimelineModal
+    requestId={id}
+    open={showRequestTimeline}
+    onClose={() => setShowRequestTimeline(false)}
+  />
+)}
     </div>
   );
 }
-

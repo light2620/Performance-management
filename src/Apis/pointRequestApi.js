@@ -68,4 +68,11 @@ const deleteRequestApi = async(id) => {
     }
 }
 
-export {getAllrequest,createRequestApi,approveRequestApi,rejectRequestApi,deleteRequestApi,getSingleRequestApi}
+const editRequestedPointApi = async(id,data) => {
+    return axiosInstance.patch(`/point-requests/${id}/admin_edit/`,data)
+}
+
+const getRequestHistoryApi=async(id) => {
+    return axiosInstance.get(`/point-requests/${id}/change-history/`);
+}
+export {getAllrequest,createRequestApi,approveRequestApi,rejectRequestApi,deleteRequestApi,getSingleRequestApi,editRequestedPointApi,getRequestHistoryApi}

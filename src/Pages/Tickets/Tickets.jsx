@@ -89,7 +89,7 @@ const Tickets = () => {
           <div className="tickets-sub">Showing {conversations.length} total</div>
         </div>
 
-        <div className="tickets-controls">
+        {/* <div className="tickets-controls">
           <input
             type="search"
             placeholder="Search by subject, participant, or message"
@@ -109,7 +109,7 @@ const Tickets = () => {
             <option value="unread">Unread</option>
             <option value="point_entries">Point Entries</option>
           </select>
-        </div>
+        </div> */}
       </header>
 
       {!filtered.length ? (
@@ -151,7 +151,7 @@ const Tickets = () => {
 
                 <div className="conversation-main">
                   <div className="conv-top">
-                    <div className="conv-title">{c.subject || `Ticket Id #${c.id.slice(0, 8)}`}</div>
+                    <div className="conv-title">{c.subject || `Entry Id# - ${c.related_object_id}`}</div>
 
                     <div className="conv-meta">
                       <span className="conv-type">{c.conversation_type}</span>

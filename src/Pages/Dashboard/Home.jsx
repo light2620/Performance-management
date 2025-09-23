@@ -83,7 +83,7 @@ const Home = () => {
     <div className="home-admin-dashboard home-home-dashboard">
       <div className="home-dashboard-header">
         <h2>Welcome back, {user?.first_name}</h2>
-        <p className="home-muted">Track your performance & team overview</p>
+        <p className="home-muted">Track your performance</p>
       </div>
 
       <div className="home-big-stats-grid">
@@ -118,14 +118,14 @@ const Home = () => {
       </div>
 
       {/* Chart area */}
-      <div className="home-card" style={{ marginTop: 12 }}>
+      {/* <div className="home-card" style={{ marginTop: 12 }}>
         <h3 className="home-section-title">Point history</h3>
         {user.id ? (
           <PointHistoryChart entryId={user.id} height={340} />
         ) : (
           <div className="home-placeholder">No entry selected to plot history (points-aggregates empty).</div>
         )}
-      </div>
+      </div> */}
 
       <div style={{ marginTop: 16 }}>
         <NotificationListener />

@@ -3,6 +3,7 @@ import { useAuth } from "../../Utils/AuthContext";
 import { createEntriesApi, getAllEntriesApi, reverseEntryApi } from "../../Apis/EntriesApi";
 import RequestModal from "../../Components/RequestModal.jsx/RequestModal";
 import { useNavigate } from "react-router-dom";
+
 import "./style.css";
 
 
@@ -29,7 +30,7 @@ const Entries = () => {
 
   // filter employees from current entries
   const filteredEmployees = entries
-    .map((e) => e.employee)
+    .map((e) => e?.employee)
     .filter(
       (emp) =>
         emp &&
@@ -205,9 +206,9 @@ const Entries = () => {
                     <td>{entry.type}</td>
                     <td>
                       <span
-                        className={`entriesComp-tag ${entry.operation.toLowerCase()}`}
+                        className={`entriesComp-tag ${entry.is_reversed ? "reversal" : "grant"}`}
                       >
-                        {entry.operation}
+                        {entry.is_reversed ? "Reversed" : "Grant"}
                       </span>
                     </td>
                    { user?.role === "ADMIN" && (

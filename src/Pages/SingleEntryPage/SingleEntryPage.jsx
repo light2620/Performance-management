@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  getSingleEntryApi,
-  reverseEntryApi,
-  getAllEntriesApi,
-} from "../../Apis/EntriesApi";
+import { getSingleEntryApi, reverseEntryApi } from "../../Apis/EntriesApi";
 import { createConversationApi } from "../../Apis/CreateConversation";
-import ConfirmModal from "../../Components/ConfirmModal/ConfirmModal";
 import { useAuth } from "../../Utils/AuthContext";
 import toast from "react-hot-toast";
-import "./style.css"; // keep filename if you'd like; classes are namespaced with `entry`
+import TimelineModal from "../../Components/TimelineModal/TimelineModal";
+import ConfirmModal from "../../Components/ConfirmModal/ConfirmModal";
+import "./style.css";
 
-const API_URL = "/point-entries/";
-
-export default function SingleEntryPageRefactor() {
+export default function SingleEntryPageRedesign() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -22,7 +17,9 @@ export default function SingleEntryPageRefactor() {
   const [entry, setEntry] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [timelineOpen, setTimelineOpen] = useState(false);
 
+  // Confirm modal for reversal
   const [confirmModal, setConfirmModal] = useState({
     open: false,
     title: "",
@@ -32,10 +29,11 @@ export default function SingleEntryPageRefactor() {
 
   useEffect(() => {
     let mounted = true;
-    const fetch = async () => {
+    const load = async () => {
       try {
         const res = await getSingleEntryApi(id);
-        if (mounted) setEntry(res.data);
+        if (!mounted) return;
+        setEntry(res.data);
       } catch (err) {
         console.error(err);
         toast.error("Failed to load entry");
@@ -43,25 +41,57 @@ export default function SingleEntryPageRefactor() {
         if (mounted) setLoading(false);
       }
     };
-    fetch();
+    load();
     return () => (mounted = false);
   }, [id]);
 
-  const markReversedLocally = () => {
-    setEntry((prev) =>
-      prev ? { ...prev, operation: "REVERSED", updated_at: new Date().toISOString() } : prev
-    );
+  const typeVal = String(entry?.type || "").toUpperCase();
+  const isDemerit = typeVal === "DEMERIT" || typeVal === "DMERIT";
+  const isMerit = typeVal === "MERIT";
+
+  // ------------------------------
+  // Create Ticket
+  // ------------------------------
+  const handleCreateTicket = async () => {
+    if (!entry) return;
+    setBusy(true);
+    try {
+      if (!isDemerit) {
+        toast.error("Ticket can only be created for demerit entries");
+        setBusy(false);
+        return;
+      }
+
+      const participant_ids = ["4459e8ab-3ce6-4dae-9f86-c16cce6c9abb"];
+      const payload = {
+        conversation_type: "point_discussion",
+        content_object_id: entry.id,
+        participant_ids,
+      };
+      const res = await createConversationApi(payload);
+      toast.success("Ticket created — opening conversation");
+      navigate(`/tickets/${res.data.id}`);
+    } catch (err) {
+      console.error(err);
+      if(err.response?.data?.content_object_id[0] === "A conversation already exist for this object"){
+
+        navigate(`/tickets/`);
+        
+      }else{
+         toast.error( err.message || "Failed to create ticket");
+      }
+     
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const operationToStatus = (op) => {
-    if (!op) return "PENDING";
-    const key = String(op).toUpperCase();
-    if (key === "GRANT") return "APPROVED";
-    if (["REVERSE", "REVOKE", "REVERSED"].includes(key)) return "REJECTED";
-    return "PENDING";
-  };
+  // ------------------------------
+  // Reversal
+  // ------------------------------
+  const handleReverse = () => {
+    if (!entry) return;
 
-  const handleReverse = (entryId) => {
     setConfirmModal({
       open: true,
       title: "Reverse Entry",
@@ -69,9 +99,10 @@ export default function SingleEntryPageRefactor() {
       action: async () => {
         setBusy(true);
         try {
-          await reverseEntryApi(entryId);
-          await getAllEntriesApi(API_URL);
-          markReversedLocally();
+          await reverseEntryApi(entry.id);
+          setEntry((prev) =>
+            prev ? { ...prev, operation: "REVERSED", is_reversed: true, updated_at: new Date().toISOString() } : prev
+          );
           toast.success("↩️ Entry reversed");
         } catch (err) {
           console.error(err);
@@ -83,211 +114,132 @@ export default function SingleEntryPageRefactor() {
     });
   };
 
-  const handleCreateTicket = async () => {
-    if (!entry) return;
-    setBusy(true);
-    try {
-      const typeCheck = String(entry.type || "").toUpperCase();
-      if (!["DEMERIT", "DMERIT"].includes(typeCheck)) {
-        toast.error("Ticket can only be created for demerit entries");
-        setBusy(false);
-        return;
-      }
-
-      const participant_ids = ["4459e8ab-3ce6-4dae-9f86-c16cce6c9abb"];
-      const payload = { conversation_type: "point_discussion", content_object_id: entry.id, participant_ids };
-
-      const res = await createConversationApi(payload);
-      const conversation = res.data;
-      toast.success("Ticket created — opening conversation");
-      navigate(`/tickets/${conversation.id}`);
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.detail || err.message || "Failed to create ticket");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  if (loading)
+  if (loading) {
     return (
-      <div className="srp-entry-root">
-        <div className="srp-entry-container">
-          <div className="srp-entry-loading">
-            <div className="srp-entry-skeleton header" />
-            <div className="srp-entry-skeleton card" />
+      <div className="sep-root sep-center">
+        <div className="sep-skeleton">
+          <div className="sep-skel-header" />
+          <div className="sep-skel-body" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!entry) {
+    return (
+      <div className="sep-root sep-center">
+        <div className="sep-empty">
+          <h3>Entry not found</h3>
+          <p className="sep-muted">We couldn't find the entry you're looking for.</p>
+          <div className="sep-actions">
+            <button className="sepr-btn sepr-btn-outline" onClick={() => navigate(-1)}>Go back</button>
           </div>
         </div>
       </div>
     );
-
-  if (!entry)
-    return (
-      <div className="srp-entry-root">
-        <div className="srp-entry-container">
-          <div className="srp-entry-empty">
-            <div className="srp-entry-empty-box">
-              <h3>Entry not found</h3>
-              <button className="entry-btn-outline" onClick={() => navigate(-1)}>Go back</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-
-  const initials = (first, last) => {
-    const a = (first?.[0] ?? "").toUpperCase();
-    const b = (last?.[0] ?? "").toUpperCase();
-    return (a + b).trim();
-  };
-
-  const status = operationToStatus(entry.operation);
+  }
 
   return (
-    <div className="srp-entry-root">
-      <div className="srp-entry-container">
-        <div className="srp-entry-header">
-          <div>
-            <h2 className="srp-entry-title">{entry.type ?? "Entry"}</h2>
-            {isAdmin && <div className="srp-entry-sub">ID: <code className="srp-entry-code">{entry.id}</code></div>}
+    <div className="sep-root">
+      <div className="sep-container">
+        {/* Header + actions */}
+        <div className="sep-header">
+          <div className="sep-title-block">
+            <h1 className="sep-title">{entry.type ?? "Entry"}</h1>
+            <div className="sep-meta">
+              <div className={`sep-badge ${isMerit ? 'sep-badge-merit' : isDemerit ? 'sep-badge-demerit' : 'sep-badge-neutral'}`}>{typeVal || '—'}</div>
+              <div className="sep-id">{entry.id}</div>
+            </div>
           </div>
 
-          <div className="srp-entry-actions">
-            <div className={`srp-entry-badge srp-entry-badge-${status.toLowerCase()}`}>
-              <span style={{marginRight:8}}>
-                {entry.operation?.toUpperCase() === "GRANT" ? "✅" : (["REVERSE","REVERSED"].includes(entry.operation?.toUpperCase()) ? "↩️" : "⏳")}
-              </span>
-              {entry.operation ?? status}
-            </div>
+          <div className="sepr-actions">
+            {isDemerit && !isAdmin && (
+              <button
+                disabled={busy}
+                onClick={handleCreateTicket}
+                className="sepr-btn sepr-btn-primary"
+              >
+                🎫 Create Ticket
+              </button>
+            )}
 
-            <div className="srp-entry-action-buttons">
-              {isAdmin && entry.operation && entry.operation.toUpperCase() !== "REVERSAL" && (
-                <button className="entry-btn-danger" disabled={busy} onClick={() => handleReverse(entry.id)}>↩️ Reverse</button>
-              )}
+            {isAdmin && !entry.is_reversed ? 
+              <button
+                disabled={busy}
+                onClick={handleReverse}
+                className="sepr-btn sepr-btn-primary"
+              >
+                Reverse Entry
+              </button> : <div className="sepr-reversed">Entry is Reversed</div>}
 
-              {(["DEMERIT","DMERIT"].includes(String(entry.type || "").toUpperCase())) && (
-                <button className="entry-btn-muted" disabled={busy} onClick={handleCreateTicket}>🎫 Create Ticket</button>
-              )}
-
-              <button className="entry-btn-ghost" onClick={() => navigate(-1)}>Back</button>
-            </div>
+            <button
+              onClick={() => setTimelineOpen(true)}
+              className="sepr-btn sepr-btn-primary"
+            >
+              History
+            </button>
+            <button
+              onClick={() => navigate(-1)}
+              className="sepr-btn sepr-btn-ghost"
+            >
+              Back
+            </button>
           </div>
         </div>
 
-        <div className="srp-entry-grid">
-          <main className="srp-entry-main">
-            <div className="srp-entry-person">
-              <div className="srp-entry-avatar">{initials(entry.employee?.first_name, entry.employee?.last_name)}</div>
-              <div>
-                <div className="srp-entry-muted">Created for</div>
-                <div className="srp-entry-strong">{entry.employee?.first_name} {entry.employee?.last_name}</div>
-                <div className="srp-entry-muted srp-entry-small">{entry.employee?.email}</div>
+        {/* Main card */}
+        <div className="sep-card">
+          <div className="sep-grid">
+            <div className="sep-main">
+              <div className="sep-points">
+                <div className="sep-muted">Points</div>
+                <div className="sep-points-value">{entry.points}</div>
+              </div>
+
+              <div className="sep-reason">
+                <div className="sep-muted">Note / Reason</div>
+                <div className="sep-reason-box">{entry.reason || '— No reason provided —'}</div>
               </div>
             </div>
 
-            <section className="srp-entry-section">
-              <h4 className="srp-entry-section-title">Note / Reason</h4>
-              <div className="srp-entry-reason">{entry.reason || "— No reason provided —"}</div>
-            </section>
-
-            <section className="srp-entry-stats">
-              <div className="srp-entry-stat">
-                <div className="srp-entry-muted">Points</div>
-                <div className="srp-entry-strong srp-entry-large">{entry.points}</div>
-              </div>
-
-              <div className="srp-entry-stat">
-                <div className="srp-entry-muted">Created</div>
-                <div className="srp-entry-strong">{new Date(entry.created_at).toLocaleString()}</div>
-              </div>
-
-              <div className="srp-entry-stat">
-                <div className="srp-entry-muted">Updated</div>
-                <div className="srp-entry-strong">{new Date(entry.updated_at || entry.created_at).toLocaleString()}</div>
-              </div>
-
-              <div className="srp-entry-stat">
-                <div className="srp-entry-muted">Operation</div>
-                <div className="srp-entry-strong">{entry.operation ?? "—"}</div>
-              </div>
-            </section>
-
-            <section className="srp-entry-activity">
-              <h4 className="srp-entry-section-title">Activity</h4>
-
-              <div className="srp-entry-activity-item">
-                <div className="srp-entry-activity-avatar">{initials(entry.created_by?.first_name, entry.created_by?.last_name)}</div>
-                <div>
-                  <div className="srp-entry-strong">Created</div>
-                  <div className="srp-entry-muted srp-entry-small">{new Date(entry.created_at).toLocaleString()}</div>
-                </div>
-              </div>
-
-              {entry.operation && (
-                <div className="srp-entry-activity-item">
-                  <div className="srp-entry-activity-avatar">{entry.operation ? initials(entry.created_by?.first_name, entry.created_by?.last_name) : "-"}</div>
-                  <div>
-                    <div className="srp-entry-strong">{entry.operation}</div>
-                    <div className="srp-entry-muted srp-entry-small">{new Date(entry.updated_at || entry.created_at).toLocaleString()}</div>
-                  </div>
+            <aside className="sep-aside">
+              {isAdmin && (
+                <div className="sep-aside-row">
+                  <div className="sep-muted">Created for</div>
+                  <div className="sep-strong">{entry.employee?.first_name} {entry.employee?.last_name}</div>
                 </div>
               )}
-            </section>
-          </main>
 
-          <aside className="srp-entry-aside">
-            <div className="srp-entry-card">
-              <div className="srp-entry-card-row">
-                <div>
-                  <div className="srp-entry-muted">Entry by</div>
-                  <div className="srp-entry-strong">{entry.created_by?.first_name} {entry.created_by?.last_name}</div>
-                </div>
-                <div className="srp-entry-muted srp-entry-small">{new Date(entry.created_at).toLocaleDateString()}</div>
+              <div className="sep-aside-row">
+                <div className="sep-muted">Created by</div>
+                <div className="sep-strong">{entry.created_by?.first_name} {entry.created_by?.last_name}</div>
               </div>
 
-              <div className="srp-entry-card-divider" />
-
-              <div className="srp-entry-card-details">
-                <div className="srp-entry-detail-row"><span className="srp-entry-muted">Type</span><span>{entry.type ?? "—"}</span></div>
-                <div className="srp-entry-detail-row"><span className="srp-entry-muted">Operation</span><span>{entry.operation ?? "—"}</span></div>
-                <div className="srp-entry-detail-row"><span className="srp-entry-muted">Original</span><span>{entry.original_entry ?? "—"}</span></div>
+              <div className="sep-aside-row">
+                <div className="sep-muted">Created at</div>
+                <div className="sep-small">{new Date(entry.created_at).toLocaleString()}</div>
               </div>
-
-              <div className="srp-entry-card-actions">
-                {isAdmin && entry.operation && entry.operation.toUpperCase() !== "REVERSAL" ? (
-                  <>
-                    <button className="entry-btn-danger entry-full" disabled={busy} onClick={() => handleReverse(entry.id)}>Reverse</button>
-                    <button className="entry-btn-ghost entry-full" disabled={busy} onClick={() => navigate(-1)}>Back</button>
-                  </>
-                ) : (
-                  <div className="srp-entry-muted srp-entry-small">No admin actions</div>
-                )}
-
-                {(["DEMERIT","DMERIT"].includes(String(entry.type || "").toUpperCase())) && (
-                  <button className="entry-btn-muted entry-full" disabled={busy} onClick={handleCreateTicket}>Create Ticket</button>
-                )}
-              </div>
-            </div>
-
-            {entry.type === "DEMERIT" && <div className="srp-entry-tip">Tip: Entry operation is shown above. Actions are audited.</div>}
-          </aside>
+            </aside>
+          </div>
         </div>
 
-        <div className="srp-entry-footer">Last updated: {new Date(entry.updated_at || entry.created_at).toLocaleString()}</div>
+        <div className="sep-footer sep-muted">Last updated: {new Date(entry.updated_at || entry.created_at).toLocaleString()}</div>
       </div>
+
+      <TimelineModal
+        entryId={entry.id}
+        open={timelineOpen}
+        onClose={() => setTimelineOpen(false)}
+        isAdmin={isAdmin}
+      />
 
       <ConfirmModal
         open={confirmModal.open}
-        title={confirmModal.title || "Confirm Action"}
-        message={confirmModal.message || "Are you sure?"}
+        title={confirmModal.title}
+        message={confirmModal.message}
         onConfirm={() => {
-          try {
-            confirmModal.action?.();
-          } catch (err) {
-            console.error("Confirm action error:", err);
-          } finally {
-            setConfirmModal({ open: false, title: "", message: "", action: null });
-          }
+          confirmModal.action?.();
+          setConfirmModal({ open: false, title: "", message: "", action: null });
         }}
         onCancel={() => setConfirmModal({ open: false, title: "", message: "", action: null })}
       />

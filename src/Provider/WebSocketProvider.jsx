@@ -45,9 +45,9 @@ export const WebSocketProvider = ({ children }) => {
         
           } else if (payload.type === "unread_status_update") {
             console.log("WS: unread count updated", payload);
-            if (typeof payload.total_unread_conversations === "number") {
+            
               setUnreadCount(payload.total_unread_conversations);
-            }
+            
           }
 
           for (const cb of subscribersRef.current.values()) {

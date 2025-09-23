@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useWebSocket } from "../../Provider/WebSocketProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaEnvelope } from "react-icons/fa";
 import "./style.css";
 
@@ -8,6 +8,12 @@ const NewMessageModal = () => {
   const { subscribe, unsubscribe } = useWebSocket();
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Extract current conversation ID from URL, e.g., "/tickets/:id"
+  const currentConversationId = location.pathname.startsWith("/tickets/")
+    ? location.pathname.split("/tickets/")[1]
+    : null;
 
   useEffect(() => {
     if (!subscribe) return;
@@ -15,6 +21,10 @@ const NewMessageModal = () => {
     const handler = (payload) => {
       if (payload.type === "conversation_message" && payload.message) {
         const { id, message, sender } = payload.message;
+
+        // Ignore messages for the conversation we are currently viewing
+        if (payload.conversation_id === currentConversationId) return;
+
         setNotifications((prev) => [
           ...prev,
           {
@@ -29,7 +39,7 @@ const NewMessageModal = () => {
 
     const subId = subscribe(handler);
     return () => unsubscribe(subId);
-  }, [subscribe, unsubscribe]);
+  }, [subscribe, unsubscribe, currentConversationId]);
 
   const handleReply = (conversationId) => {
     navigate(`/tickets/${conversationId}`);
@@ -54,10 +64,7 @@ const NewMessageModal = () => {
             <div className="nm-message-text">{n.text}</div>
           </div>
           <div className="nm-modal-footer">
-            <button
-              className="nm-reply-btn"
-              onClick={() => handleReply(n.conversationId)}
-            >
+            <button className="nm-reply-btn" onClick={() => handleReply(n.conversationId)}>
               Reply
             </button>
           </div>

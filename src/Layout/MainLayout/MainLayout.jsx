@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router-dom'
 import MobileProfile from '../../Components/MobileProfile/MobileProfile'
 import ProfileModal from '../../Components/Profile/Profile'
 import ThemeToggle from '../../Utils/ThemeToggle.js/ThemeToggle'
+import NewMessageNotification from '../../Components/NewMessageNotification/NewMessageNotification'
+
 
 import "./style.css"
 const MainLayout = () => {
@@ -66,6 +68,7 @@ const fetchAllUsers = async() => {
 
             </div>}
               <div className="main-content-area">
+                
                 {/* <Header /> */}
                 {isMobile && <Header />}
                 <div className="main-cont">
@@ -76,6 +79,7 @@ const fetchAllUsers = async() => {
             
           </div>
           {showProfileModal && <ProfileModal  onClose={() => setShowProfileModal(false)} />}
+            {<NewMessageNotification />}
     </div>
   )
 }

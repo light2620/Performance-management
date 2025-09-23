@@ -11,6 +11,7 @@ import { store } from './Redux/store';
 import { ThemeProvider } from './Utils/ThemeContext';
 import NotificationListener from './Components/NotificationListener/NotificationListener';
 import { WebSocketProvider } from './Provider/WebSocketProvider';
+import NewMessageNotification from './Components/NewMessageNotification/NewMessageNotification';
 
 
 

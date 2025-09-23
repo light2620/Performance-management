@@ -138,9 +138,9 @@
 .nm-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .nm-btn-primary {
-  background: linear-gradient(90deg,#10b981,#059669);
+  background: #111827;
   color: white;
-  box-shadow: 0 8px 22px rgba(16,185,129,0.12);
+
 }
 .nm-btn-ghost {
   background: transparent;

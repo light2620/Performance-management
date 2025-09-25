@@ -166,14 +166,24 @@ export default function SingleEntryPageRedesign() {
               </button>
             )}
 
-            {isAdmin && !entry.is_reversed ? 
-              <button
-                disabled={busy}
-                onClick={handleReverse}
-                className="sepr-btn sepr-btn-primary "
-              >
-                Reverse Entry
-              </button> : <div className="sepr-reversed reverse-text">Entry is Reversed</div>}
+            {isAdmin ? (
+  !entry.is_reversed ? (
+    <button
+      disabled={busy}
+      onClick={handleReverse}
+      className="sepr-btn sepr-btn-primary "
+    >
+      Reverse Entry
+    </button>
+  ) : (
+    <div className="sepr-reversed reverse-text">Entry is Reversed</div>
+  )
+) : (
+  entry.is_reversed && (
+    <div className="sepr-reversed reverse-text">Entry is Reversed</div>
+  )
+)}
+
 
             <button
               onClick={() => setTimelineOpen(true)}

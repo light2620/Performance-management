@@ -71,7 +71,7 @@ const NotificationModal = ({ id, onClose, previewMessage, fetchNotification }) =
     switch (type) {
       case "DEMERIT_AWARDED":
       case "MERIT_AWARDED":
-        return `/points-entries/${related_object_id}`;
+        return `/points-entries/${object_id}`;
       case "MERIT_REVERSED":
         return `/points-entries/${metadata?.reversal_entry_id}`;
       case "POINT_REQUEST_APPROVED":

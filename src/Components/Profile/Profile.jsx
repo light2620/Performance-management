@@ -16,7 +16,9 @@ const ProfileModal = ({ id, onClose }) => {
     const fetchUser = async () => {
       setLoading(true);
       try {
+        console.log("userId", id)
         const res = await axiosInstance.get(`/users/${id}/`);
+        
         setUser(res.data);
       } catch (err) {
         console.error("Error fetching user:", err);

@@ -20,6 +20,7 @@ const UserDetailModal = ({ userId, onClose, fetchUsers, editable = false }) => {
           ? tokenService.getAccess()
           : tokenService.get?.();
         const res = await axiosInstance.get(`/users/${userId}/`);
+        console.log(userId , "userId")
         setUser(res.data);
       } catch (err) {
         console.error("Error fetching user detail:", err);

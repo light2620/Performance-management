@@ -17,7 +17,7 @@ const ProfileModal = ({ id, onClose }) => {
       setLoading(true);
       try {
         console.log("userId", id)
-        const res = await axiosInstance.get(`/users/${id}/`);
+        const res = await axiosInstance.get(`/users/me/`);
         
         setUser(res.data);
       } catch (err) {

@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import departmentReducer from "./DepartmentSlice"
 import allUserReducer from "./AllUsersSllice"
+import countReducer from "./CountSlice"
 
 
 export const store = configureStore({
     reducer : {
        department : departmentReducer,
-       allUser : allUserReducer
+       allUser : allUserReducer,
+       count : countReducer
     }
 })

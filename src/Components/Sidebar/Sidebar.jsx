@@ -15,6 +15,9 @@ import { IoMdNotifications } from "react-icons/io";
 import { RiMessage2Fill } from "react-icons/ri";
 import { useWebSocket } from "../../Provider/WebSocketProvider";
 import { useNotifications } from "../../Provider/NotificationProvider";
+import { useSelector } from "react-redux";
+import { setCount } from "../../Redux/CountSlice";
+import { useDispatch } from "react-redux";
 
 
 
@@ -23,20 +26,20 @@ import { getUnreadCount } from "../../Apis/NotificationApis";
 
 const Sidebar = ({ closeMobileMenu }) => {
   const [showSettingOptions, setShowSettingOptions] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const unreadCount =  useSelector((state) => state.count.count);
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const dispatch = useDispatch();
   const {unreadCount: unreadConversation} = useWebSocket();
   const {unreadCount: unreadNotification} = useNotifications();
 
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const res = await getUnreadCount(); // { count: number }
-        setUnreadCount(res.data?.unread_count
- || 0);
+        const res = await getUnreadCount();
+       dispatch(setCount(res.data?.unread_count))
       } catch (err) {
         console.error("Error fetching unread count:", err);
       }
@@ -44,6 +47,8 @@ const Sidebar = ({ closeMobileMenu }) => {
 
     fetchCount();
   }, [unreadNotification]);
+
+
 
   const navOption = [
     {

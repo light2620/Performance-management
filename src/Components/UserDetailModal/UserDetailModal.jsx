@@ -64,10 +64,7 @@ const UserDetailModal = ({ userId, onClose, fetchUsers, editable = false }) => {
         company_email: user.company_email,
         phone: user.phone,
         department_id: user.department?.id,
-        password: user.password || "",
-        is_staff: user.is_staff,
         is_blocked: user.is_blocked,
-        is_active: user.is_active,
       };
 
       const res = await axiosInstance.put(`/users/${userId}/`, body);
@@ -158,7 +155,7 @@ const UserDetailModal = ({ userId, onClose, fetchUsers, editable = false }) => {
                   />
                 )}
               </label>
-
+{/* 
               {isEditing && (
                 <label className="full-width">
                   Password
@@ -169,12 +166,12 @@ const UserDetailModal = ({ userId, onClose, fetchUsers, editable = false }) => {
                     onChange={handleChange}
                   />
                 </label>
-              )}
+              )} */}
             </div>
 
             {/* Status Section */}
             <div className="status-section">
-              {["is_active", "is_staff", "is_blocked"].map((field) => (
+              {["is_blocked"].map((field) => (
                 <div key={field} className="status-row">
                   <span className="status-label">
                     {field.replace("is_", "").replace("_", " ")}:

@@ -3,6 +3,12 @@ import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { getNotificationById, markAsRead } from "../../Apis/NotificationApis";
 import { useAuth } from "../../Utils/AuthContext";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { getUnreadCount } from "../../Apis/NotificationApis";
+import { setCount } from "../../Redux/CountSlice";
+
+
 import "./style.css";
 
 const NotificationModal = ({ id, onClose, previewMessage, fetchNotification }) => {
@@ -11,6 +17,7 @@ const NotificationModal = ({ id, onClose, previewMessage, fetchNotification }) =
   const [busy, setBusy] = useState(false);
   const { user } = useAuth();
   const isAdmin = user?.role === "ADMIN";
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,6 +53,17 @@ const NotificationModal = ({ id, onClose, previewMessage, fetchNotification }) =
       setBusy(false);
     }
   };
+    
+
+      const fetchCount = async () => {
+      try {
+        const res = await getUnreadCount();
+       dispatch(setCount(res.data?.unread_count))
+      } catch (err) {
+        console.error("Error fetching unread count:", err);
+      }
+    };
+
 
   const handleNavigate = async (url) => {
     if (!notification) return;
@@ -54,6 +72,7 @@ const NotificationModal = ({ id, onClose, previewMessage, fetchNotification }) =
       await markAsRead(notification.id);
       if (typeof fetchNotification === "function") await fetchNotification();
       navigate(url);
+      fetchCount();
       onClose?.();
     } catch (err) {
       console.error(err);

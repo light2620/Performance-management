@@ -5,6 +5,7 @@ import AddDepartment from "../../Components/AddDepartment/AddDepartment";
 import DepartmentsTable from "../../Components/DepartmentsTable/DepartmentsTable";
 import axiosInstance from "../../Apis/axiosInstance";
 import { addDepartment, editDepartment, deleteDepartment } from "../../Apis/DepartmentApis";
+import ConfirmModal from "../../Components/ConfirmModal/ConfirmModal";
 import "./style.css";
 
 const API_BASE = "/departments/";
@@ -19,6 +20,9 @@ const ManageDepartment = () => {
   const [err, setErr] = useState("");
   const [search, setSearch] = useState("");
   const [ordering, setOrdering] = useState("");
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedDeptId, setSelectedDeptId] = useState(null);
 
   const params = useMemo(() => {
     const p = {};
@@ -51,7 +55,6 @@ const ManageDepartment = () => {
 
   useEffect(() => {
     fetchDepartments(API_BASE, params);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, ordering]);
 
   const handleAdd = async (deptName, reset) => {
@@ -73,11 +76,13 @@ const ManageDepartment = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this department?")) return;
+  const handleDelete = async () => {
+    if (!selectedDeptId) return;
     try {
-      await deleteDepartment(id);
+      await deleteDepartment(selectedDeptId);
       fetchDepartments(API_BASE, params);
+      setConfirmOpen(false);
+      setSelectedDeptId(null);
     } catch (e) {
       alert(e?.response?.data?.detail || "Failed to delete department");
     }
@@ -127,10 +132,24 @@ const ManageDepartment = () => {
         next={next}
         previous={prev}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        onDelete={(id) => {
+          setSelectedDeptId(id);
+          setConfirmOpen(true);
+        }}
         onNext={() => next && fetchDepartments(next)}
         onPrev={() => prev && fetchDepartments(prev)}
         onRefresh={() => fetchDepartments(API_BASE, params)}
+      />
+
+      <ConfirmModal
+        open={confirmOpen}
+        title="Delete Department"
+        message="Are you sure you want to delete this department?"
+        onConfirm={handleDelete}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setSelectedDeptId(null);
+        }}
       />
     </div>
   );

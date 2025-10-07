@@ -33,7 +33,7 @@ const EmployeeSelector = ({ allEmployees, value, onChange }) => {
 
   return (
     <div className="employee-selector" ref={dropdownRef}>
-      <label>Employee</label>
+      <label>Employee*</label>
 
       {/* Dropdown Box */}
       <div

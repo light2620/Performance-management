@@ -103,3 +103,29 @@
   font-size: 18px;
   cursor: pointer;
 }
+
+
+/* input error visuals */
+.input-error {
+  border: 2px solid #ef4444 !important;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.06);
+}
+
+/* error text under field */
+.error-text {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* ensure DepartmentSelector when invalid shows red border -- adjust selector if your Dept component uses different class */
+.department-selector,
+.compact-grid select,
+.compact-grid input[type="text"],
+.compact-grid input[type="email"] {
+  /* keep default look; .input-error will override when applied */
+}
+
+/* keep existing styles' consistency */
+.compact-grid label { position: relative; }
+

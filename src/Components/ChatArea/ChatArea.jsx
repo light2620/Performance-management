@@ -250,9 +250,40 @@ const ChatArea = ({
   const handleTextareaInput = (e) => {
     const ta = textareaRef.current;
     if (!ta) return;
+    // prevent leading whitespace when starting new message
+    let val = e.target.value;
+
+    // If the current stored text is empty and the user types/pastes leading spaces, strip them
+    if ((text === "" || text == null) && /^\s+/.test(val)) {
+      val = val.replace(/^\s+/, "");
+    }
+
+    // cap height
     ta.style.height = "auto";
     ta.style.height = Math.min(ta.scrollHeight, 200) + "px";
-    setText(e.target.value);
+    setText(val);
+  };
+
+  // handle paste: remove leading whitespace from pasted chunk and insert at caret
+  const handlePaste = (e) => {
+    if (!textareaRef.current) return;
+    e.preventDefault();
+    const paste = (e.clipboardData || window.clipboardData).getData("text") || "";
+    const cleaned = paste.replace(/^\s+/, ""); // remove leading spaces
+    const ta = textareaRef.current;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const newText = text.slice(0, start) + cleaned + text.slice(end);
+    setText(newText);
+    // adjust textarea height after paste
+    setTimeout(() => {
+      if (!textareaRef.current) return;
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + "px";
+      // set caret after inserted text
+      const caret = start + cleaned.length;
+      textareaRef.current.selectionStart = textareaRef.current.selectionEnd = caret;
+    }, 0);
   };
 
   const handleSend = useCallback(() => {
@@ -373,10 +404,17 @@ const ChatArea = ({
           value={text}
           onChange={handleTextareaInput}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           rows={1}
         />
 
-        <button className="composer-send-btn" aria-label="Send message" onClick={handleSend}>
+        <button
+          className="composer-send-btn"
+          aria-label="Send message"
+          onClick={handleSend}
+          disabled={text.trim().length === 0}
+          aria-disabled={text.trim().length === 0}
+        >
           ➤
         </button>
       </div>}

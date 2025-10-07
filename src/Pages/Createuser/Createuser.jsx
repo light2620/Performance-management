@@ -30,15 +30,50 @@ const CreateUser = ({onClose}) => {
     }
   };
   const validate = () => {
-    const required = ["first_name", "last_name", "phone", "company_email", "password", "department_id"];
-    const newErrors = {};
-    required.forEach((key) => {
-      if (!String(formData[key] ?? "").trim()) {
-        newErrors[key] = "This field is required";
-      }
-    });
-    return newErrors;
-  };
+  const newErrors = {};
+
+  // First Name / Last Name: letters only
+  if (!formData.first_name.trim()) {
+    newErrors.first_name = "First name is required";
+  } else if (!/^[A-Za-z\s]+$/.test(formData.first_name.trim())) {
+    newErrors.first_name = "First name can only contain letters";
+  }
+
+  if (!formData.last_name.trim()) {
+    newErrors.last_name = "Last name is required";
+  } else if (!/^[A-Za-z\s]+$/.test(formData.last_name.trim())) {
+    newErrors.last_name = "Last name can only contain letters";
+  }
+
+  // Phone: numeric, length 10-15 (you can adjust)
+  if (!formData.phone.trim()) {
+    newErrors.phone = "Phone is required";
+  } else if (!/^\+?\d{10,20}$/.test(formData.phone.trim())) {
+    newErrors.phone = "Phone must be atleast 10 digits";
+  }
+
+  // Email
+  if (!formData.company_email.trim()) {
+    newErrors.company_email = "Email is required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.company_email.trim())) {
+    newErrors.company_email = "Invalid email address";
+  }
+
+  // Department
+  if (!formData.department_id) {
+    newErrors.department_id = "Department is required";
+  }
+
+  // Password: min 6 characters
+  if (!formData.password.trim()) {
+    newErrors.password = "Password is required";
+  } else if (formData.password.trim().length < 6) {
+    newErrors.password = "Password must be at least 6 characters";
+  }
+
+  return newErrors;
+};
+
    const handleSubmit = async (e) => {
     e.preventDefault();
     const v = validate();
@@ -81,7 +116,7 @@ const CreateUser = ({onClose}) => {
 
         {/* First Name */}
         <div className="form-group">
-          <label htmlFor="first_name">First Name :</label>
+          <label htmlFor="first_name">First Name :*</label>
           <div className="input-cont">
             <input
               type="text"
@@ -98,7 +133,7 @@ const CreateUser = ({onClose}) => {
 
         {/* Last Name */}
         <div className="form-group">
-          <label htmlFor="last_name">Last Name :</label>
+          <label htmlFor="last_name">Last Name :*</label>
           <div className="input-cont">
             <input
               type="text"
@@ -115,14 +150,28 @@ const CreateUser = ({onClose}) => {
 
         {/* Phone */}
         <div className="form-group">
-          <label htmlFor="phone">Phone :</label>
+          <label htmlFor="phone">Phone :*</label>
           <div className="input-cont">
             <input
               type="text"
               id="phone"
               name="phone"
               value={formData.phone}
-              onChange={handleChange}
+               onChange={(e) => {
+    let value = e.target.value;
+
+    // allow only digits and one + at the start
+    if (value.startsWith("+")) {
+      // keep the leading + and remove other non-digit characters
+      value = "+" + value.slice(1).replace(/\D/g, "");
+    } else {
+      // remove any non-digit characters
+      value = value.replace(/\D/g, "");
+    }
+
+    setFormData({ ...formData, phone: value });
+    if (errors.phone) setErrors({ ...errors, phone: "" });
+  }}
               className={errors.phone ? "error-input" : ""}
               placeholder="+91 98765 43210"
             />
@@ -132,7 +181,7 @@ const CreateUser = ({onClose}) => {
  
         {/* company_email */}
         <div className="form-group">
-          <label htmlFor="company_email">company_email :</label>
+          <label htmlFor="company_email">company_email :*</label>
           <div className="input-cont">
             <input
               type="company_email"
@@ -149,7 +198,7 @@ const CreateUser = ({onClose}) => {
 
       {/* Department (placed just below company_email) */}
         <div className="form-group">
-          <label>Department :</label>
+          <label>Department :*</label>
           <div className="input-cont">
             <DepartmentSelector
               value={formData.department_id}
@@ -165,7 +214,7 @@ const CreateUser = ({onClose}) => {
         </div>
         {/* Password */}
         <div className="form-group">
-          <label htmlFor="password">Password :</label>
+          <label htmlFor="password">Password :*</label>
           <div className="input-cont">
             <input
               type="password"
@@ -182,7 +231,10 @@ const CreateUser = ({onClose}) => {
 
         {/* Actions */}
         <div className="form-actions">
-          <button type="submit" disabled={loading} className="save-btn">{loading ? "Creating.... ": "Create"}</button>
+         
+         <button type="submit" disabled={loading} className="save-btn">
+  {loading ? "Creating..." : "Create"}
+</button>
         </div>
       </form>
     </div>

@@ -133,7 +133,14 @@
 
 .primary-btn:hover {
   background: #111827a8;
+   
 }
+.primary-btn:disabled{
+  opacity: .7;
+  cursor:not-allowed;
+  pointer-events: none;
+}
+
 
 .primary-btn.full {
   width: 100%;
@@ -148,4 +155,15 @@
 .loading, .error {
   text-align: center;
   padding: 20px 0;
+}
+
+
+.error-input {
+  border: 1px solid red !important;
+}
+
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 2px;
 }

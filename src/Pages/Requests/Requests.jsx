@@ -34,19 +34,26 @@ const Requests = () => {
   const [count, setCount] = useState(0);
 
   // filter employees
-  const filteredEmployees = requests
-    .map((req) => req.employee)
-    .filter(
-      (emp) =>
-        emp &&
-        `${emp.first_name} ${emp.last_name}`
-          .toLowerCase()
-          .includes(employeeSearch.toLowerCase())
-    );
+// filters
+// filters (handles whitespace & better UX)
+const normalizedEmployeeSearch = employeeSearch.trim().replace(/\s+/g, " ").toLowerCase();
 
-  const uniqueEmployees = Array.from(
-    new Map(filteredEmployees.map((e) => [e.id, e])).values()
-  );
+const filteredEmployees =
+  normalizedEmployeeSearch.length === 0
+    ? []
+    : requests
+        .map((req) => req.employee)
+        .filter((emp) => {
+          if (!emp) return false;
+          const fullName = `${emp.first_name} ${emp.last_name}`.toLowerCase();
+          return fullName.includes(normalizedEmployeeSearch);
+        });
+
+const uniqueEmployees = Array.from(
+  new Map(filteredEmployees.map((e) => [e.id, e])).values()
+);
+
+
 
   useEffect(() => {
     if (!user) return;
@@ -146,13 +153,22 @@ const Requests = () => {
             placeholder="Search employee in requests..."
             value={employeeSearch}
             onChange={(e) => {
-              const value = e.target.value;
-              setEmployeeSearch(value);
-              setShowSuggestions(true);
-              if (value.trim() === "") {
-                setEmployee("");
-              }
-            }}
+  let value = e.target.value;
+
+  // ❌ Prevent typing leading space
+  if (value.startsWith(" ")) return;
+
+  // 🧹 Collapse multiple spaces into one
+  value = value.replace(/\s{2,}/g, " ");
+
+  setEmployeeSearch(value);
+  setShowSuggestions(true);
+
+  if (value.trim() === "") {
+    setEmployee("");
+  }
+}}
+
             onFocus={() => setShowSuggestions(true)}
           />
           {showSuggestions && employeeSearch && (
@@ -292,6 +308,7 @@ const Requests = () => {
       {/* Modal */}
       {isModalOpen && (
         <RequestModal
+          title={"Request"}
           onClose={() => setIsModalOpen(false)}
           getApi={() => fetchRequests(API_URL)}
           postApi={createRequestApi}

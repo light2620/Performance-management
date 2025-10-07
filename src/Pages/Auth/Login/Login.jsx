@@ -9,6 +9,8 @@ import { useAuth } from "../../../Utils/AuthContext";
 import Spinner from "../../../Utils/SmallSpinner/SmallSpinner";
 import { getCurrentUserApi } from "../../../Apis/UserApi";
 import { IoStatsChartSharp } from "react-icons/io5";
+import { useWebSocket } from "../../../Provider/WebSocketProvider";
+import { useNotifications } from "../../../Provider/NotificationProvider";
 
 const Login = () => {
   const { setIsLoggedIn, setUser } = useAuth();
@@ -16,17 +18,23 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errs, setErrs] = useState({ company_email: false, password: false });
+  const { connect } = useWebSocket();
+const { connectNotification, close } = useNotifications();
+const handleChange = (e) => {
+  const { name, value } = e.target;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setErrs((p) => ({ ...p, [name]: false }));
-    setCreds((p) => ({ ...p, [name]: value }));
-  };
+  // Prevent spaces for password field
+  const newValue =
+    name === "password" ? value.replace(/\s/g, "") : value;
+
+  setErrs((p) => ({ ...p, [name]: false }));
+  setCreds((p) => ({ ...p, [name]: newValue }));
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const emptyEmail = !creds.company_email?.trim();
-    const emptyPass = !creds.password;
+    const emptyPass = !creds.password || /\s/.test(creds.password);
     if (emptyEmail || emptyPass) {
       setErrs({ company_email: emptyEmail, password: emptyPass });
       return;
@@ -34,10 +42,13 @@ const Login = () => {
 
     try {
       setLoading(true);
-      await login(creds);
+      await login(creds,connect);
       setIsLoggedIn(true);
       const userRes = await getCurrentUserApi();
       setUser(userRes.data);
+      connect();
+      connectNotification();
+      toast.success("Login successful!");
     } catch (err) {
       console.error(err);
       toast.error(err?.response?.data?.detail || "Login failed. Check credentials.");
@@ -85,7 +96,7 @@ const Login = () => {
 
           <form className="lf-form" onSubmit={handleSubmit} noValidate>
             <label className="lf-label" htmlFor="company_email">
-              Company Email
+              Company Email*
             </label>
             <input
               id="company_email"
@@ -99,11 +110,11 @@ const Login = () => {
               autoComplete="username"
             />
             {errs.company_email && (
-              <div className="lf-error">Please enter your email</div>
+              <div className="lf-error">Please enter a valid email address.</div>
             )}
 
             <label className="lf-label" htmlFor="password">
-              Password
+              Password*
             </label>
             <div className="lf-password-row">
               <input
@@ -126,7 +137,7 @@ const Login = () => {
               </button>
             </div>
             {errs.password && (
-              <div className="lf-error">Please enter your password</div>
+              <div className="lf-error">Password is required.</div>
             )}
 
             <button className="lf-submit" type="submit" disabled={loading}>

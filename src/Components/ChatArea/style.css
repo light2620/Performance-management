@@ -250,6 +250,9 @@
   box-shadow: 0 6px 14px rgba(17, 24, 39, 0.12);
 }
 
+.composer-send-btn:disabled{
+  opacity: .7;
+}
 /* responsive */
 @media (max-width: 720px) {
   .chat-area-root {

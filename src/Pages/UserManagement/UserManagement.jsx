@@ -3,11 +3,11 @@ import "./style.css";
 import { IoSearch } from "react-icons/io5";
 import { LuPencil, LuTrash2 } from "react-icons/lu";
 import { tokenService } from "../../Apis/tokenService";
-import { getAllUser } from "../../Apis/UserApi";
+import { getAllUser, deleteUserApi } from "../../Apis/UserApi";
 import axiosInstance from "../../Apis/axiosInstance";
 import CreateUser from "../Createuser/Createuser";
-import { deleteUserApi } from "../../Apis/UserApi";
 import UserDetailModal from "../../Components/UserDetailModal/UserDetailModal";
+import ConfirmModal from "../../Components/ConfirmModal/ConfirmModal";
 
 const API_BASE = "users/";
 
@@ -34,41 +34,38 @@ export default function UserManagement() {
   const [search, setSearch] = useState("");
   const [ordering, setOrdering] = useState("-created_at");
   const [loading, setLoading] = useState(false);
-  const [pageUrl, setPageUrl] = useState(API_BASE); // current endpoint
+  const [pageUrl, setPageUrl] = useState(API_BASE);
   const [meta, setMeta] = useState({ count: 0, next: null, previous: null });
-  const [showCreateUserModal,setShowCreateUserModal] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
-const [modalEditable, setModalEditable] = useState(false);
+  const [modalEditable, setModalEditable] = useState(false);
 
-useEffect(() => {
-  const url = new URL(API_BASE, window.location.origin);
-  if (search.trim()) url.searchParams.set("search", search.trim());
-  if (ordering) url.searchParams.set("ordering", ordering);
-  fetchUsers(url.pathname + url.search);
-}, [search, ordering]);
+  // delete modal states
+  const [deleteUserId, setDeleteUserId] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
-const fetchUsers = async (url = pageUrl) => {
-  setLoading(true);
-  try {
-    const token = tokenService.getAccess
-      ? tokenService.getAccess()
-      : tokenService.get?.();
-
-    const res = await axiosInstance.get(url);
-
-    const { results, count, next, previous } = res.data;
-    setRows(results || []);
-    setMeta({ count: count ?? 0, next, previous });
-  } catch (e) {
-    console.log(e);
-  } finally {
-    setLoading(false);
-  }
-};
-
-  // fetch data
   useEffect(() => {
-   
+    const url = new URL(API_BASE, window.location.origin);
+    if (search.trim()) url.searchParams.set("search", search.trim());
+    if (ordering) url.searchParams.set("ordering", ordering);
+    fetchUsers(url.pathname + url.search);
+  }, [search, ordering]);
+
+  const fetchUsers = async (url = pageUrl) => {
+    setLoading(true);
+    try {
+      const res = await axiosInstance.get(url);
+      const { results, count, next, previous } = res.data;
+      setRows(results || []);
+      setMeta({ count: count ?? 0, next, previous });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, [pageUrl]);
 
@@ -96,25 +93,36 @@ const fetchUsers = async (url = pageUrl) => {
     }
   }, [ordering]);
 
-  const handleDelete = async(id) => {
-    console.log(id)
-    try{
-         await deleteUserApi(id);
-        await fetchUsers();
+  const handleDeleteClick = (e, id) => {
+    e.stopPropagation(); // prevent opening UserDetailModal
+    setDeleteUserId(id);
+    setConfirmOpen(true);
+  };
 
-    }catch(err){
-        console.log(err)
+  const handleConfirmDelete = async () => {
+    if (!deleteUserId) return;
+    try {
+      await deleteUserApi(deleteUserId);
+      await fetchUsers(API_BASE); // refresh table
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setConfirmOpen(false);
+      setDeleteUserId(null);
     }
-  } 
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmOpen(false);
+    setDeleteUserId(null);
+  };
 
   return (
     <div className="user-mgmt-wrapper">
       <div className="user-mgmt-header">
         <h2>User Management</h2>
         <div className="user-mgmt-actions">
-          <button className="user-mgmt-btn user-mgmt-btn--ghost" onClick={() => window.print()}>
-            Export
-          </button>
+          <button className="user-mgmt-btn user-mgmt-btn--ghost" onClick={() => window.print()}>Export</button>
           <button className="user-mgmt-btn user-mgmt-btn--primary" onClick={() => setShowCreateUserModal(true)}>
             + Add User
           </button>
@@ -127,20 +135,11 @@ const fetchUsers = async (url = pageUrl) => {
       <div className="user-mgmt-toolbar">
         <div className="user-mgmt-search">
           <IoSearch className="user-mgmt-search-icon" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search"
-          />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" />
         </div>
 
         <div className="user-mgmt-selects">
-          <select
-            value={ordering}
-            onChange={(e) => setOrdering(e.target.value)}
-            className="user-mgmt-select"
-            title="Sort"
-          >
+          <select value={ordering} onChange={(e) => setOrdering(e.target.value)} className="user-mgmt-select" title="Sort">
             <option value="-created_at">Newest</option>
             <option value="created_at">Oldest</option>
             <option value="first_name">First name (A–Z)</option>
@@ -156,7 +155,6 @@ const fetchUsers = async (url = pageUrl) => {
           <table className="user-mgmt-table">
             <thead>
               <tr>
-               
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Phone</th>
@@ -172,33 +170,23 @@ const fetchUsers = async (url = pageUrl) => {
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={10} className="center muted">
-                    Loading…
-                  </td>
+                  <td colSpan={10} className="center muted">Loading…</td>
                 </tr>
               )}
 
               {!loading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="center muted">
-                    No users found.
-                  </td>
+                  <td colSpan={10} className="center muted">No users found.</td>
                 </tr>
               )}
 
               {!loading &&
-  
                 rows.map((u) => (
-                  <tr key={u.id} 
-                  onClick={() => {
-    setSelectedUserId(u.id);
-    setModalEditable(false); // view mode
-  }}
-  style={{ cursor: "pointer" }}
+                  <tr
+                    key={u.id}
+                    onClick={() => { setSelectedUserId(u.id); setModalEditable(false); }}
+                    style={{ cursor: "pointer" }}
                   >
-              
-
-                    {/* Full name with avatar */}
                     <td>
                       <div className="user-mgmt-user-cell">
                         <div className="user-mgmt-user-meta">
@@ -206,44 +194,30 @@ const fetchUsers = async (url = pageUrl) => {
                         </div>
                       </div>
                     </td>
-
-                    {/* Email */}
                     <td className="muted">{u.company_email || u.personal_email || "—"}</td>
-
-                    {/* Phone */}
                     <td className="muted">{u.phone || "—"}</td>
-
-                    {/* Status pill */}
                     <td>{statusPill(u)}</td>
-
-                    {/* Role */}
                     <td>{(u.role || "").charAt(0).toUpperCase() + (u.role || "").slice(1)}</td>
-
-                    {/* Department */}
                     <td>{u.department?.dept_name || "—"}</td>
-
-                    {/* Joined */}
                     <td className="muted">{fmtDate(u.created_at)}</td>
-
-                    {/* Last Active */}
                     <td className="muted">{timeAgo(u.updated_at)}</td>
-
-                    {/* Actions */}
                     <td className="user-mgmt-actions">
-                     <button
-  className="user-mgmt-icon-btn"
-  title="Edit"
-  onClick={(e) => {
-    e.stopPropagation();
-    setSelectedUserId(u.id);
-    setModalEditable(true); // edit mode
-  }}
->
-  <LuPencil />
-</button>
-                      <button 
-                      onClick={() => handleDelete(u.id)}
-                      className="user-mgmt-icon-btn danger" title="Delete">
+                      <button
+                        className="user-mgmt-icon-btn"
+                        title="Edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedUserId(u.id);
+                          setModalEditable(true);
+                        }}
+                      >
+                        <LuPencil />
+                      </button>
+                      <button
+                        onClick={(e) => handleDeleteClick(e, u.id)}
+                        className="user-mgmt-icon-btn danger"
+                        title="Delete"
+                      >
                         <LuTrash2 />
                       </button>
                     </td>
@@ -253,7 +227,6 @@ const fetchUsers = async (url = pageUrl) => {
           </table>
         </div>
 
-        {/* footer */}
         <div className="user-mgmt-table-footer">
           <div className="muted">Rows: {rows.length} • Total: {meta.count}</div>
           <div className="user-mgmt-pager">
@@ -273,22 +246,36 @@ const fetchUsers = async (url = pageUrl) => {
             </button>
           </div>
         </div>
+
         {selectedUserId && (
-  <UserDetailModal
-    fetchUsers={ () => fetchUsers(API_BASE)}
-    userId={selectedUserId}
-    onClose={() => setSelectedUserId(null)}
-    editable={modalEditable}
-  />
-)}
+          <UserDetailModal
+            fetchUsers={() => fetchUsers(API_BASE)}
+            userId={selectedUserId}
+            onClose={() => setSelectedUserId(null)}
+            editable={modalEditable}
+          />
+        )}
+
+        {showCreateUserModal && (
+          <CreateUser
+            resetFilters={() => {
+              setSearch("");
+              setOrdering("-created_at");
+              setPageUrl(API_BASE);
+              fetchUsers(API_BASE);
+            }}
+            onClose={() => setShowCreateUserModal(false)}
+          />
+        )}
+
+        <ConfirmModal
+          open={confirmOpen}
+          title="Delete User"
+          message="Are you sure you want to delete this user?"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
       </div>
-      {showCreateUserModal && <CreateUser  resetFilters ={ () => {
-  setSearch("");
-  setOrdering("-created_at");
-  setPageUrl(API_BASE);   // ✅ force reset explicitly
-  fetchUsers(API_BASE);   // ✅ call fetch right here
-}}
-   onClose={() => setShowCreateUserModal(false)}  />}
     </div>
   );
 }

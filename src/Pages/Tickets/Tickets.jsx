@@ -8,7 +8,14 @@ import "./style.css";
 const formatDate = (iso) => {
   if (!iso) return "-";
   const d = new Date(iso);
-  return d.toLocaleString([], { dateStyle: "short", timeStyle: "short" });
+  return `${d.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric", // ✅ 4-digit year
+  })} ${d.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`;
 };
 
 const initialsFrom = (user) => {

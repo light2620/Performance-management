@@ -41,6 +41,10 @@
 }
 
 .modal-actions .btn.confirm {
-  background: #3b82f6;
+  background: #111827;
   color: white;
+}
+
+.modal-actions .btn.confirm:hover{
+  opacity: 0.7;
 }

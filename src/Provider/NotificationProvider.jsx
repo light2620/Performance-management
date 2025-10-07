@@ -16,20 +16,18 @@ const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
   const socketRef = useRef(null);
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const reconnectRef = useRef(null);
   const tokenRef = useRef(tokenService.getAccess?.() ?? null);
-  console.log("unread count", unreadCount)
 
-  const openSocket = useCallback((token) => {
-    if (!token) {
-      console.log("NotificationProvider: ❌ no token, skipping socket connect");
-      return;
-    }
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Internal: open socket for a token
+  const openSocketWithToken = useCallback((token) => {
+    if (!token) return;
+
     try {
       const url = `${WS_BASE}?token=${token}`;
-      console.log("NotificationProvider: 🌐 connecting ->", url);
       const ws = new WebSocket(url);
       socketRef.current = ws;
 
@@ -38,10 +36,8 @@ export const NotificationProvider = ({ children }) => {
       };
 
       ws.onmessage = (evt) => {
-        console.log("Notification WS 📩 raw message:", evt.data);
         try {
           const data = JSON.parse(evt.data);
-          console.log("Notification WS 📦 parsed payload:", data);
 
           if (data?.type === "notification" && data.notification) {
             const n = data.notification;
@@ -65,23 +61,15 @@ export const NotificationProvider = ({ children }) => {
               is_read,
             };
 
-            console.log("Notification WS ➕ adding notification:", item);
-
             setNotifications((prev) => {
-              if (prev.some((p) => p.id === id)) {
-                console.log("Notification WS 🔄 duplicate ignored:", id);
-                return prev;
-              }
+              if (prev.some((p) => p.id === id)) return prev;
               return [item, ...prev].slice(0, 10);
             });
           } else if (data?.type === "count_update") {
-            console.log("Notification WS 🔢 updating unread count:", data.unread_count);
             setUnreadCount(data.unread_count ?? 0);
-          } else {
-            console.log("Notification WS ℹ️ other message received:", data);
           }
         } catch (e) {
-          console.warn("NotificationProvider: ⚠️ failed to parse WS message", e);
+          console.warn("NotificationProvider: ⚠️ failed to parse message", e);
         }
       };
 
@@ -90,10 +78,9 @@ export const NotificationProvider = ({ children }) => {
         socketRef.current = null;
         if (!reconnectRef.current) {
           reconnectRef.current = setTimeout(() => {
-            console.log("Notification WS 🔄 attempting reconnect...");
             reconnectRef.current = null;
             const t = tokenService.getAccess?.();
-            if (t) openSocket(t);
+            if (t) openSocketWithToken(t);
           }, 3000);
         }
       };
@@ -106,45 +93,78 @@ export const NotificationProvider = ({ children }) => {
     }
   }, []);
 
-  const closeSocket = useCallback(() => {
+  // Public: connectNotification() - call manually after login
+  const connectNotification = useCallback(() => {
+    const token = tokenService.getAccess?.();
+    if (!token) return false;
+
+    if (socketRef.current) {
+      const rs = socketRef.current.readyState;
+      if (rs === WebSocket.OPEN || rs === WebSocket.CONNECTING) return true;
+      try {
+        socketRef.current.close();
+      } catch {}
+      socketRef.current = null;
+    }
+
+    tokenRef.current = token;
+    openSocketWithToken(token);
+  
+    return true;
+  }, [openSocketWithToken]);
+
+  // Public: close socket (call on logout)
+  const close = useCallback(() => {
     console.log("NotificationProvider: 🔌 closing socket");
     try {
       socketRef.current?.close();
-    } catch (_) {}
+    } catch {}
     socketRef.current = null;
   }, []);
 
-  useEffect(() => {
-    const token = tokenService.getAccess?.();
-    tokenRef.current = token ?? null;
-    console.log(
-      "NotificationProvider: 🚀 useEffect mount, token =",
-      tokenRef.current
+  // Local helpers
+  const remove = useCallback((id) => {
+    setNotifications((p) => p.filter((x) => x.id !== id));
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setNotifications([]);
+    setUnreadCount(0);
+  }, []);
+
+  const markReadLocal = useCallback((id) => {
+    setNotifications((p) =>
+      p.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+  }, []);
 
-    if (tokenRef.current) openSocket(tokenRef.current);
+  // On mount: register global helpers and event listeners
+  useEffect(() => {
+    try {
+      window.__notif_connect = connectNotification;
+      window.__notif_close = close;
+    } catch (e) {}
 
-    const onStorage = () => {
-      console.log("NotificationProvider: 📦 storage event fired");
-      const newToken = tokenService.getAccess?.() ?? null;
-      if (!newToken && tokenRef.current) {
-        console.log("NotificationProvider: 🔒 logged out, clearing notifications");
-        tokenRef.current = null;
-        closeSocket();
-        setNotifications([]);
-        setUnreadCount(0);
-      } else if (newToken && newToken !== tokenRef.current) {
-        console.log("NotificationProvider: 🔑 token changed, reconnecting");
-        tokenRef.current = newToken;
-        closeSocket();
-        setTimeout(() => openSocket(newToken), 200);
+    const onStorage = (e) => {
+      if (e.key === "access") {
+        const newToken = tokenService.getAccess?.() ?? null;
+        if (!newToken && tokenRef.current) {
+          tokenRef.current = null;
+          close();
+          setNotifications([]);
+          setUnreadCount(0);
+        } else if (newToken && newToken !== tokenRef.current) {
+          tokenRef.current = newToken;
+          close();
+          setTimeout(() => openSocketWithToken(newToken), 200);
+        }
       }
     };
 
     const onAuthLogout = () => {
-      console.log("NotificationProvider: 🔒 auth:logout event, clearing notifications");
       tokenRef.current = null;
-      closeSocket();
+      close();
       setNotifications([]);
       setUnreadCount(0);
     };
@@ -153,35 +173,19 @@ export const NotificationProvider = ({ children }) => {
     window.addEventListener("auth:logout", onAuthLogout);
 
     return () => {
-      console.log("NotificationProvider: 🧹 cleanup on unmount");
+      try {
+        delete window.__notif_connect;
+        delete window.__notif_close;
+      } catch (e) {}
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("auth:logout", onAuthLogout);
-      closeSocket();
+      close();
       if (reconnectRef.current) {
         clearTimeout(reconnectRef.current);
         reconnectRef.current = null;
       }
     };
-  }, [openSocket, closeSocket]);
-
-  const remove = useCallback((id) => {
-    console.log("NotificationProvider: 🗑️ removing notification", id);
-    setNotifications((p) => p.filter((x) => x.id !== id));
-  }, []);
-
-  const clearAll = useCallback(() => {
-    console.log("NotificationProvider: 🗑️ clearing all notifications");
-    setNotifications([]);
-    setUnreadCount(0);
-  }, []);
-
-  const markReadLocal = useCallback((id) => {
-    console.log("NotificationProvider: ✏️ marking notification as read", id);
-    setNotifications((p) =>
-      p.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-    );
-    setUnreadCount((prev) => Math.max(0, prev - 1));
-  }, []);
+  }, [connectNotification, close, openSocketWithToken]);
 
   return (
     <NotificationContext.Provider
@@ -191,6 +195,8 @@ export const NotificationProvider = ({ children }) => {
         removeNotification: remove,
         clearNotifications: clearAll,
         markReadLocal,
+        connectNotification,
+        close,
       }}
     >
       {children}

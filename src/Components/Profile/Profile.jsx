@@ -11,14 +11,13 @@ const ProfileModal = ({ id, onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({}); // for password mismatch
 
   useEffect(() => {
     const fetchUser = async () => {
       setLoading(true);
       try {
-        console.log("userId", id)
         const res = await axiosInstance.get(`/users/me/`);
-        
         setUser(res.data);
       } catch (err) {
         console.error("Error fetching user:", err);
@@ -28,36 +27,47 @@ const ProfileModal = ({ id, onClose }) => {
     };
     fetchUser();
   }, [id]);
-  
 
   const initials = user
     ? `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase()
     : "";
 
-   const updatePassword = async () => {
-      if (newPassword !== confirmPassword) {
-        alert("New passwords do not match!");
-        return;
-      }
-      setSaving(true);
-      try {
-        await axiosInstance.post(`users/${id}/change-password/`, {
-          new_password: newPassword,
-          current_password: currentPassword,
-        });
-        alert("Password updated successfully!");
-        setShowPasswordForm(false);
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-      } catch (err) {
-       
-        toast.error(err?.response?.data?.new_password[0] || "Error updating password");
-        console.error("Error updating password:", err);
-      } finally {
-        setSaving(false);
-      }
-    };
+  const updatePassword = async () => {
+    const newErrors = {};
+    if (!currentPassword.trim()) newErrors.currentPassword = "Current password is required";
+    if (!newPassword.trim()) newErrors.newPassword = "New password is required";
+    if (!confirmPassword.trim()) newErrors.confirmPassword = "Confirm password is required";
+    if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length) return; // stop if errors
+
+    setSaving(true);
+    try {
+      await axiosInstance.post(`users/${id}/change-password/`, {
+        new_password: newPassword,
+        current_password: currentPassword,
+      });
+      toast.success("Password updated successfully!");
+      setShowPasswordForm(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setErrors({});
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.new_password?.[0] ||
+          err?.response?.data?.current_password?.[0] ||
+          "Error updating password"
+      );
+      console.error("Error updating password:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="profile-overlay">
@@ -106,44 +116,68 @@ const ProfileModal = ({ id, onClose }) => {
             ) : (
               <div className="password-form">
                 <h3>Change Password</h3>
+
                 <label>
-                  Current Password
+                  Current Password *
                   <input
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
+                    className={errors.currentPassword ? "error-input" : ""}
                   />
+                  {errors.currentPassword && (
+                    <span className="error-text">{errors.currentPassword}</span>
+                  )}
                 </label>
+
                 <label>
-                  New Password
+                  New Password *
                   <input
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
+                    className={errors.newPassword ? "error-input" : ""}
                   />
+                  {errors.newPassword && (
+                    <span className="error-text">{errors.newPassword}</span>
+                  )}
                 </label>
+
                 <label>
-                  Confirm New Password
+                  Confirm New Password *
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
+                    className={errors.confirmPassword ? "error-input" : ""}
                   />
+                  {errors.confirmPassword && (
+                    <span className="error-text">{errors.confirmPassword}</span>
+                  )}
                 </label>
+
                 <div className="form-actions">
                   <button
                     className="secondary-btn"
-                    onClick={() => setShowPasswordForm(false)}
+                    onClick={() => {
+                      setShowPasswordForm(false);
+                      setErrors({});
+                    }}
                   >
                     Cancel
                   </button>
-                  <button
-                    className="primary-btn"
-                    onClick={updatePassword}
-                    disabled={saving}
-                  >
-                    {saving ? "Updating..." : "Update"}
-                  </button>
+                <button
+  className="primary-btn"
+  onClick={updatePassword}
+  disabled={
+    saving || 
+    !currentPassword.trim() || 
+    !newPassword.trim() || 
+    !confirmPassword.trim()
+  }
+>
+  {saving ? "Updating..." : "Update"}
+</button>
                 </div>
               </div>
             )}

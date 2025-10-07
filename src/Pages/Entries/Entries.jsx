@@ -251,6 +251,7 @@ const Entries = () => {
 
       {showModal && (
         <RequestModal
+          title ="Entry"
           postApi={createEntriesApi}
           getApi={() => getAllEntriesApi(API_URL)}
           onClose={() => setShowModal(false)}

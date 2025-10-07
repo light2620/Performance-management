@@ -137,30 +137,37 @@ export default function SingleRequestPageRedesign() {
     setConfirmModal({ open: true, title: item.title, message: item.message, action: item.fn });
   };
 
-  const handleEditPointsSubmit = async () => {
-    if (!editPointsModal.points || Number(editPointsModal.points) <= 0) {
-      toast.error("Points must be a positive number");
-      return;
-    }
-    setBusy(true);
-    try {
-      await editRequestedPointApi(id, {
-        points: Number(editPointsModal.points),
-        admin_reason: editPointsModal.admin_reason,
-      });
-      setRequest((prev) => ({
-        ...prev,
-        points: Number(editPointsModal.points),
-      }));
-      toast.success("Points updated successfully");
-      setEditPointsModal({ open: false, points: "", admin_reason: "" });
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.response?.data?.detail || "Failed to update points");
-    } finally {
-      setBusy(false);
-    }
-  };
+ const handleEditPointsSubmit = async () => {
+  const pts = Number(editPointsModal.points);
+  if (!pts || pts <= 0) {
+    toast.error("Points must be a positive number");
+    return;
+  }
+  if (pts > 20) {
+    toast.error("Points cannot be greater than 20");
+    return;
+  }
+
+  setBusy(true);
+  try {
+    await editRequestedPointApi(id, {
+      points: pts,
+      admin_reason: editPointsModal.admin_reason,
+    });
+    setRequest((prev) => ({
+      ...prev,
+      points: pts,
+    }));
+    toast.success("Points updated successfully");
+    setEditPointsModal({ open: false, points: "", admin_reason: "" });
+  } catch (err) {
+    console.error(err);
+    toast.error(err?.response?.data?.detail || "Failed to update points");
+  } finally {
+    setBusy(false);
+  }
+};
+
 
   if (loading) {
     return (
@@ -267,7 +274,12 @@ export default function SingleRequestPageRedesign() {
       size={14} // smaller icon
       style={{ marginLeft: 6, cursor: "pointer", verticalAlign: "middle" }}
       onClick={() =>
-        setEditPointsModal({ open: true, points: request.points, admin_reason: "" })
+        setEditPointsModal({
+  open: true,
+  points: request.points,
+  originalPoints: request.points, // track original value
+  admin_reason: "",
+})
       }
     />
   )}
@@ -333,46 +345,72 @@ export default function SingleRequestPageRedesign() {
 
       {/* Edit Points Modal */}
       {editPointsModal.open && (
-        <div className="srdr-modal-backdrop">
-          <div className="srdr-modal">
-            <h2>Edit Points</h2>
-            <label>
-              Points (positive number)
-              <input
-                type="number"
-                value={editPointsModal.points}
-                onChange={(e) => setEditPointsModal({ ...editPointsModal, points: e.target.value })}
-                min={1}
-              />
-            </label>
-            <label>
-              Reason (optional)
-              <textarea
-                value={editPointsModal.admin_reason}
-                onChange={(e) =>
-                  setEditPointsModal({ ...editPointsModal, admin_reason: e.target.value })
-                }
-              />
-            </label>
-            <div className="srdr-modal-actions">
-              <button
-                className="srdr-btn srdr-btn-primary"
-                onClick={handleEditPointsSubmit}
-                disabled={busy}
-              >
-                Save
-              </button>
-              <button
-                className="srdr-btn srdr-btn-outline"
-                onClick={() => setEditPointsModal({ open: false, points: "", admin_reason: "" })}
-                disabled={busy}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="srdr-modal-backdrop">
+    <div className="srdr-modal">
+      <h2>Edit Points</h2>
+
+      <label>
+        Points (1 - 20)
+        <input
+          type="number"
+          value={editPointsModal.points}
+          min={1}
+          max={20}
+          onChange={(e) => {
+            // clamp value between 1 and 20 and allow empty string
+            const raw = e.target.value;
+            if (raw === "") {
+              setEditPointsModal({ ...editPointsModal, points: "" });
+              return;
+            }
+            let n = Number(raw);
+            if (Number.isNaN(n)) n = "";
+            else if (n < 1) n = 1;
+            else if (n > 20) n = 20;
+            setEditPointsModal({ ...editPointsModal, points: n });
+          }}
+        />
+      </label>
+
+      <label>
+        Reason (optional)
+        <textarea
+          value={editPointsModal.admin_reason}
+          onChange={(e) =>
+            setEditPointsModal({ ...editPointsModal, admin_reason: e.target.value })
+          }
+        />
+      </label>
+
+      <div className="srdr-modal-actions">
+        <button
+          className="srdr-btn srdr-btn-primary"
+          onClick={handleEditPointsSubmit}
+          disabled={
+            busy ||
+            // invalid / empty value
+            !editPointsModal.points ||
+            Number(editPointsModal.points) <= 0 ||
+            Number(editPointsModal.points) > 20 ||
+            // unchanged value
+            Number(editPointsModal.points) === Number(editPointsModal.originalPoints)
+          }
+        >
+          Save
+        </button>
+        <button
+          className="srdr-btn srdr-btn-outline"
+          onClick={() => setEditPointsModal({ open: false, points: "", originalPoints: undefined, admin_reason: "" })}
+          disabled={busy}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
       {showRequestTimeline && (
   <RequestTimelineModal
     requestId={id}

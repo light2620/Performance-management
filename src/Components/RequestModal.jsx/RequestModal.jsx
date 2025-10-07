@@ -1,9 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import EmployeeSelector from "../EmployeeSelector/EmployeeSelector";
 import "./style.css";
+import toast from "react-hot-toast";
 
-const RequestModal = ({ onClose, getApi, postApi }) => {
+const RequestModal = ({ onClose, getApi, postApi, title }) => {
   const allEmployees = useSelector((state) => state.allUser.allUsers);
 
   const [type, setType] = useState("MERIT");
@@ -17,12 +18,19 @@ const RequestModal = ({ onClose, getApi, postApi }) => {
     const newErrors = {};
     if (!type) newErrors.type = "Type is required";
     if (!employee) newErrors.employee = "Employee is required";
-    if (!points || points <= 0) newErrors.points = "Points must be greater than 0";
+
+    if (!points || Number(points) <= 0) {
+      newErrors.points = "Points must be greater than 0";
+    } else if (Number(points) > 20) {
+      newErrors.points = "Points cannot be greater than 20";
+    }
+
     if (!reason) {
       newErrors.reason = "Reason is required";
     } else if (reason.length < 50) {
       newErrors.reason = "Reason must be at least 50 characters long";
     }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -42,6 +50,7 @@ const RequestModal = ({ onClose, getApi, postApi }) => {
 
       await postApi(body);
       setTimeout(async () => await getApi(), 1000);
+      toast.success(`${type} ${title} Created Successfully`);
       onClose();
     } catch (err) {
       console.error("Error creating request:", err);
@@ -62,75 +71,116 @@ const RequestModal = ({ onClose, getApi, postApi }) => {
   };
 
   return (
-    <div className="request-modal-container">
+    <div className="request-modal-container" role="dialog" aria-modal="true">
       <div className="request-modal-header">
-        <h3>Create New Point Request</h3>
-        <button className="request-modal-close-btn" onClick={onClose}>
+        <h3>{`Create New Point ${title}`}</h3>
+        <button className="request-modal-close-btn" onClick={onClose} aria-label="Close">
           ✕
         </button>
       </div>
 
-      <form className="request-modal-body" onSubmit={handleSubmit}>
+      <form className="request-modal-body" onSubmit={handleSubmit} noValidate>
         {/* Type */}
-        <label>Type</label>
+        <label htmlFor="req-type">Type*</label>
         <select
+          id="req-type"
           value={type}
           onChange={(e) => {
-            setType(e.target.value);
             clearError("type");
+            setType(e.target.value);
           }}
           className={errors.type ? "request-modal-error" : ""}
+          aria-invalid={!!errors.type}
+          aria-describedby={errors.type ? "err-type" : undefined}
           required
         >
           <option value="MERIT">Merit</option>
           <option value="DEMERIT">Demerit</option>
         </select>
-        {errors.type && <p className="request-modal-error-text">{errors.type}</p>}
+        {errors.type && (
+          <small id="err-type" className="request-modal-error-text">
+            {errors.type}
+          </small>
+        )}
 
         {/* Employee */}
+  
         <EmployeeSelector
           allEmployees={allEmployees}
           value={employee}
           onChange={(id) => {
-            setEmployee(id);
             clearError("employee");
+            setEmployee(id);
           }}
+          id="req-employee"
+          aria-invalid={!!errors.employee}
+          aria-describedby={errors.employee ? "err-employee" : undefined}
         />
-        {errors.employee && <p className="request-modal-error-text">{errors.employee}</p>}
+        {errors.employee && (
+          <small id="err-employee" className="request-modal-error-text">
+            {errors.employee}
+          </small>
+        )}
 
         {/* Points */}
-        <label>Points</label>
+        <label htmlFor="req-points">Points* (Max 20)</label>
         <input
+          id="req-points"
           type="number"
           value={points}
           onChange={(e) => {
-            setPoints(e.target.value);
+            // allow empty string; clamp numeric values
+            const raw = e.target.value;
             clearError("points");
+            if (raw === "") {
+              setPoints("");
+              return;
+            }
+            const n = Number(raw);
+            if (Number.isNaN(n)) return;
+            // clamp between 1 and 20
+            if (n < 1) setPoints("1");
+            else if (n > 20) setPoints("20");
+            else setPoints(String(n));
           }}
+          min="1"
+          max="20"
           className={errors.points ? "request-modal-error" : ""}
+          aria-invalid={!!errors.points}
+          aria-describedby={errors.points ? "err-points" : undefined}
           required
         />
-        {errors.points && <p className="request-modal-error-text">{errors.points}</p>}
+        {errors.points && (
+          <small id="err-points" className="request-modal-error-text">
+            {errors.points}
+          </small>
+        )}
 
         {/* Reason */}
-        <label>Reason</label>
+        <label htmlFor="req-reason">Reason*</label>
         <textarea
+          id="req-reason"
           value={reason}
           onChange={(e) => {
-            setReason(e.target.value);
             clearError("reason");
+            setReason(e.target.value);
           }}
           rows="3"
           className={errors.reason ? "request-modal-error" : ""}
+          aria-invalid={!!errors.reason}
+          aria-describedby={errors.reason ? "err-reason" : undefined}
           required
         />
-        <small className="request-modal-char-count">
-          {reason.length}/50 min characters
-        </small>
-        {errors.reason && <p className="request-modal-error-text">{errors.reason}</p>}
+        {errors.reason && (
+          <small id="err-reason" className="request-modal-error-text">
+            {errors.reason}
+          </small>
+        )}
+        <small className="request-modal-char-count">{reason.length}/50 min characters</small>
+        
 
         <button type="submit" className="request-modal-submit-btn" disabled={loading}>
-          {loading ? "Submitting..." : "Create Request"}
+          {loading ? "Submitting..." : `Create ${title}`}
         </button>
       </form>
     </div>

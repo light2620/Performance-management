@@ -1,4 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import axiosInstance from "../../Apis/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 import "./style.css";
 
@@ -33,12 +35,30 @@ const EntryDetails = ({
   reason,
   points,
   type,
-  operation,
   forUser,
   created_at,
-  requestId,
+  entryId,
 }) => {
   const firstButtonRef = useRef(null);
+
+  const [forUserDetail,setForUserDetail] = useState({});
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!forUser?.id) return;
+
+    const fetchUserDetail = async () => {
+      
+      try {
+        const res = await axiosInstance.get(`/users/${forUser?.id}/`);
+        setForUserDetail(res.data);
+      } catch (err) {
+        console.error("Error fetching user detail:", err);
+      } 
+    };
+
+    fetchUserDetail();
+  }, [forUser?.id]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -63,9 +83,7 @@ const EntryDetails = ({
 
   if (!isOpen) return null;
 
-  const title = isAdmin
-    ? `${type || "Request"} • ${forUser?.first_name || ""} ${forUser?.last_name || ""}`.trim()
-    : `${type || "Request"} request`;
+  const title = `${type?.charAt(0).toUpperCase() + type?.slice(1).toLowerCase()} Point Entry`
 
   return (
     <div
@@ -88,7 +106,7 @@ const EntryDetails = ({
             </div> */}
             <div className="modal-heading">
               <div id="ed-title" className="modal-title">{title}</div>
-             {isAdmin && <div className="modal-sub">Request ID: <span className="modal-id">{requestId || "—"}</span></div>}
+             {isAdmin && <div className="modal-sub">Entry ID: <span className="modal-id">{entryId || "—"}</span></div>}
             </div>
           </div>
 
@@ -117,34 +135,38 @@ const EntryDetails = ({
                   {/* <div className="person-avatar">{forUser?.first_name?.[0]?.toUpperCase() || "U"}</div> */}
                 </div>
                 <div className="person-right">
-                  <div className="person-name">{forUser?.first_name} {forUser?.last_name}</div>
-                  <div className="person-role">{forUser?.role || "Employee"}</div>
-                  {forUser?.department?.dept_name && (
-                    <div className="person-dept">{forUser.department.dept_name}</div>
+                  <div className="person-name">{forUserDetail?.first_name} {forUser?.last_name}</div>
+                   {forUserDetail?.department?.dept_name && (
+                    <div className="person-dept">  Department: {forUserDetail.department.dept_name}</div>
                   )}
                   <div className="contact">
-                    <div>📧 {forUser?.company_email || createdBy?.company_email || "—"}</div>
-                    <div>📞 {forUser?.phone || createdBy?.phone || "—"}</div>
+                    <div>Email: {forUserDetail?.company_email || "—"}</div>
+                    
                   </div>
                 </div>
               </div>
             )}
 
             <div className="meta-list">
-              <div className="meta-item">
+              {/* <div className="meta-item">
                 <div className="meta-key">Created by</div>
                 <div className="meta-val">{createdBy?.first_name ? `${createdBy.first_name} ${createdBy.last_name || ""}` : createdBy?.company_email || "—"}</div>
-              </div>
+              </div> */}
 
               <div className="meta-item">
                 <div className="meta-key">Created at</div>
                 <div className="meta-val">{formatDate(created_at)}</div>
               </div>
 
-              <div className="meta-item">
+              {/* <div className="meta-item">
                 <div className="meta-key">Operation</div>
-                {/* <div className="meta-val">{operation || "—"}</div> */}
-              </div>
+                <div className="meta-val">{operation || "—"}</div>
+              </div> */}
+            </div>
+            <div className="meta-item">
+                 <button  
+                   onClick={() => navigate(`/points-entries/${entryId}`)}
+                 className="redirect-entry-btn">Show Entry</button>
             </div>
           </aside>
 

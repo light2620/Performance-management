@@ -135,7 +135,7 @@
   gap: 12px;
 }
 
-.person-row { display: flex; gap: 12px; align-items: center; }
+.person-row { display: flex; align-items: center; }
 
 .person-avatar {
   width: 56px;
@@ -201,6 +201,17 @@
 .btn.ghost { background: transparent; color: #374151; border: 1px solid rgba(15,20,30,0.06); }
 .btn.primary { background: #2563eb; color: #fff; box-shadow: 0 6px 18px rgba(37,99,235,0.12); }
 .btn.danger { background: #ef4444; color: #fff; }
+.redirect-entry-btn{
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  background-color: #0f1724;
+  cursor: pointer;
+}
+.redirect-entry-btn:hover{
+  opacity: .6;
+}
 
 /* Responsive behavior */
 @media (max-width: 840px) {

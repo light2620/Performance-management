@@ -258,7 +258,7 @@ const SingleTicketPage = () => {
         forUser={entryDetail?.employee}
         isAdmin={isAdmin}
         created_at={entryDetail?.created_at}
-        requestId={entryDetail?.id}
+        entryId={entryDetail?.id}
       />
 
       <CloseReasonModal

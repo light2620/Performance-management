@@ -190,7 +190,7 @@ const Entries = () => {
               <thead>
                 <tr>
                   <th>Type</th>
-                  <th>Operation</th>
+                  <th>Status</th>
                   {user?.role === "ADMIN" && <th>Employee</th>}
                   <th>Points</th>
               
@@ -209,10 +209,10 @@ const Entries = () => {
                     <td>
                       <span
                         className={`entriesComp-tag ${
-                          entry.is_reversed ? "reversal" : "grant"
+                          entry.is_reversed ? "reversal" : "grand"
                         }`}
                       >
-                        {entry.is_reversed ? "Reversal" : "Grant"}
+                        {entry.is_reversed ? "Reversal" : "Approved"}
                       </span>
                     </td>
                     {user?.role === "ADMIN" && (

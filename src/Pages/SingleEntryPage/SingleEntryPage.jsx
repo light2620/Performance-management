@@ -48,12 +48,15 @@ export default function SingleEntryPageRedesign() {
     return () => (mounted = false);
   }, [id]);
 
+  console.log(entry)
   const typeVal = String(entry?.type || "").toUpperCase();
+  // const is_reversed = entry.is_reversed;
   const isDemerit = typeVal === "DEMERIT" || typeVal === "DMERIT";
   const isMerit = typeVal === "MERIT";
 
   // ------------------------------
   // Create Ticket
+
   // ------------------------------
   const handleCreateTicket = async () => {
     if (!entry) return;
@@ -156,7 +159,7 @@ export default function SingleEntryPageRedesign() {
           </div>
 
           <div className="sepr-actions">
-            {isDemerit && !isAdmin && (
+            {isDemerit && !entry?.is_reversed && !isAdmin && (
               <button
                 disabled={busy}
                 onClick={handleCreateTicket}

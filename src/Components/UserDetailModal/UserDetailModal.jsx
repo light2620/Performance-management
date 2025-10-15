@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../Apis/axiosInstance";
 import { tokenService } from "../../Apis/tokenService";
 import DepartmentSelector from "../DepartmentSelector/DepartmentSelector";
+import toast from "react-hot-toast";
 import "./style.css";
 
 const UserDetailModal = ({ userId, onClose, fetchUsers, editable = false }) => {
@@ -44,11 +45,64 @@ const UserDetailModal = ({ userId, onClose, fetchUsers, editable = false }) => {
     if (!isEditing) return;
     const { name, value } = e.target;
     clearError(name);
+
     setUser((prev) => ({
       ...prev,
       [name]:
         value === "true" ? true : value === "false" ? false : value,
     }));
+  };
+
+  // Phone-specific handler: allow optional leading +, then digits only.
+  const handlePhoneChange = (e) => {
+    if (!isEditing) return;
+    const raw = e.target.value || "";
+
+    // Allow an optional leading +, then digits. Remove all other characters.
+    // Keep only the first leading + (if present) and subsequent digits.
+    let sanitized = raw;
+
+    // If user types multiple + signs or places + not at start, clean it:
+    // Keep leading + only if it exists at position 0, rest digits only.
+    const hasLeadingPlus = sanitized.startsWith("+");
+    // Remove everything except digits
+    const digitsOnly = sanitized.replace(/\D+/g, "");
+    sanitized = hasLeadingPlus ? `+${digitsOnly}` : digitsOnly;
+
+    // Show inline error if original input had forbidden characters
+    if (sanitized !== raw) {
+      setErrors((prev) => ({
+        ...prev,
+        phone: "Phone can contain only digits and an optional leading +",
+      }));
+    } else {
+      clearError("phone");
+    }
+
+    setUser((prev) => ({
+      ...prev,
+      phone: sanitized,
+    }));
+  };
+
+  // Handle paste into phone field: sanitize pasted value
+  const handlePhonePaste = (e) => {
+    if (!isEditing) return;
+    const paste = (e.clipboardData || window.clipboardData).getData("text") || "";
+    const hasLeadingPlus = paste.startsWith("+");
+    const digitsOnly = paste.replace(/\D+/g, "");
+    const sanitized = hasLeadingPlus ? `+${digitsOnly}` : digitsOnly;
+
+    if (sanitized !== paste) {
+      e.preventDefault();
+      // update value manually
+      setUser((prev) => ({ ...prev, phone: sanitized }));
+      setErrors((prev) => ({
+        ...prev,
+        phone: "Phone can contain only digits and an optional leading +",
+      }));
+    }
+    // otherwise let normal paste happen (the onChange will sanitize anyway)
   };
 
   const handleDeptChange = (id, dept) => {
@@ -70,7 +124,18 @@ const UserDetailModal = ({ userId, onClose, fetchUsers, editable = false }) => {
       const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!re.test(email)) newErrors.company_email = "Enter a valid email address";
     }
-    if (!user?.phone?.toString().trim()) newErrors.phone = "Phone is required";
+
+    // Phone validation: must be non-empty and match optional + followed by digits only
+    const phoneVal = user?.phone?.toString().trim() ?? "";
+    if (!phoneVal) {
+      newErrors.phone = "Phone is required";
+    } else {
+      const phoneRe = /^\+?\d+$/;
+      if (!phoneRe.test(phoneVal)) {
+        newErrors.phone = "Phone must contain only digits and an optional leading +";
+      }
+    }
+
     if (!user?.department?.id) newErrors.department = "Select a department";
 
     setErrors(newErrors);
@@ -97,7 +162,17 @@ const UserDetailModal = ({ userId, onClose, fetchUsers, editable = false }) => {
       onClose();
     } catch (err) {
       console.error("Error updating user:", err);
-      alert("Failed to update user");
+      const data = err?.response?.data;
+
+      const msg =
+    data?.phone?.[0] ??
+    data?.company_email?.[0] ??
+    data?.detail ??
+    (typeof data === "string" ? data : null) ??
+    err?.message ??
+    "Failed to update user, try again";
+
+    toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -168,14 +243,16 @@ const UserDetailModal = ({ userId, onClose, fetchUsers, editable = false }) => {
               <label>
                 Phone*
                 <input
-                  type="text"
+                  type="tel"
                   name="phone"
                   value={user.phone || ""}
-                  onChange={handleChange}
+                  onChange={handlePhoneChange}
+                  onPaste={handlePhonePaste}
                   disabled={!isEditing}
                   className={errors.phone ? "input-error" : ""}
                   aria-invalid={!!errors.phone}
                   aria-describedby={errors.phone ? "err-phone" : undefined}
+                  placeholder="+919999999999"
                 />
                 {errors.phone && <div id="err-phone" className="error-text">{errors.phone}</div>}
               </label>

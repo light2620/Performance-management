@@ -104,7 +104,6 @@ const RequestModal = ({ onClose, getApi, postApi, title }) => {
         )}
 
         {/* Employee */}
-  
         <EmployeeSelector
           allEmployees={allEmployees}
           value={employee}
@@ -129,7 +128,6 @@ const RequestModal = ({ onClose, getApi, postApi, title }) => {
           type="number"
           value={points}
           onChange={(e) => {
-            // allow empty string; clamp numeric values
             const raw = e.target.value;
             clearError("points");
             if (raw === "") {
@@ -138,7 +136,6 @@ const RequestModal = ({ onClose, getApi, postApi, title }) => {
             }
             const n = Number(raw);
             if (Number.isNaN(n)) return;
-            // clamp between 1 and 20
             if (n < 1) setPoints("1");
             else if (n > 20) setPoints("20");
             else setPoints(String(n));
@@ -162,8 +159,18 @@ const RequestModal = ({ onClose, getApi, postApi, title }) => {
           id="req-reason"
           value={reason}
           onChange={(e) => {
-            clearError("reason");
-            setReason(e.target.value);
+            const value = e.target.value;
+            // Check for invalid characters
+            const invalid = /[^a-zA-Z0-9 _.,&()\-/]/.test(value);
+            setErrors((prev) => ({
+              ...prev,
+              reason: invalid
+                ? "Only letters, numbers, underscores, spaces, and .,&()-/ are allowed"
+                : undefined,
+            }));
+            // Keep only allowed characters
+            const filtered = value.replace(/[^a-zA-Z0-9 _.,&()\-/]/g, "");
+            setReason(filtered);
           }}
           rows="3"
           className={errors.reason ? "request-modal-error" : ""}
@@ -177,7 +184,6 @@ const RequestModal = ({ onClose, getApi, postApi, title }) => {
           </small>
         )}
         <small className="request-modal-char-count">{reason.length}/50 min characters</small>
-        
 
         <button type="submit" className="request-modal-submit-btn" disabled={loading}>
           {loading ? "Submitting..." : `Create ${title}`}

@@ -31,98 +31,104 @@ export default function RequestTimelineModal({ requestId, open, onClose }) {
 
   if (!open) return null;
 
-const current = history?.current_data ?? null;
-const changes = [...(history?.change_history ?? [])].reverse(); // reverse order
-const original = history?.original_values ?? null;
+  const current = history?.current_data ?? null;
+  const original = history?.original_values ?? null;
+
+  // Build chronological changes: oldest first.
+  const changesOrdered = (history?.change_history ?? [])
+    .slice()
+    .sort((a, b) => {
+      const ta = a?.changed_at ? new Date(a.changed_at).getTime() : 0;
+      const tb = b?.changed_at ? new Date(b.changed_at).getTime() : 0;
+      return ta - tb;
+    });
+
+  const formatName = (objOrString) => {
+    if (!objOrString) return "—";
+    if (typeof objOrString === "string") return objOrString;
+    const name = `${objOrString.first_name ?? ""} ${objOrString.last_name ?? ""}`.trim();
+    return name || "—";
+  };
 
   return (
-    <div className="sep-tl-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="sep-tl-modal" role="dialog" aria-modal="true" aria-label="Point change history">
+    <div
+      className="sep-tl-backdrop"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        className="sep-tl-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Point change history"
+      >
         <button className="sep-tl-close" onClick={onClose} aria-label="Close timeline">
           <FaTimes />
         </button>
 
         <div className="sep-tl-body">
-  {loading && <div className="sep-tl-loading">Loading history...</div>}
+          {loading && <div className="sep-tl-loading">Loading history...</div>}
 
-  {!loading && !current && <div className="sep-tl-empty">No history available</div>}
+          {!loading && !current && <div className="sep-tl-empty">No history available</div>}
 
-  {!loading && current && (
-    <>
-      {/* Top-left badge */}
-      <div
-        className={`sep-tl-type ${
-          current.type?.toLowerCase() === "merit"
-            ? "sep-tl-type-merit"
-            : current.type?.toLowerCase() === "demerit"
-            ? "sep-tl-type-demerit"
-            : ""
-        }`}
-      >
-        {current.type || "—"}
-      </div>
+          {!loading && current && (
+            <>
+              {/* Top row: Original & Current */}
+              <div className="sep-tl-top-row">
+                <div className="sep-tl-summary-card">
+                  <div className="sep-tl-summary-title">Original Points</div>
+                  <div className="sep-tl-summary-value">{original?.points ?? "—"}</div>
+                  <div className="sep-tl-summary-sub">Reason: {original?.reason ?? "— No reason —"}</div>
+                </div>
 
-      {/* Original starting point */}
-      {original && (
-        <div className="sep-tl-timeline-wrap">
-          <div className="sep-tl-line" />
-
-          <div className="sep-tl-item sep-tl-item-center">
-            <div className="sep-tl-dot sep-tl-dot-current" />
-            <div className="sep-tl-card sep-tl-card-center">
-              <div className="sep-tl-card-row">
-                <strong>Original Points:</strong>&nbsp;{original.points ?? "—"}
+                <div className="sep-tl-summary-card sep-tl-summary-current">
+                  <div className="sep-tl-summary-title">Current Points</div>
+                  <div className="sep-tl-summary-value">{current?.points ?? "—"}</div>
+                  <div className="sep-tl-summary-sub">
+                    Reason: {current?.reason ?? "— No reason —"}
+                  </div>
+                </div>
               </div>
-              <div className="sep-tl-card-row">
-                <strong>Original Reason:</strong>&nbsp;{original.reason || "— No reason —"}
+
+              {/* Timeline */}
+              <div className="sep-tl-timeline-wrap-vertical">
+                <div className="sep-tl-vertical-line" aria-hidden="true" />
+
+                {changesOrdered.length === 0 && (
+                  <div className="sep-tl-empty">No edits in history</div>
+                )}
+
+                {changesOrdered.map((item, idx) => {
+                  const oldPts = item?.changes?.points?.old ?? "—";
+                  const newPts = item?.changes?.points?.new ?? "—";
+                  const changedBy = formatName(item.changed_by);
+                  const changedAt = item.changed_at ? new Date(item.changed_at).toLocaleString() : "—";
+
+                  return (
+                    <div className="sep-tl-timeline-item" key={idx}>
+                      <div className="sep-tl-timeline-dot" aria-hidden="true" />
+                      <div className="sep-tl-timeline-card">
+                        <div className="sep-tl-card-row">
+                          <strong>Edited By:</strong>&nbsp;{changedBy}
+                        </div>
+                        <div className="sep-tl-card-row">
+                          <strong>Edited At:</strong>&nbsp;{changedAt}
+                        </div>
+                        <div className="sep-tl-card-row">
+                          <strong>Points:</strong>&nbsp;{oldPts} → {newPts}
+                        </div>
+                        {item?.admin_reason && (
+                          <div className="sep-tl-card-row">
+                            <strong>Admin Reason:</strong>&nbsp;{item.admin_reason}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          </div>
-
-          {/* History items */}
-          {changes.map((item, i) => {
-  const side = i % 2 === 0 ? "left" : "right";
-  const oldPts = item?.changes?.points?.old ?? "—";
-  const newPts = item?.changes?.points?.new ?? "—";
-
-  // Format changed_by
-  const changedBy =
-    item.changed_by && typeof item.changed_by === "object"
-      ? `${item.changed_by.first_name ?? ""} ${item.changed_by.last_name ?? ""}`.trim()
-      : item.changed_by ?? "—";
-
-  return (
-    <div className={`sep-tl-item sep-tl-item-${side}`} key={i}>
-      <div className="sep-tl-dot" />
-      <div className={`sep-tl-card sep-tl-card-${side}`}>
-        <div className="sep-tl-card-row">
-          <strong>Changed By:</strong>&nbsp;{changedBy}
+            </>
+          )}
         </div>
-        <div className="sep-tl-card-row">
-          <strong>Changed At:</strong>&nbsp;
-          {item.changed_at ? new Date(item.changed_at).toLocaleString() : "—"}
-        </div>
-        <div className="sep-tl-card-row">
-          <strong>Points:</strong>&nbsp;{oldPts} → {newPts}
-        </div>
-
-        {/* Show admin_reason if available */}
-        {item.admin_reason && (
-          <div className="sep-tl-card-row">
-            <strong>Admin Reason:</strong>&nbsp;{item.admin_reason}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-})}
-
-        </div>
-      )}
-    </>
-  )}
-</div>
-
       </div>
     </div>
   );

@@ -8,7 +8,6 @@ import { getPerformanceApi } from "../../Apis/Points";
 import TotalPoints from "../../Components/Performance/TotalPoints";
 import { useAuth } from "../../Utils/AuthContext";
 import NotificationListener from "../../Components/NotificationListener/NotificationListener";
-import SetupWebSocket from "../../Components/Test";
 import { getAllConversationsApi } from "../../Apis/CreateConversation";
 import axiosInstance from "../../Apis/axiosInstance";
 import { FaTrophy } from "react-icons/fa";
@@ -129,7 +128,7 @@ const Home = () => {
 
       <div style={{ marginTop: 16 }}>
         <NotificationListener />
-        <SetupWebSocket />
+     
       </div>
     </div>
   );

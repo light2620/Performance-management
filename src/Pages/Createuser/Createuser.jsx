@@ -5,7 +5,7 @@ import { createUserApi,getAllUser } from '../../Apis/UserApi';
 import { IoClose } from "react-icons/io5";
 
 import toast from 'react-hot-toast';
-const CreateUser = ({onClose}) => {
+const CreateUser = ({onClose,resetFilters}) => {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -86,6 +86,7 @@ const CreateUser = ({onClose}) => {
     setLoading(true)
     await createUserApi(formData);
     onClose();
+    resetFilters();
         toast.success("user created")
 
    }catch(err){

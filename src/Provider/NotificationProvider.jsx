@@ -74,16 +74,10 @@ export const NotificationProvider = ({ children }) => {
       };
 
       ws.onclose = (ev) => {
-        console.log("Notification WS ❌ closed", ev?.reason ?? ev?.code ?? "");
-        socketRef.current = null;
-        if (!reconnectRef.current) {
-          reconnectRef.current = setTimeout(() => {
-            reconnectRef.current = null;
-            const t = tokenService.getAccess?.();
-            if (t) openSocketWithToken(t);
-          }, 3000);
-        }
-      };
+  console.log("Notification WS ❌ closed", ev?.reason ?? ev?.code ?? "");
+  socketRef.current = null;
+  // do not auto-reconnect — manual connection only
+};
 
       ws.onerror = (err) => {
         console.error("Notification WS ⚠️ error", err);
@@ -109,7 +103,7 @@ export const NotificationProvider = ({ children }) => {
 
     tokenRef.current = token;
     openSocketWithToken(token);
-  
+
     return true;
   }, [openSocketWithToken]);
 
@@ -142,22 +136,33 @@ export const NotificationProvider = ({ children }) => {
   // On mount: register global helpers and event listeners
   useEffect(() => {
     try {
+      // expose manual helpers so other code can call them
       window.__notif_connect = connectNotification;
       window.__notif_close = close;
     } catch (e) {}
 
     const onStorage = (e) => {
+      // When the access token in localStorage changes we will NOT auto-connect.
+      // We only react to removals (logout) by closing and clearing local state.
       if (e.key === "access") {
         const newToken = tokenService.getAccess?.() ?? null;
         if (!newToken && tokenRef.current) {
+          // token removed -> treat as logout
           tokenRef.current = null;
           close();
           setNotifications([]);
           setUnreadCount(0);
         } else if (newToken && newToken !== tokenRef.current) {
+          // token changed/added: update tokenRef but do NOT auto-open the socket.
           tokenRef.current = newToken;
-          close();
-          setTimeout(() => openSocketWithToken(newToken), 200);
+          // If there's an existing socket, close it so subsequent manual connect starts fresh.
+          if (socketRef.current) {
+            try {
+              socketRef.current.close();
+            } catch {}
+            socketRef.current = null;
+          }
+          // IMPORTANT: do not call openSocketWithToken here — connection is manual only.
         }
       }
     };
